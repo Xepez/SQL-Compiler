@@ -9,6 +9,9 @@ using namespace std;
 
 
 int main () {
+    
+    /* Old Code
+     
 	string table = "region", attribute, type;
 	vector<string> attributes, types;
 	vector<unsigned int> distincts;
@@ -52,6 +55,37 @@ int main () {
 	c.CreateTable(table, attributes, types);
 
 	cout << c << endl;
+    */
 
+    // Choice Menu
+    cout << "Choose a Number:" << endl;
+    cout << "1. Create a Table" << endl;
+    cout << "2. Drop a Table" << endl;
+    cout << "3. Display Contant" << endl;
+    cout << "4. Save Data" << endl;
+    
+    // What the user chooses
+    int choice;
+    cin >> choice;
+    
+    if (choice == 1) {
+        // Create Table
+        
+    }
+    else if (choice == 2) {
+        // Drop Table
+        
+    }
+    else if (choice == 3) {
+        // Display Content of a Table
+        
+    }
+    else if (choice == 4) {
+        // Save Data
+        
+    }
+    else {
+        cout << "Invalid Input!" << endl;
+    }
 	return 0;
 }
