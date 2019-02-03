@@ -9,8 +9,6 @@ using namespace std;
 
 
 int main () {
-    
-    /* Old Code
      
 	string table = "region", attribute, type;
 	vector<string> attributes, types;
@@ -47,45 +45,79 @@ int main () {
 	cout << s << endl;
 	cout << s1 << endl;
 	cout << s2 << endl;
-
-
+    
+    cout << "-----------------------------------------------------" << endl;
+    cout << "Project 1:" << endl;
+    
 	string dbFile = "catalog.sqlite";
 	Catalog c(dbFile);
 
+    // Creates a Table
 	c.CreateTable(table, attributes, types);
 
+    // Display Current Catalog
 	cout << c << endl;
-    */
+    
+    // Changes # of Tuples
+    int temp = 9;
+    c.SetNoTuples(table, temp);
+    
+    // If Table Exists Display # of Tuples
+    int tupleCount = 0;
+    if (c.GetNoTuples(table, tupleCount))
+        cout << "# of Tuples: " << tupleCount << endl;
+    
+    // Changes Data Path
+    string setPath;
+    c.SetDataFile(table, setPath);
+    
+    // If Table Exists Display File Path
+    string path;
+    if (c.GetDataFile(table, path))
+        cout << "Path: " << path << endl;
+    
+    // Changes # of Distinct Elements
+    int setNoDist = 5;
+    // NEED TO ADD attribute to both SET AND GET --------------------------------------
+    c.SetNoDistinct(table, attribute, setNoDist);
+    
+    // If Table Exists Display # of Distinct Elements
+    int noDistinct = 0;
+    if (c.GetNoDistinct(table, attribute, noDistinct))
+        cout << "# of Distinct: " << noDistinct << " from attribute " << attribute;
+    
+    // Displays all Tables in DB
+    vector<string> listOfTables;
+    c.GetTables(listOfTables);
+    for (vector<string>::iterator itT = listOfTables.begin(); itT != listOfTables.end(); itT++) {
+        cout << *itT;
+    }
+    cout << endl;
+    
+    // Displays all Attributes in a Table
+    vector<string> listOfAtts;
+    c.GetAttributes(table, listOfAtts);
+    for (vector<string>::iterator itA = listOfAtts.begin(); itA != listOfAtts.end(); itA+) {
+        cout << *itA;
+    }
+    cout << endl;
+    
+    // Gets the Schema of the table
+    Schema schema;
+    c.GetSchema(table, schema);
+    cout << schema << endl;
+    
+    // Print Table
+    cout << c << endl;
+    
+    // Saves altered contents
+    c.Save();
+    
+    // Drops the Table
+    c.DropTable(table);
+    
+    // Display Current Catalog
+    cout << c << endl;
 
-    // Choice Menu
-    cout << "Choose a Number:" << endl;
-    cout << "1. Create a Table" << endl;
-    cout << "2. Drop a Table" << endl;
-    cout << "3. Display Contant" << endl;
-    cout << "4. Save Data" << endl;
-    
-    // What the user chooses
-    int choice;
-    cin >> choice;
-    
-    if (choice == 1) {
-        // Create Table
-        
-    }
-    else if (choice == 2) {
-        // Drop Table
-        
-    }
-    else if (choice == 3) {
-        // Display Content of a Table
-        
-    }
-    else if (choice == 4) {
-        // Save Data
-        
-    }
-    else {
-        cout << "Invalid Input!" << endl;
-    }
 	return 0;
 }
