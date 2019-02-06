@@ -68,7 +68,7 @@ int main () {
         cout << "# of Tuples: " << tupleCount << endl;
     
     // Changes Data Path
-    string setPath;
+    string setPath = table + ".dat";
     c.SetDataFile(table, setPath);
     
     // If Table Exists Display File Path
@@ -78,13 +78,18 @@ int main () {
     
     // Changes # of Distinct Elements
     int setNoDist = 5;
-    // NEED TO ADD attribute to both SET AND GET --------------------------------------
-    c.SetNoDistinct(table, attribute, setNoDist);
+    for (vector<string>::iterator itD = attributes.begin(); itD != attributes.end(); itD++) {
+        c.SetNoDistinct(table, *itD, setNoDist);
+        setNoDist++;
+    }
+    
     
     // If Table Exists Display # of Distinct Elements
     int noDistinct = 0;
-    if (c.GetNoDistinct(table, attribute, noDistinct))
-        cout << "# of Distinct: " << noDistinct << " from attribute " << attribute;
+    for (vector<string>::iterator itD = attributes.begin(); itD != attributes.end(); itD++) {
+        if (c.GetNoDistinct(table, *itD, noDistinct))
+            cout << "# of Distinct: " << noDistinct << " from attribute " << *itD;
+    }
     
     // Displays all Tables in DB
     vector<string> listOfTables;
