@@ -6,10 +6,6 @@
 
 using namespace std;
 
-sqlite3 *db;
-char *zErrMsg = 0;
-
-
 Catalog::Catalog(string& _fileName) {
 
 	int rc = sqlite3_open(_fileName.c_str(), &db);
@@ -40,20 +36,24 @@ bool Catalog::Save() {
 
 bool Catalog::GetNoTuples(string& _table, unsigned int& _noTuples) {
 
+    sqlite3_stmt *stmt;
 
-	if(_table == ){
-
-	
-		return true;	
-
+    // Prepares Select for tablename and numTuples
+    sqlite3_prepare_v2(db, "SELECT tablename, numTuples FROM table WHERE tablename = (?)", -1, &stmt, NULL);
+    // Binds our the table we are looking for
+    sqlite3_bind_int(stmt, 1, _table);
+    
+    int step = sqlite3_step(stmt);
+    
+	if(step == SQLITE_ROW){
+        _noTuples = sqlite3_column_text(stmt, 1);
+        
+        sqlite3_finalize(stmt);
+		return true;
+	} else {
+        sqlite3_finalize(stmt);
+        return false;
 	}
-
-	else{
-	
-		return false;	
-	
-	}
-
 }
 
 void Catalog::SetNoTuples(string& _table, unsigned int& _noTuples) {

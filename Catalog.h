@@ -18,6 +18,11 @@ private:
 	 * Avoid linear traversals when possible.
 	 */
 
+    // Database var
+    sqlite3 *db;
+    // Error msg
+    char *zErrMsg = 0;
+    
 public:
 	/* Catalog constructor.
 	 * Initialize the catalog with the persistent data stored in _fileName.
