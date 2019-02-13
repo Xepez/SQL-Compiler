@@ -21,7 +21,7 @@ Catalog::~Catalog() {
 
 	sqlite3_close(db);
 
-	printf("Database Closed");
+	cout << "Database Closed" << endl;
 
 }
 
@@ -94,11 +94,26 @@ void Catalog::SetDataFile(string& _table, string& _path) {
 bool Catalog::GetNoDistinct(string& _table, string& _attribute, unsigned int& _noDistinct) {
 	return true;
 }
-void Catalog::SetNoDistinct(string& _table, string& _attribute,
-	unsigned int& _noDistinct) {
+void Catalog::SetNoDistinct(string& _table, string& _attribute, unsigned int& _noDistinct) {
 }
 
 void Catalog::GetTables(vector<string>& _tables) {
+    
+    sqlite3_stmt *stmt;
+    
+    // Prepares Select for tablename
+    sqlite3_prepare_v2(db, "SELECT tablename FROM table", -1, &stmt, NULL);
+    
+    int step = sqlite3_step(stmt);
+    
+    while ((step = sqlite3_step(stmt)) == SQLITE_ROW){
+        // Convert to a string
+        string temp = string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+        // Gets each table name
+        _tables.push_back(temp);
+    }
+    
+    sqlite3_finalize(stmt);
 }
 
 bool Catalog::GetAttributes(string& _table, vector<string>& _attributes) {

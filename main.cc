@@ -61,6 +61,13 @@ int main () {
     testTup = 0;
     c.GetNoTuples(test, testTup);
     cout << testTup << endl;
+    
+    vector<string> listOfTables;
+    c.GetTables(listOfTables);
+    for (vector<string>::iterator itT = listOfTables.begin(); itT != listOfTables.end(); itT++) {
+        cout << *itT;
+    }
+    cout << endl;
 //    // Creates a Table
 //    c.CreateTable(table, attributes, types);
 //
@@ -68,11 +75,11 @@ int main () {
 //    cout << c << endl;
 //
 //    // Changes # of Tuples
-//    int temp = 9;
+//    unsigned int temp = 9;
 //    c.SetNoTuples(table, temp);
 //
 //    // If Table Exists Display # of Tuples
-//    int tupleCount = 0;
+//    unsigned int tupleCount = 0;
 //    if (c.GetNoTuples(table, tupleCount))
 //        cout << "# of Tuples: " << tupleCount << endl;
 //
@@ -86,7 +93,7 @@ int main () {
 //        cout << "Path: " << path << endl;
 //
 //    // Changes # of Distinct Elements
-//    int setNoDist = 5;
+//    unsigned int setNoDist = 5;
 //    for (vector<string>::iterator itD = attributes.begin(); itD != attributes.end(); itD++) {
 //        c.SetNoDistinct(table, *itD, setNoDist);
 //        setNoDist++;
@@ -94,7 +101,7 @@ int main () {
 //
 //
 //    // If Table Exists Display # of Distinct Elements
-//    int noDistinct = 0;
+//    unsigned int noDistinct = 0;
 //    for (vector<string>::iterator itD = attributes.begin(); itD != attributes.end(); itD++) {
 //        if (c.GetNoDistinct(table, *itD, noDistinct))
 //            cout << "# of Distinct: " << noDistinct << " from attribute " << *itD;
