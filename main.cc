@@ -52,77 +52,86 @@ int main () {
 	string dbFile = "catalog.sqlite";
 	Catalog c(dbFile);
 
-    // Creates a Table
-	c.CreateTable(table, attributes, types);
-
-    // Display Current Catalog
-	cout << c << endl;
-    
-    // Changes # of Tuples
-    int temp = 9;
-    c.SetNoTuples(table, temp);
-    
-    // If Table Exists Display # of Tuples
-    int tupleCount = 0;
-    if (c.GetNoTuples(table, tupleCount))
-        cout << "# of Tuples: " << tupleCount << endl;
-    
-    // Changes Data Path
-    string setPath = table + ".dat";
-    c.SetDataFile(table, setPath);
-    
-    // If Table Exists Display File Path
-    string path;
-    if (c.GetDataFile(table, path))
-        cout << "Path: " << path << endl;
-    
-    // Changes # of Distinct Elements
-    int setNoDist = 5;
-    for (vector<string>::iterator itD = attributes.begin(); itD != attributes.end(); itD++) {
-        c.SetNoDistinct(table, *itD, setNoDist);
-        setNoDist++;
-    }
-    
-    
-    // If Table Exists Display # of Distinct Elements
-    int noDistinct = 0;
-    for (vector<string>::iterator itD = attributes.begin(); itD != attributes.end(); itD++) {
-        if (c.GetNoDistinct(table, *itD, noDistinct))
-            cout << "# of Distinct: " << noDistinct << " from attribute " << *itD;
-    }
-    
-    // Displays all Tables in DB
-    vector<string> listOfTables;
-    c.GetTables(listOfTables);
-    for (vector<string>::iterator itT = listOfTables.begin(); itT != listOfTables.end(); itT++) {
-        cout << *itT;
-    }
-    cout << endl;
-    
-    // Displays all Attributes in a Table
-    vector<string> listOfAtts;
-    c.GetAttributes(table, listOfAtts);
-    for (vector<string>::iterator itA = listOfAtts.begin(); itA != listOfAtts.end(); itA+) {
-        cout << *itA;
-    }
-    cout << endl;
-    
-    // Gets the Schema of the table
-    Schema schema;
-    c.GetSchema(table, schema);
-    cout << schema << endl;
-    
-    // Print Table
-    cout << c << endl;
-    
-    // Saves altered contents
-    c.Save();
-    
-    // Drops the Table
-    c.DropTable(table);
-    
-    // Display Current Catalog
-    cout << c << endl;
-
-	return 0;
+    unsigned int testTup = 0;
+    string test = "test";
+    c.GetNoTuples(test, testTup);
+    cout << testTup << endl;
+    testTup = 69;
+    c.SetNoTuples(test, testTup);
+    testTup = 0;
+    c.GetNoTuples(test, testTup);
+    cout << testTup << endl;
+//    // Creates a Table
+//    c.CreateTable(table, attributes, types);
+//
+//    // Display Current Catalog
+//    cout << c << endl;
+//
+//    // Changes # of Tuples
+//    int temp = 9;
+//    c.SetNoTuples(table, temp);
+//
+//    // If Table Exists Display # of Tuples
+//    int tupleCount = 0;
+//    if (c.GetNoTuples(table, tupleCount))
+//        cout << "# of Tuples: " << tupleCount << endl;
+//
+//    // Changes Data Path
+//    string setPath = table + ".dat";
+//    c.SetDataFile(table, setPath);
+//
+//    // If Table Exists Display File Path
+//    string path;
+//    if (c.GetDataFile(table, path))
+//        cout << "Path: " << path << endl;
+//
+//    // Changes # of Distinct Elements
+//    int setNoDist = 5;
+//    for (vector<string>::iterator itD = attributes.begin(); itD != attributes.end(); itD++) {
+//        c.SetNoDistinct(table, *itD, setNoDist);
+//        setNoDist++;
+//    }
+//
+//
+//    // If Table Exists Display # of Distinct Elements
+//    int noDistinct = 0;
+//    for (vector<string>::iterator itD = attributes.begin(); itD != attributes.end(); itD++) {
+//        if (c.GetNoDistinct(table, *itD, noDistinct))
+//            cout << "# of Distinct: " << noDistinct << " from attribute " << *itD;
+//    }
+//
+//    // Displays all Tables in DB
+//    vector<string> listOfTables;
+//    c.GetTables(listOfTables);
+//    for (vector<string>::iterator itT = listOfTables.begin(); itT != listOfTables.end(); itT++) {
+//        cout << *itT;
+//    }
+//    cout << endl;
+//
+//    // Displays all Attributes in a Table
+//    vector<string> listOfAtts;
+//    c.GetAttributes(table, listOfAtts);
+//    for (vector<string>::iterator itA = listOfAtts.begin(); itA != listOfAtts.end(); itA+) {
+//        cout << *itA;
+//    }
+//    cout << endl;
+//
+//    // Gets the Schema of the table
+//    Schema schema;
+//    c.GetSchema(table, schema);
+//    cout << schema << endl;
+//
+//    // Print Table
+//    cout << c << endl;
+//
+//    // Saves altered contents
+//    c.Save();
+//
+//    // Drops the Table
+//    c.DropTable(table);
+//
+//    // Display Current Catalog
+//    cout << c << endl;
+//
+//    return 0;
 }

@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "sqlite3.h"
+//#include <sqlite3.h>
 
 #include "Schema.h"
 
@@ -20,8 +22,6 @@ private:
 
     // Database var
     sqlite3 *db;
-    // Error msg
-    char *zErrMsg = 0;
     
 public:
 	/* Catalog constructor.
