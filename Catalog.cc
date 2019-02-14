@@ -207,8 +207,42 @@ bool Catalog::GetAttributes(string& _table, vector<string>& _attributes) {
 }
 
 bool Catalog::GetSchema(string& _table, Schema& _schema) {
-    // Will work on tomorrow
-	return true;
+    
+    sqlite3_stmt *stmt;
+    vector<string> attName;
+    vector<string> attType;
+    vector<unsigned int> attNoDist;
+    
+    // Prepares Select for attribute's attributes
+    int rc = sqlite3_prepare_v2(db, "SELECT attributename, attType, numDistinct FROM attribute, table_info WHERE table_info.tableid = attribute.tableid AND tablename = ?", -1, &stmt, NULL);
+    
+    if (rc == SQLITE_OK) {
+        // Binds the table we are looking for
+        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
+    } else {
+        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
+    }
+    
+    int step = sqlite3_step(stmt);
+    
+    if(step != SQLITE_ROW){
+        sqlite3_finalize(stmt);
+        return false;
+    }
+    
+    while(step == SQLITE_ROW) {
+        attName.push_back(string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0))));
+        attType.push_back(string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1))));
+        attNoDist.push_back(sqlite3_column_int(stmt, 2));
+        
+        // Take a step to the next row
+        step = sqlite3_step(stmt);
+    }
+    
+    sqlite3_finalize(stmt);
+    Schema insertSchema(attName, attType, attNoDist);
+    _schema = insertSchema;
+    return true;
 }
 
 //bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<string>& _attributeTypes) {
@@ -271,8 +305,9 @@ bool Catalog::DropTable(string& _table) {
     
         if(rc){
         
-            printf("Error dropping table");
-            cout << endl;
+            printf("Error dropping table: ");
+            cout << sqlite3_errmsg(db) << endl;
+            sqlite3_finalize(stmt);
             return false;
         
         }
@@ -297,7 +332,7 @@ ostream& operator<<(ostream& _os, Catalog& _c) {
     int step2;
     
     // Prepares Select for all of catalog
-    sqlite3_prepare_v2(_c.db, "SELECT tablename, numTuples, path, tableid FROM table_info", -1, &stmt, NULL);
+    sqlite3_prepare_v2(_c.db, "SELECT tablename, numTuples, path, tableid FROM table_info ORDER BY tablename ASC", -1, &stmt, NULL);
     // Runs Query
     int step = sqlite3_step(stmt);
     
@@ -306,7 +341,7 @@ ostream& operator<<(ostream& _os, Catalog& _c) {
         cout << sqlite3_column_text(stmt, 0) << "\t" << sqlite3_column_int(stmt, 1) << "\t" << sqlite3_column_text(stmt, 2) << endl;
         
         
-        rc = sqlite3_prepare_v2(_c.db, "SELECT attributename, attType, numDistinct FROM attribute WHERE tableid = ?", -1, &stmt2, NULL);
+        rc = sqlite3_prepare_v2(_c.db, "SELECT attributename, attType, numDistinct FROM attribute WHERE tableid = ? ORDER BY attributename ASC", -1, &stmt2, NULL);
         
         if (rc == SQLITE_OK) {
             // Binds the table we are looking for
@@ -326,6 +361,7 @@ ostream& operator<<(ostream& _os, Catalog& _c) {
         
         // Take a step to the next row
         step = sqlite3_step(stmt);
+        sqlite3_finalize(stmt2);
         cout << endl;
     }
     
