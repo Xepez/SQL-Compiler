@@ -245,53 +245,46 @@ bool Catalog::GetSchema(string& _table, Schema& _schema) {
     return true;
 }
 
-//bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<string>& _attributeTypes) {
+bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<string>& _attributeTypes) {
 
-//    sqlite3_stmt *stmt;
-//    char *query = NULL;
+    sqlite3_stmt *stmt;
+    sqlite3_stmt *stmt2;
 
-//    asprintf()
-
-
-
-//    need to include att,and atttype
-//    sqlite3_prepare_v2(db, " CREATE TABLE ?1 ()", -1, &stmt, NULL);
+    sqlite3_prepare_v2(db, " INSERT INTO table_info(tableid,tablename,numTuples,path) VALUES(?,?,?,?)", -1, &stmt, NULL);
+    sqlite3_prepare_v2(db, " INSERT INTO attribute(attributeid, attributename,tableid,numDistinct,attType) VALUES(?,?,?,?,?)", -1, &stmt2, NULL);
 
 
-//    add to see if table exits
-//    if(_table == ){
+	//repeat for each value
+	sqlite3_bind_text(stmt, 1, , -1, NULL);
+        sqlite3_bind_text(stmt, 2, _table.c_str(), -1, NULL);
+	
+	//bind values for attribute aswell
+	//push_back _attribute/_attributeTypes vector to add each
+       int rc = sqlite3_step(stmt);
+       int rc2 = sqlite3_step(stmt2);
+       
+       
+            if(rc){
 
-//        printf("Table exists");
+                printf("Table Not Added");
 
-//    }
-//    else{
+                return false;
 
+            }
+            else{
 
-//        sqlite3_bind_text(stmt, 1, _table,SQLITE_STATIC);
+                sqlite3_finalize(stmt);
+                printf("Table successfully added");
 
-//       int rc = sqlite3_step(stmt);
+                return true;
 
-//            if(rc){
+            }
 
-//                printf("Table Not Added");
+        
 
-//                return false;
+    
 
-//            }
-//            else{
-
-//                sqlite3_finalize(stmt);
-//                printf("Table successfully added");
-
-//                return true;
-
-//            }
-
-//        }
-
-//    
-
-//}
+}
 
 bool Catalog::DropTable(string& _table) {
 
