@@ -248,6 +248,7 @@ bool Catalog::GetSchema(string& _table, Schema& _schema) {
 bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<string>& _attributeTypes) {
 
     sqlite3_stmt *stmt;
+
     int step2, att_id, table_id;
     string att = "None";
     string attT = "None";
