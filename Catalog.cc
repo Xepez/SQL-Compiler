@@ -210,86 +210,81 @@ bool Catalog::GetSchema(string& _table, Schema& _schema) {
 	return true;
 }
 
-bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<string>& _attributeTypes) {
-//
+//bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<string>& _attributeTypes) {
+
 //    sqlite3_stmt *stmt;
 //    char *query = NULL;
-//
+
 //    asprintf()
-//
-//
-//
-//    //need to include att,and atttype
-//    sqlite3_prepare_v2(db, " CREATE TABLE ?1 ()", -1, &stmt, NULL)
-//
-//
-//    //add to see if table exits
+
+
+
+//    need to include att,and atttype
+//    sqlite3_prepare_v2(db, " CREATE TABLE ?1 ()", -1, &stmt, NULL);
+
+
+//    add to see if table exits
 //    if(_table == ){
-//
+
 //        printf("Table exists");
-//
+
 //    }
 //    else{
-//
-//
-//        sqlite3_bind_string(stmt, 1, _table,SQLITE_STATIC);
-//
-//        rc = sqlite3_step(stmt);
-//
+
+
+//        sqlite3_bind_text(stmt, 1, _table,SQLITE_STATIC);
+
+//       int rc = sqlite3_step(stmt);
+
 //            if(rc){
-//
+
 //                printf("Table Not Added");
-//
+
 //                return false;
-//
+
 //            }
 //            else{
-//
+
 //                sqlite3_finalize(stmt);
 //                printf("Table successfully added");
-//
+
 //                return true;
-//
+
 //            }
-//
+
 //        }
-//
-//    }
-                    return true;
-}
+
+//    
+
+//}
 
 bool Catalog::DropTable(string& _table) {
 
-//    sqlite3_stmt *stmt;
-//    
-//    char *query = NULL;
-//    
-//    asprint(&query, "DROP TABLE ?1 ");
-//    
-//    sqlite3_prepare_v2(db, query, strlen(query), &stmt, NULL);
-//    
-//    sqlite3_bind_string(stmt, 1, _table, SQLITE_STATIC);
-//    
-//    rc = sqlite3_step(stmt);
-//    
-//        if(rc){
-//        
-//            printf("Error dropping table");
-//            
-//            return false;
-//        
-//        }
-//    
-//        else{
-//        
-//            sqlite3_finalize(stmt);
-//            printf("Table dropped");
-//            free(query);
-//            
-//            return true;
-//        
-//        }
-    return true;
+    sqlite3_stmt *stmt;
+    
+    sqlite3_prepare_v2(db, "DROP TABLE ?", -1, &stmt, NULL);
+    
+    sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
+    
+    int rc = sqlite3_step(stmt);
+    
+        if(rc){
+        
+            printf("Error dropping table");
+            
+            return false;
+        
+        }
+    
+        else{
+        
+            sqlite3_finalize(stmt);
+            printf("Table dropped");
+
+            return true;
+        
+        }
+
 	
 }
 
