@@ -6,9 +6,9 @@
 using namespace std;
 
 Catalog::Catalog(string& _fileName) {
-
-	int rc = sqlite3_open(_fileName.c_str(), &db);
-
+    
+    int rc = sqlite3_open(_fileName.c_str(), &db);
+    
     if(rc){
         cout << "Cannot open database" << endl;
     }
@@ -18,23 +18,23 @@ Catalog::Catalog(string& _fileName) {
 }
 
 Catalog::~Catalog() {
-
-	sqlite3_close(db);
-
-	cout << "Database Closed" << endl;
-
+    
+    sqlite3_close(db);
+    
+    cout << "Database Closed" << endl;
+    
 }
 
 bool Catalog::Save() {
-
-	//save();
+    
+    //save();
     // Will always be success since we are doing SQL statements
     return true;
-
+    
 }
 
 bool Catalog::GetNoTuples(string& _table, unsigned int& _noTuples) {
-
+    
     sqlite3_stmt *stmt;
     
     // Prepares Select for tablename and numTuples
@@ -49,14 +49,14 @@ bool Catalog::GetNoTuples(string& _table, unsigned int& _noTuples) {
     
     int step = sqlite3_step(stmt);
     
-	if(step == SQLITE_ROW){
+    if(step == SQLITE_ROW){
         _noTuples = sqlite3_column_int(stmt, 0);
         sqlite3_finalize(stmt);
-		return true;
-	} else {
+        return true;
+    } else {
         sqlite3_finalize(stmt);
         return false;
-	}
+    }
 }
 
 void Catalog::SetNoTuples(string& _table, unsigned int& _noTuples) {
@@ -70,7 +70,7 @@ void Catalog::SetNoTuples(string& _table, unsigned int& _noTuples) {
     sqlite3_bind_text(stmt, 2, _table.c_str(), -1, NULL);
     
     int rc = sqlite3_step(stmt);
-
+    
     if (rc != SQLITE_DONE) {
         cout << "ERROR inserting data -> " << sqlite3_errmsg(db) << endl;
     }
@@ -79,7 +79,7 @@ void Catalog::SetNoTuples(string& _table, unsigned int& _noTuples) {
 }
 
 bool Catalog::GetDataFile(string& _table, string& _path) {
-	
+    
     sqlite3_stmt *stmt;
     
     // Prepares Select for tablename and numTuples
@@ -124,7 +124,7 @@ void Catalog::SetDataFile(string& _table, string& _path) {
 }
 
 bool Catalog::GetNoDistinct(string& _table, string& _attribute, unsigned int& _noDistinct) {
-
+    
     sqlite3_stmt *stmt;
     
     // Prepares Select for numDistinct
@@ -203,7 +203,7 @@ bool Catalog::GetAttributes(string& _table, vector<string>& _attributes) {
     }
     
     sqlite3_finalize(stmt);
-	return true;
+    return true;
 }
 
 bool Catalog::GetSchema(string& _table, Schema& _schema) {
@@ -245,56 +245,79 @@ bool Catalog::GetSchema(string& _table, Schema& _schema) {
     return true;
 }
 
-//bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<string>& _attributeTypes) {
+bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<string>& _attributeTypes) {
 
-//    sqlite3_stmt *stmt;
-//    char *query = NULL;
+    sqlite3_stmt *stmt;
+    int step2, att_id, table_id;
+    string att = "None";
+    string attT = "None";
 
-//    asprintf()
+    // Get Max Table ID
+    sqlite3_prepare_v2(db, "SELECT MAX(tableid) FROM table_info", -1, &stmt, NULL);
+    int step = sqlite3_step(stmt);
+    if(step == SQLITE_ROW){
+        table_id = sqlite3_column_int(stmt, 0) + 1;
+        sqlite3_finalize(stmt);
+    }
 
+    // Get Max Attribute ID
+    sqlite3_prepare_v2(db, "SELECT MAX(attributeid) FROM attribute", -1, &stmt, NULL);
+    step = sqlite3_step(stmt);
+    if(step == SQLITE_ROW){
+        att_id = sqlite3_column_int(stmt, 0) + 1;
+        sqlite3_finalize(stmt);
+    }
 
+    sqlite3_prepare_v2(db, "INSERT INTO table_info(tableid,tablename) VALUES(?,?)", -1, &stmt, NULL);
 
-//    need to include att,and atttype
-//    sqlite3_prepare_v2(db, " CREATE TABLE ?1 ()", -1, &stmt, NULL);
+    // Table_info binds
+    sqlite3_bind_int(stmt, 1, table_id);
+    sqlite3_bind_text(stmt, 2, _table.c_str(), -1, NULL);
+    step = sqlite3_step(stmt);
+    if (step != SQLITE_DONE) {
+        sqlite3_finalize(stmt);
+        cout << "Error1: " << sqlite3_errmsg(db) << endl;
+        return false;
+    }
+    sqlite3_finalize(stmt);
 
+    sqlite3_prepare_v2(db, "INSERT INTO attribute(attributeid, attributename, tableid, attType) VALUES(?, ?, ?, ?)", -1, &stmt, NULL);
 
-//    add to see if table exits
-//    if(_table == ){
+    // Attribute binds
+    vector<string>::iterator itType = _attributeTypes.begin();
+    vector<string>::iterator it = _attributes.begin();
+    while (it != _attributes.end()) {
+        att = *it;
+        attT = *itType;
 
-//        printf("Table exists");
+        sqlite3_bind_int(stmt, 1, att_id);
+        sqlite3_bind_text(stmt, 2, att.c_str(), -1, NULL);
+        sqlite3_bind_int(stmt, 3, table_id);
+        sqlite3_bind_text(stmt, 4, attT.c_str(), -1, NULL);
 
-//    }
-//    else{
+        step2 = sqlite3_step(stmt);
+        if (step2 != SQLITE_DONE) {
+            sqlite3_finalize(stmt);
+            cout << "Error2: " << sqlite3_errmsg(db) << endl;
+            return false;
+        }
 
+        att_id++;
+        itType++;
+        it++;
+    }
 
-//        sqlite3_bind_text(stmt, 1, _table,SQLITE_STATIC);
+    //bind values for attribute aswell
+    //push_back _attribute/_attributeTypes vector to add each
 
-//       int rc = sqlite3_step(stmt);
-
-//            if(rc){
-
-//                printf("Table Not Added");
-
-//                return false;
-
-//            }
-//            else{
-
-//                sqlite3_finalize(stmt);
-//                printf("Table successfully added");
-
-//                return true;
-
-//            }
-
-//        }
-
-//    
-
-//}
+    sqlite3_finalize(stmt);
+    printf("Table successfully added");
+    cout << endl;
+    return true;
+}
 
 bool Catalog::DropTable(string& _table) {
-
+    
     sqlite3_stmt *stmt;
     sqlite3_stmt *stmt2;
     int table_id;
@@ -324,27 +347,27 @@ bool Catalog::DropTable(string& _table) {
     rc = sqlite3_step(stmt);
     int rc2 = sqlite3_step(stmt2);
     
-        if(rc || rc2){
+    if(rc || rc2){
         
-            printf("Error dropping table: ");
-            cout << sqlite3_errmsg(db) << endl;
-            sqlite3_finalize(stmt);
-            sqlite3_finalize(stmt2);
-            return false;
+        printf("Error dropping table: ");
+        cout << sqlite3_errmsg(db) << endl;
+        sqlite3_finalize(stmt);
+        sqlite3_finalize(stmt2);
+        return false;
         
-        }
+    }
     
-        else{
+    else{
         
-            sqlite3_finalize(stmt);
-            sqlite3_finalize(stmt2);
-            printf("Table dropped");
-            cout << endl;
-            return true;
+        sqlite3_finalize(stmt);
+        sqlite3_finalize(stmt2);
+        printf("Table dropped");
+        cout << endl;
+        return true;
         
-        }
-
-	
+    }
+    
+    
 }
 
 ostream& operator<<(ostream& _os, Catalog& _c) {
@@ -393,5 +416,5 @@ ostream& operator<<(ostream& _os, Catalog& _c) {
     //* \tab attribute_2 \tab type \tab noDistinct
     
     sqlite3_finalize(stmt);
-	return _os;
+    return _os;
 }

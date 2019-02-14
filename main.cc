@@ -53,17 +53,21 @@ int main () {
 	Catalog c(dbFile);
     
     // Testing Purposes May Remove Later
-    string table = "test";
-    string attribute = "test_key";
+    string table = "new";
+    string attribute = "new_key";
     vector<string> attributes;
+    vector<string> types;
     attributes.push_back(attribute);
-    attributes.push_back("test_profile");
-    attributes.push_back("test_cal");
+    types.push_back("INTEGER");
+    attributes.push_back("new_profile");
+    types.push_back("STRING");
+    attributes.push_back("new_cal");
+    types.push_back("STRING");
     // -----------------------------------
     
     // Creates a Table
     cout << "-----------------------------------" << endl;
-//    c.CreateTable(table, attributes, types);
+    c.CreateTable(table, attributes, types);
     cout << "-----------------------------------" << endl;
 
     // Display Current Catalog
