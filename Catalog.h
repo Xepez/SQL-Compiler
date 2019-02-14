@@ -19,11 +19,12 @@ private:
 	 * Efficient data structures are recommended.
 	 * Avoid linear traversals when possible.
 	 */
-
+    
+public:
+    
     // Database var
     sqlite3 *db;
     
-public:
 	/* Catalog constructor.
 	 * Initialize the catalog with the persistent data stored in _fileName.
 	 * _fileName is a SQLite database containing data on tables and their attributes.

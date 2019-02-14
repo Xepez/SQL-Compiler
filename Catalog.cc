@@ -28,7 +28,8 @@ Catalog::~Catalog() {
 bool Catalog::Save() {
 
 	//save();
-    return false;
+    // Will always be success since we are doing SQL statements
+    return true;
 
 }
 
@@ -271,7 +272,7 @@ bool Catalog::DropTable(string& _table) {
         if(rc){
         
             printf("Error dropping table");
-            
+            cout << endl;
             return false;
         
         }
@@ -280,7 +281,7 @@ bool Catalog::DropTable(string& _table) {
         
             sqlite3_finalize(stmt);
             printf("Table dropped");
-
+            cout << endl;
             return true;
         
         }
@@ -289,6 +290,49 @@ bool Catalog::DropTable(string& _table) {
 }
 
 ostream& operator<<(ostream& _os, Catalog& _c) {
-    // Will work on tomorrow
+    
+    sqlite3_stmt *stmt;
+    sqlite3_stmt *stmt2;
+    int rc;
+    int step2;
+    
+    // Prepares Select for all of catalog
+    sqlite3_prepare_v2(_c.db, "SELECT tablename, numTuples, path, tableid FROM table_info", -1, &stmt, NULL);
+    // Runs Query
+    int step = sqlite3_step(stmt);
+    
+    // Prints out Info
+    while(step == SQLITE_ROW){
+        cout << sqlite3_column_text(stmt, 0) << "\t" << sqlite3_column_int(stmt, 1) << "\t" << sqlite3_column_text(stmt, 2) << endl;
+        
+        
+        rc = sqlite3_prepare_v2(_c.db, "SELECT attributename, attType, numDistinct FROM attribute WHERE tableid = ?", -1, &stmt2, NULL);
+        
+        if (rc == SQLITE_OK) {
+            // Binds the table we are looking for
+            sqlite3_bind_int(stmt2, 1, sqlite3_column_int(stmt, 3));
+        } else {
+            cout << "Failed to execute statement: " << sqlite3_errmsg(_c.db) << endl;
+        }
+        
+        step2 = sqlite3_step(stmt2);
+        
+        while(step2 == SQLITE_ROW) {
+            cout << "\t" << sqlite3_column_text(stmt2, 0) << "\t" << sqlite3_column_text(stmt2, 1) << "\t" << sqlite3_column_int(stmt2, 2) << endl;
+            
+            // Take a step to the next row
+            step2 = sqlite3_step(stmt2);
+        }
+        
+        // Take a step to the next row
+        step = sqlite3_step(stmt);
+        cout << endl;
+    }
+    
+    //table_1 \tab noTuples \tab pathToFile
+    //* \tab attribute_1 \tab type \tab noDistinct
+    //* \tab attribute_2 \tab type \tab noDistinct
+    
+    sqlite3_finalize(stmt);
 	return _os;
 }
