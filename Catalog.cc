@@ -296,18 +296,40 @@ bool Catalog::GetSchema(string& _table, Schema& _schema) {
 bool Catalog::DropTable(string& _table) {
 
     sqlite3_stmt *stmt;
+    sqlite3_stmt *stmt2;
+    int table_id;
     
-    sqlite3_prepare_v2(db, "DROP TABLE ?", -1, &stmt, NULL);
+    int rc = sqlite3_prepare_v2(db, "SELECT tableid FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
     
-    sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
+    if (rc == SQLITE_OK) {
+        // Binds the table we are looking for
+        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
+    } else {
+        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
+    }
     
-    int rc = sqlite3_step(stmt);
+    int step = sqlite3_step(stmt);
     
-        if(rc){
+    if(step == SQLITE_ROW){
+        table_id = sqlite3_column_int(stmt, 0);
+        sqlite3_finalize(stmt);
+    }
+    
+    sqlite3_prepare_v2(db, "DELETE FROM table_info WHERE tableid = ?", -1, &stmt, NULL);
+    sqlite3_prepare_v2(db, "DELETE FROM attribute WHERE tableid = ?", -1, &stmt2, NULL);
+    
+    sqlite3_bind_int(stmt, 1, table_id);
+    sqlite3_bind_int(stmt2, 1, table_id);
+    
+    rc = sqlite3_step(stmt);
+    int rc2 = sqlite3_step(stmt2);
+    
+        if(rc || rc2){
         
             printf("Error dropping table: ");
             cout << sqlite3_errmsg(db) << endl;
             sqlite3_finalize(stmt);
+            sqlite3_finalize(stmt2);
             return false;
         
         }
@@ -315,6 +337,7 @@ bool Catalog::DropTable(string& _table) {
         else{
         
             sqlite3_finalize(stmt);
+            sqlite3_finalize(stmt2);
             printf("Table dropped");
             cout << endl;
             return true;
