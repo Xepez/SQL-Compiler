@@ -251,10 +251,25 @@ bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<st
     int step2, att_id = 0, table_id = 0;
     string att = "None";
     string attT = "None";
+    int step, rc;
 
+    rc = sqlite3_prepare_v2(db, "SELECT tableid FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
+    if (rc == SQLITE_OK) {
+        // Binds the table we are looking for
+        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
+    } else {
+        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
+        return false;
+    }
+    
+    step = sqlite3_step(stmt);
+    if (step == SQLITE_ROW) {
+        return false;
+    }
+    
     // Get Max Table ID
     sqlite3_prepare_v2(db, "SELECT MAX(tableid) FROM table_info", -1, &stmt, NULL);
-    int step = sqlite3_step(stmt);
+    step = sqlite3_step(stmt);
     if(step == SQLITE_ROW){
         table_id = sqlite3_column_int(stmt, 0) + 1;
         sqlite3_finalize(stmt);
