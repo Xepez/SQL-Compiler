@@ -319,7 +319,7 @@ bool Catalog::DropTable(string& _table) {
     
     sqlite3_stmt *stmt;
     sqlite3_stmt *stmt2;
-    int table_id = ;
+    int table_id;
     int rc2;
     
     int rc = sqlite3_prepare_v2(db, "SELECT tableid FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
