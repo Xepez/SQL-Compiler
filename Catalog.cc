@@ -249,7 +249,7 @@ bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<st
 
     sqlite3_stmt *stmt;
 
-    int step2, att_id, table_id;
+    int step2, att_id = 0, table_id = 0;
     string att = "None";
     string attT = "None";
 
@@ -282,14 +282,13 @@ bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<st
     }
     sqlite3_finalize(stmt);
 
-    sqlite3_prepare_v2(db, "INSERT INTO attribute(attributeid, attributename, tableid, attType) VALUES(?, ?, ?, ?)", -1, &stmt, NULL);
-
     // Attribute binds
     vector<string>::iterator itType = _attributeTypes.begin();
-    vector<string>::iterator it = _attributes.begin();
-    while (it != _attributes.end()) {
+    for (vector<string>::iterator it = _attributes.begin(); it != _attributes.end(); it++) {
         att = *it;
         attT = *itType;
+        
+        sqlite3_prepare_v2(db, "INSERT INTO attribute(attributeid, attributename, tableid, attType) VALUES(?, ?, ?, ?)", -1, &stmt, NULL);
 
         sqlite3_bind_int(stmt, 1, att_id);
         sqlite3_bind_text(stmt, 2, att.c_str(), -1, NULL);
@@ -305,7 +304,6 @@ bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<st
 
         att_id++;
         itType++;
-        it++;
     }
 
     //bind values for attribute aswell
@@ -322,6 +320,7 @@ bool Catalog::DropTable(string& _table) {
     sqlite3_stmt *stmt;
     sqlite3_stmt *stmt2;
     int table_id;
+    int rc2;
     
     int rc = sqlite3_prepare_v2(db, "SELECT tableid FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
     
@@ -346,11 +345,10 @@ bool Catalog::DropTable(string& _table) {
     sqlite3_bind_int(stmt2, 1, table_id);
     
     rc = sqlite3_step(stmt);
-    int rc2 = sqlite3_step(stmt2);
     
-    if(rc || rc2){
+    if(rc != SQLITE_DONE){
         
-        printf("Error dropping table: ");
+        printf("Error1 dropping table: ");
         cout << sqlite3_errmsg(db) << endl;
         sqlite3_finalize(stmt);
         sqlite3_finalize(stmt2);
@@ -358,6 +356,17 @@ bool Catalog::DropTable(string& _table) {
         
     }
     
+    rc2 = sqlite3_step(stmt2);
+    
+    if(rc2 != SQLITE_DONE){
+        
+        printf("Error2 dropping table: ");
+        cout << sqlite3_errmsg(db) << endl;
+        sqlite3_finalize(stmt);
+        sqlite3_finalize(stmt2);
+        return false;
+        
+    }
     else{
         
         sqlite3_finalize(stmt);
@@ -385,7 +394,16 @@ ostream& operator<<(ostream& _os, Catalog& _c) {
     
     // Prints out Info
     while(step == SQLITE_ROW){
-        cout << sqlite3_column_text(stmt, 0) << "\t" << sqlite3_column_int(stmt, 1) << "\t" << sqlite3_column_text(stmt, 2) << endl;
+        cout << sqlite3_column_text(stmt, 0) << "\t";
+        if (sqlite3_column_int(stmt, 1) == NULL)
+            cout << "NULL" << "\t";
+        else
+            cout << sqlite3_column_int(stmt, 1) << "\t";
+        
+        if (sqlite3_column_text(stmt, 2) == NULL)
+            cout << "NULL" << endl;
+        else
+            cout << sqlite3_column_text(stmt, 2) << endl;
         
         
         rc = sqlite3_prepare_v2(_c.db, "SELECT attributename, attType, numDistinct FROM attribute WHERE tableid = ? ORDER BY attributename ASC", -1, &stmt2, NULL);
@@ -400,7 +418,16 @@ ostream& operator<<(ostream& _os, Catalog& _c) {
         step2 = sqlite3_step(stmt2);
         
         while(step2 == SQLITE_ROW) {
-            cout << "\t" << sqlite3_column_text(stmt2, 0) << "\t" << sqlite3_column_text(stmt2, 1) << "\t" << sqlite3_column_int(stmt2, 2) << endl;
+            cout << "\t" << sqlite3_column_text(stmt2, 0) << "\t";
+            if (sqlite3_column_text(stmt2, 1) == NULL)
+                cout << "NULL" << "\t";
+            else
+                cout << sqlite3_column_text(stmt2, 1) << "\t";
+            
+            if (sqlite3_column_int(stmt2, 2) == NULL)
+                cout << "NULL" << endl;
+            else
+                cout << sqlite3_column_int(stmt2, 2) << endl;
             
             // Take a step to the next row
             step2 = sqlite3_step(stmt2);
