@@ -318,9 +318,9 @@ bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<st
 bool Catalog::DropTable(string& _table) {
     
     sqlite3_stmt *stmt;
-    sqlite3_stmt *stmt2;
+    //sqlite3_stmt *stmt2;
     int table_id ;
-    int rc2;
+    //int rc2;
     
     int rc = sqlite3_prepare_v2(db, "SELECT tableid FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
     
@@ -339,45 +339,63 @@ bool Catalog::DropTable(string& _table) {
         sqlite3_finalize(stmt);
     }
     
-    sqlite3_prepare_v2(db, "DELETE FROM table_info WHERE tableid = ?", -1, &stmt, NULL);
-    sqlite3_prepare_v2(db, "DELETE FROM attribute WHERE tableid = ?", -1, &stmt2, NULL);
+    sqlite3_finalize(stmt);
     
-    sqlite3_bind_int(stmt, 1, table_id);
-    sqlite3_bind_int(stmt2, 1, table_id);
+    rc = sqlite3_prepare_v2(db, "DELETE FROM table_info WHERE tableid = ?", -1, &stmt, NULL);
     
-    rc = sqlite3_step(stmt);
-    
-    if(rc != SQLITE_DONE){
-        
-        printf("Error1 dropping table: ");
-        cout << sqlite3_errmsg(db) << endl;
-        sqlite3_finalize(stmt);
-        sqlite3_finalize(stmt2);
+    if (rc == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, table_id);
+    } else {
+        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
         return false;
-        
+    }
+
+    step = sqlite3_step(stmt);
+    
+    if (step != SQLITE_DONE){
+        cout << "Error1: " << sqlite3_errmsg(db) << endl;
     }
     
-    rc2 = sqlite3_step(stmt2);
+//    if(rc){
+//
+//        printf("Error1 dropping table: ");
+//        cout << sqlite3_errmsg(db) << endl;
+//        sqlite3_finalize(stmt);
+//        //sqlite3_finalize(stmt2);
+//        return false;
+//
+//    }
     
-    if(rc2 != SQLITE_DONE){
-        
-        printf("Error2 dropping table: ");
-        cout << sqlite3_errmsg(db) << endl;
-        sqlite3_finalize(stmt);
-        sqlite3_finalize(stmt2);
+    rc = sqlite3_prepare_v2(db, "DELETE FROM attribute WHERE tableid = ?", -1, &stmt, NULL);
+    
+    if (rc == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, table_id);
+    } else {
+        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
         return false;
-        
-    }
-    else{
-        
-        sqlite3_finalize(stmt);
-        sqlite3_finalize(stmt2);
-        printf("Table dropped");
-        cout << endl;
-        return true;
-        
     }
     
+    step = sqlite3_step(stmt);
+    
+    if (step != SQLITE_DONE){
+        cout << "Error2: " << sqlite3_errmsg(db) << endl;
+    }
+//    if(rc){
+//
+//        printf("Error2 dropping table: ");
+//        cout << sqlite3_errmsg(db) << endl;
+//        sqlite3_finalize(stmt);
+//        //sqlite3_finalize(stmt2);
+//        return false;
+//
+//    }
+//    else{
+    
+    sqlite3_finalize(stmt);
+    //sqlite3_finalize(stmt2);
+    printf("Table dropped");
+    cout << endl;
+    return true;
     
 }
 
