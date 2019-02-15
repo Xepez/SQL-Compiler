@@ -248,7 +248,6 @@ bool Catalog::GetSchema(string& _table, Schema& _schema) {
 bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<string>& _attributeTypes) {
 
     sqlite3_stmt *stmt;
-
     int step2, att_id = 0, table_id = 0;
     string att = "None";
     string attT = "None";
@@ -337,6 +336,9 @@ bool Catalog::DropTable(string& _table) {
     if(step == SQLITE_ROW){
         table_id = sqlite3_column_int(stmt, 0);
         sqlite3_finalize(stmt);
+    }
+    else {
+        return false;
     }
     
     sqlite3_finalize(stmt);
