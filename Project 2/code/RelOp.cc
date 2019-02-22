@@ -9,7 +9,7 @@ ostream& operator<<(ostream& _os, RelationalOp& _op) {
 }
 
 
-Scan::Scan(Schema& _schema, DBFile& _file) {
+Scan::Scan(Schema& _schema, DBFile& _file) {    // Peyton
 
 }
 
@@ -22,8 +22,7 @@ ostream& Scan::print(ostream& _os) {
 }
 
 
-Select::Select(Schema& _schema, CNF& _predicate, Record& _constants,
-	RelationalOp* _producer) {
+Select::Select(Schema& _schema, CNF& _predicate, Record& _constants, RelationalOp* _producer) { // Michael
 
 }
 
@@ -36,8 +35,7 @@ ostream& Select::print(ostream& _os) {
 }
 
 
-Project::Project(Schema& _schemaIn, Schema& _schemaOut, int _numAttsInput,
-	int _numAttsOutput, int* _keepMe, RelationalOp* _producer) {
+Project::Project(Schema& _schemaIn, Schema& _schemaOut, int _numAttsInput, int _numAttsOutput, int* _keepMe, RelationalOp* _producer) {    // Peyton
 
 }
 
@@ -50,8 +48,7 @@ ostream& Project::print(ostream& _os) {
 }
 
 
-Join::Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut,
-	CNF& _predicate, RelationalOp* _left, RelationalOp* _right) {
+Join::Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut, CNF& _predicate, RelationalOp* _left, RelationalOp* _right) { // Michael
 
 }
 
@@ -64,7 +61,7 @@ ostream& Join::print(ostream& _os) {
 }
 
 
-DuplicateRemoval::DuplicateRemoval(Schema& _schema, RelationalOp* _producer) {
+DuplicateRemoval::DuplicateRemoval(Schema& _schema, RelationalOp* _producer) {  // Peyton
 
 }
 
@@ -77,8 +74,7 @@ ostream& DuplicateRemoval::print(ostream& _os) {
 }
 
 
-Sum::Sum(Schema& _schemaIn, Schema& _schemaOut, Function& _compute,
-	RelationalOp* _producer) {
+Sum::Sum(Schema& _schemaIn, Schema& _schemaOut, Function& _compute, RelationalOp* _producer) {  // Michael
 
 }
 
@@ -91,8 +87,7 @@ ostream& Sum::print(ostream& _os) {
 }
 
 
-GroupBy::GroupBy(Schema& _schemaIn, Schema& _schemaOut, OrderMaker& _groupingAtts,
-	Function& _compute,	RelationalOp* _producer) {
+GroupBy::GroupBy(Schema& _schemaIn, Schema& _schemaOut, OrderMaker& _groupingAtts, Function& _compute,	RelationalOp* _producer) {  // Peyton
 
 }
 
@@ -105,7 +100,7 @@ ostream& GroupBy::print(ostream& _os) {
 }
 
 
-WriteOut::WriteOut(Schema& _schema, string& _outFile, RelationalOp* _producer) {
+WriteOut::WriteOut(Schema& _schema, string& _outFile, RelationalOp* _producer) {    // Michael
 
 }
 
