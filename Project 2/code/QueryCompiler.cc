@@ -49,12 +49,15 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         CNF selectPredicate;
         RelationalOp* selectProducer;
         
-        if (selectPredicate.extractCNF(currAnd, selectSchema, constants) != 0) {
+        // TODO
+        AndList temp; // temp variable to get code to compile for now
+        
+        if (selectPredicate.ExtractCNF(temp/*currAnd*/, selectSchema, selectConst) != 0) {
             cout << "ERROR GETTING CNF IN SELECT - QueryCompiler.cc";
         }
         
         // TODO
-        Select select(selectSchema, selectPredicate, selectConst, selectProducer)
+        Select select(selectSchema, selectPredicate, selectConst, selectProducer);
         
         currAnd = currAnd->rightAnd;
     }
