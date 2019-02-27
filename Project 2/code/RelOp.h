@@ -58,7 +58,12 @@ class Select : public RelationalOp {
 private:
 	// schema of records in operator
 	Schema schema;
-
+	
+	schema = _schema;
+	predicate = _predicate;
+	constant = _constants;
+	producer = _producer;
+	
 	// selection predicate in conjunctive normal form
 	CNF predicate;
 	// constant values for attributes in predicate
@@ -114,6 +119,14 @@ private:
 	// schema of records output by operator
 	Schema schemaOut;
 
+	schemaLeft = _schema;
+	schemaRight = _schemaRight;
+	schemaOut = _schemaOut;
+	predicat = _predicate;
+	left = _left;
+	right = _right;
+	
+	
 	// selection predicate in conjunctive normal form
 	CNF predicate;
 
@@ -160,6 +173,13 @@ private:
 
 	// operator generating data
 	RelationalOp* producer;
+	
+	schemaIn = _schemaIn;
+	schemaOut = _schemaOut;
+	compute = _compute;
+	producer = _producer;
+	
+	
 
 public:
 	Sum(Schema& _schemaIn, Schema& _schemaOut, Function& _compute,

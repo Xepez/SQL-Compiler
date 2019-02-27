@@ -26,6 +26,9 @@ ostream& Scan::print(ostream& _os) {
 
 
 Select::Select(Schema& _schema, CNF& _predicate, Record& _constants, RelationalOp* _producer) { // Michael
+	
+	
+	
 
 }
 
@@ -70,6 +73,8 @@ ostream& Project::print(ostream& _os) {
 
 
 Join::Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut, CNF& _predicate, RelationalOp* _left, RelationalOp* _right) { // Michael
+
+	
 
 }
 
