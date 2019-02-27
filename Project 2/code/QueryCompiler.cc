@@ -13,8 +13,8 @@ using namespace std;
 
 QueryCompiler::QueryCompiler(Catalog& _catalog, QueryOptimizer& _optimizer) : catalog(&_catalog), optimizer(&_optimizer) {
     
-    catalog = _catalog;
-    optimizer = _optimizer;
+    catalog = &_catalog;
+    optimizer = &_optimizer;
 }
 
 QueryCompiler::~QueryCompiler() {
@@ -26,16 +26,17 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 	QueryExecutionTree& _queryTree) {
 
 	// create a SCAN operator for each table in the query
-    while (_tables.tableName != NULL) {
+    while (_tables->tableName != NULL) {
         Schema scanSchema;
-        DBFile db();
+        DBFile db;
+        string tableName = _tables->tableName;
         
-        if (catalog.getSchema(_tables.tableName, scanSchema)) {
+        if (catalog->GetSchema(tableName, scanSchema)) {
             // TODO: Ensure loading into different scans
             Scan scan(scanSchema, db);
         }
         
-        _tables.next();
+        _tables->next;
     }
 
 	// push-down selections: create a SELECT operator wherever necessary
