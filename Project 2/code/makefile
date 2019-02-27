@@ -45,7 +45,7 @@ Catalog.o: Schema.cc Catalog.cc
 
 QueryParser.o: QueryParser.y
 	yacc --defines=QueryParser.h -o QueryParser.c QueryParser.y
-	sed $(tag) -e "s/  __attribute__ ((__unused__))$$/# ifndef __cplusplus\n  __attribute__ ((__unused__));\n# endif/" QueryParser.c
+	sed $(tag) QueryParser.c -e "s/  __attribute__ ((__unused__))$$/# ifndef __cplusplus\n  __attribute__ ((__unused__));\n# endif/"
 	g++ -c QueryParser.c
 
 QueryLexer.o: QueryLexer.l
