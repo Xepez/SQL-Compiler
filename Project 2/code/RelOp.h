@@ -173,6 +173,13 @@ private:
 
 	// operator generating data
 	RelationalOp* producer;
+	
+	schemaIn = _schemaIn;
+	schemaOut = _schemaOut;
+	compute = _compute;
+	producer = _producer;
+	
+	
 
 public:
 	Sum(Schema& _schemaIn, Schema& _schemaOut, Function& _compute,

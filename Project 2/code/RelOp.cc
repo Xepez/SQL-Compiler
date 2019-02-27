@@ -28,6 +28,7 @@ ostream& Scan::print(ostream& _os) {
 Select::Select(Schema& _schema, CNF& _predicate, Record& _constants, RelationalOp* _producer) { // Michael
 	
 	
+	
 
 }
 
