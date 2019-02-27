@@ -113,14 +113,6 @@ private:
 	Schema schemaRight;
 	// schema of records output by operator
 	Schema schemaOut;
-
-	schemaLeft = _schema;
-	schemaRight = _schemaRight;
-	schemaOut = _schemaOut;
-	predicat = _predicate;
-	left = _left;
-	right = _right;
-	
 	
 	// selection predicate in conjunctive normal form
 	CNF predicate;
@@ -169,13 +161,6 @@ private:
 	// operator generating data
 	RelationalOp* producer;
 	
-	schemaIn = _schemaIn;
-	schemaOut = _schemaOut;
-	compute = _compute;
-	producer = _producer;
-	
-	
-
 public:
 	Sum(Schema& _schemaIn, Schema& _schemaOut, Function& _compute,
 		RelationalOp* _producer);

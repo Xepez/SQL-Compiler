@@ -75,7 +75,12 @@ ostream& Project::print(ostream& _os) {
 
 Join::Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut, CNF& _predicate, RelationalOp* _left, RelationalOp* _right) { // Michael
 
-	
+    schemaLeft = _schema;
+    schemaRight = _schemaRight;
+    schemaOut = _schemaOut;
+    predicat = _predicate;
+    left = _left;
+    right = _right;
 
 }
 
@@ -106,6 +111,10 @@ ostream& DuplicateRemoval::print(ostream& _os) {
 
 Sum::Sum(Schema& _schemaIn, Schema& _schemaOut, Function& _compute, RelationalOp* _producer) {  // Michael
 
+    schemaIn = _schemaIn;
+    schemaOut = _schemaOut;
+    compute = _compute;
+    producer = _producer;
 }
 
 Sum::~Sum() {
