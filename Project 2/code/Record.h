@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <iostream>
+#include <unistd.h>
 #include "Schema.h"
 
 using namespace std;

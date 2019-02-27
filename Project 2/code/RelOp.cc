@@ -11,6 +11,9 @@ ostream& operator<<(ostream& _os, RelationalOp& _op) {
 
 Scan::Scan(Schema& _schema, DBFile& _file) {    // Peyton
 
+    // Saves Data for printing
+    schema = _schema;
+    file = _file;
 }
 
 Scan::~Scan() {
@@ -18,7 +21,7 @@ Scan::~Scan() {
 }
 
 ostream& Scan::print(ostream& _os) {
-	return _os << "SCAN";
+	return _os << "SCAN " << schema;
 }
 
 
@@ -36,7 +39,14 @@ ostream& Select::print(ostream& _os) {
 
 
 Project::Project(Schema& _schemaIn, Schema& _schemaOut, int _numAttsInput, int _numAttsOutput, int* _keepMe, RelationalOp* _producer) {    // Peyton
-
+    
+    // Saves Data for printing
+    schemaIn = _schemaIn;
+    schemaOut = _schemaOut;
+    numAttsInput = _numAttsInput;
+    numAttsOutput = _numAttsOutput;
+    keepMe = _keepMe;
+    producer = _producer;
 }
 
 Project::~Project() {
@@ -44,7 +54,10 @@ Project::~Project() {
 }
 
 ostream& Project::print(ostream& _os) {
-	return _os << "PROJECT";
+    
+    // TODO ADD KEEP ME
+    _os << "PROJECT IN: " << schemaIn << ", " << numAttsInput << " OUT: " << schemaOut << ", " << numAttsOutput;
+    return _os;
 }
 
 
@@ -62,7 +75,10 @@ ostream& Join::print(ostream& _os) {
 
 
 DuplicateRemoval::DuplicateRemoval(Schema& _schema, RelationalOp* _producer) {  // Peyton
-
+    
+    // Saves Data for printing
+    schema = _schema;
+    producer = _producer;
 }
 
 DuplicateRemoval::~DuplicateRemoval() {
@@ -70,7 +86,7 @@ DuplicateRemoval::~DuplicateRemoval() {
 }
 
 ostream& DuplicateRemoval::print(ostream& _os) {
-	return _os << "DISTINCT";
+	return _os << "DISTINCT " << schema;
 }
 
 
@@ -89,6 +105,13 @@ ostream& Sum::print(ostream& _os) {
 
 GroupBy::GroupBy(Schema& _schemaIn, Schema& _schemaOut, OrderMaker& _groupingAtts, Function& _compute,	RelationalOp* _producer) {  // Peyton
 
+    // Saves Data for printing
+    schemaIn = _schemaIn;
+    schemaOut = _schemaOut;
+    // TODO
+    groupingAtts = _groupingAtts;
+    compute = _compute;
+    producer = _producer;
 }
 
 GroupBy::~GroupBy() {
@@ -96,7 +119,7 @@ GroupBy::~GroupBy() {
 }
 
 ostream& GroupBy::print(ostream& _os) {
-	return _os << "GROUP BY";
+    return _os << "GROUP BY " << schemaIn << " ";
 }
 
 
@@ -114,5 +137,9 @@ ostream& WriteOut::print(ostream& _os) {
 
 
 ostream& operator<<(ostream& _os, QueryExecutionTree& _op) {
+    
+    // Print tree using preorder tree traversal
+    // From root to each child till whole tree complete
+    
 	return _os << "QUERY EXECUTION TREE";
 }

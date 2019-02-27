@@ -2,7 +2,9 @@
 #include <string>
 
 #include "Catalog.h"
+extern "C" {
 #include "QueryParser.h"
+}
 #include "QueryOptimizer.h"
 #include "QueryCompiler.h"
 #include "RelOp.h"

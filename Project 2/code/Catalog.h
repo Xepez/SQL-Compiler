@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "sqlite3.h"
+//#include <sqlite3.h>
 
 #include "Schema.h"
 
@@ -17,8 +19,12 @@ private:
 	 * Efficient data structures are recommended.
 	 * Avoid linear traversals when possible.
 	 */
-
+    
 public:
+    
+    // Database var
+    sqlite3 *db;
+    
 	/* Catalog constructor.
 	 * Initialize the catalog with the persistent data stored in _fileName.
 	 * _fileName is a SQLite database containing data on tables and their attributes.
