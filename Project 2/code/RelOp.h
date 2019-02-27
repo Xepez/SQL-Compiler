@@ -59,11 +59,6 @@ private:
 	// schema of records in operator
 	Schema schema;
 	
-	schema = _schema;
-	predicate = _predicate;
-	constant = _constants;
-	producer = _producer;
-	
 	// selection predicate in conjunctive normal form
 	CNF predicate;
 	// constant values for attributes in predicate
