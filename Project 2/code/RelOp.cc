@@ -21,7 +21,7 @@ Scan::~Scan() {
 }
 
 ostream& Scan::print(ostream& _os) {
-	return _os << "SCAN " << schema;
+    return _os << "SCAN: " << schema;
 }
 
 
@@ -55,8 +55,16 @@ Project::~Project() {
 
 ostream& Project::print(ostream& _os) {
     
-    // TODO ADD KEEP ME
-    _os << "PROJECT IN: " << schemaIn << ", " << numAttsInput << " OUT: " << schemaOut << ", " << numAttsOutput;
+    // TODO FIX IF NEEDED
+    _os << "PROJECT:";
+    _os << " IN: " << schemaIn << ", " << numAttsInput << " / ";
+    _os << " OUT: " << schemaOut;
+    for (int x = 0; x < numAttsOutput; x++) {
+        _os << " KEEPING" << " = " << keepMe[x];
+        if ((x+1) != numAttsOutput)
+            _os << ",";
+    }
+    
     return _os;
 }
 
@@ -86,7 +94,7 @@ DuplicateRemoval::~DuplicateRemoval() {
 }
 
 ostream& DuplicateRemoval::print(ostream& _os) {
-	return _os << "DISTINCT " << schema;
+    return _os << "DISTINCT: " << schema;
 }
 
 
@@ -108,7 +116,6 @@ GroupBy::GroupBy(Schema& _schemaIn, Schema& _schemaOut, OrderMaker& _groupingAtt
     // Saves Data for printing
     schemaIn = _schemaIn;
     schemaOut = _schemaOut;
-    // TODO
     groupingAtts = _groupingAtts;
     compute = _compute;
     producer = _producer;
@@ -119,7 +126,14 @@ GroupBy::~GroupBy() {
 }
 
 ostream& GroupBy::print(ostream& _os) {
-    return _os << "GROUP BY " << schemaIn << " ";
+    
+    _os << "GROUP BY:";
+    _os << " IN: " << schemaIn;
+    _os << " OUT: " << schemaOut;
+    // TODO FIX IF NEEDED
+    _os << " GROUPING BY: " << groupingAtts;
+    //_os << " FUNCTION: " << compute;
+    return _os;
 }
 
 
