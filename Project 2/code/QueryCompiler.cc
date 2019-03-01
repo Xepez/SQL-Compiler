@@ -180,6 +180,8 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
     
     
 	// connect everything in the query execution tree and return
-
+    _queryTree.SetRoot(writeOut);
+    
+    
 	// free the memory occupied by the parse tree since it is not necessary anymore
 }
