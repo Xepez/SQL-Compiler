@@ -70,6 +70,9 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
             cout << "ERROR GETTING CNF IN SELECT - QueryCompiler.cc";
         }
         
+        cout << "WE GOT HERE WOOO!" << endl;
+        cout << selectSchema << endl;
+        
         // TODO
         Select select(selectSchema, selectPredicate, selectConst, selectProducer);
         
