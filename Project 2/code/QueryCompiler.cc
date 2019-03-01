@@ -23,61 +23,85 @@ QueryCompiler::~QueryCompiler() {
 }
 
 void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOperator* _finalFunction, AndList* _predicate, NameList* _groupingAtts, int& _distinctAtts, QueryExecutionTree& _queryTree) {
-
+    
     // TODO: ADD TO .h if correct
     vector<Scan> scanVector;
-    
-	// create a SCAN operator for each table in the query
+    vector<Select> selectVector;
+	
+    // create a SCAN operator for each table in the query
     TableList* scanTable = _tables;
-    while (scanTable->tableName != NULL) {
+    while (scanTable != NULL) {
         Schema scanSchema;
         DBFile db;
+        RelationalOp* ropScan;
         string tableName = scanTable->tableName;
         
         if (catalog->GetSchema(tableName, scanSchema)) {
-            // TODO: Ensure loading into different scans
             Scan scan(scanSchema, db);
+            // May Cause Problems
+            ropScan = &scan;
             scanVector.push_back(scan);
         }
         else {
             cout << "ERROR GETTING SCHEMA IN SCAN - QueryCompiler.cc";
+            continue;
+        }
+        
+        // push-down selections: create a SELECT operator wherever necessary
+        Record selectConst;
+        CNF selectPredicate;
+        
+        if (selectPredicate.ExtractCNF(*_predicate, scanSchema, selectConst) != 0) {
+            cout << "ERROR GETTING CNF IN SELECT - QueryCompiler.cc";
+        }
+    
+        if (selectPredicate.numAnds > 0) {
+            //cout << "WE GOT HERE WOOO!" << endl;
+            //cout << scanSchema << endl << endl;
+            
+            Select select(scanSchema, selectPredicate, selectConst, ropScan);
+            selectVector.push_back(select);
         }
         
         scanTable = scanTable->next;
     }
     
 
-	// push-down selections: create a SELECT operator wherever necessary
-    AndList* currAnd = _predicate;
-    while(currAnd->left != NULL) {
-        Schema selectSchema;
-        Record selectConst;
-        CNF selectPredicate;
-        RelationalOp* selectProducer;
-        
-        // Finds schema used
+//    // push-down selections: create a SELECT operator wherever necessary
+//    AndList* currAnd = _predicate;
+//    while(currAnd != NULL) {
+//        Schema selectSchema;
+//        Record selectConst;
+//        CNF selectPredicate;
+//        RelationalOp* selectProducer;
+//
+//        // Finds schema used
+//        // TODO
 //        TableList* selectTable = _tables;
-//        while (selectTable->tableName != NULL) {
-//            if (catalog->GetSchema(tableName, scanSchema)) {
-//                if (scanSchema.Index(currAnd->left->left->value) != -1) {
+//        string selName = selectTable->tableName;
+//        while (selectTable != NULL) {
+//            if (catalog->GetSchema(selName, selectSchema)) {
+//                string selLeft = currAnd->left->left->value;
+//                string selRight = currAnd->left->right->value;
+//                if (selectSchema.Index(selLeft) != -1 || selectSchema.Index(selRight) != -1) {
 //                    break;
 //                }
-//                selectSchema = NULL;
 //            }
+//            selectTable = selectTable->next;
 //        }
-        
-        if (selectPredicate.ExtractCNF(*currAnd, selectSchema, selectConst) != 0) {
-            cout << "ERROR GETTING CNF IN SELECT - QueryCompiler.cc";
-        }
-        
-        cout << "WE GOT HERE WOOO!" << endl;
-        cout << selectSchema << endl;
-        
-        // TODO
-        Select select(selectSchema, selectPredicate, selectConst, selectProducer);
-        
-        currAnd = currAnd->rightAnd;
-    }
+//
+//        if (selectPredicate.ExtractCNF(*currAnd, selectSchema, selectConst) != 0) {
+//            cout << "ERROR GETTING CNF IN SELECT - QueryCompiler.cc";
+//        }
+//
+//        cout << "WE GOT HERE WOOO!" << endl;
+//        cout << selectSchema << endl << endl;
+//
+//        // TODO
+//        Select select(selectSchema, selectPredicate, selectConst, selectProducer);
+//
+//        currAnd = currAnd->rightAnd;
+//    }
     
 
 	// call the optimizer to compute the join order
@@ -91,7 +115,7 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
     // create the remaining operators based on the query {
     // PROJECT
     NameList* projectSelect = _attsToSelect;
-    while (projectSelect->name != NULL) {
+    while (projectSelect != NULL) {
         Schema projectSchemaIn, projectSchemaOut;
         int numAttsInput, numAttsOutput;
         int* keepMe;
