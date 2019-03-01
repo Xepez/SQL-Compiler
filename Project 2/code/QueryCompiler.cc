@@ -8,6 +8,8 @@
 #include "Function.h"
 #include "RelOp.h"
 
+#include <vector>
+
 using namespace std;
 
 
@@ -22,6 +24,8 @@ QueryCompiler::~QueryCompiler() {
 
 void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOperator* _finalFunction, AndList* _predicate, NameList* _groupingAtts, int& _distinctAtts, QueryExecutionTree& _queryTree) {
 
+    // TODO: ADD TO .h if correct
+    vector<Scan> scanVector;
     
 	// create a SCAN operator for each table in the query
     TableList* scanTable = _tables;
@@ -33,6 +37,7 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         if (catalog->GetSchema(tableName, scanSchema)) {
             // TODO: Ensure loading into different scans
             Scan scan(scanSchema, db);
+            scanVector.push_back(scan);
         }
         else {
             cout << "ERROR GETTING SCHEMA IN SCAN - QueryCompiler.cc";
@@ -60,9 +65,6 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
 //                selectSchema = NULL;
 //            }
 //        }
-        
-        // TODO
-        AndList temp; // temp variable to get code to compile for now
         
         if (selectPredicate.ExtractCNF(*currAnd, selectSchema, selectConst) != 0) {
             cout << "ERROR GETTING CNF IN SELECT - QueryCompiler.cc";
