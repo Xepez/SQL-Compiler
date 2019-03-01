@@ -34,8 +34,9 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
             // TODO: Ensure loading into different scans
             Scan scan(scanSchema, db);
         }
-        else
+        else {
             cout << "ERROR GETTING SCHEMA IN SCAN - QueryCompiler.cc";
+        }
         
         scanTable = scanTable->next;
     }
@@ -49,10 +50,21 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         CNF selectPredicate;
         RelationalOp* selectProducer;
         
+        // Finds schema used
+//        TableList* selectTable = _tables;
+//        while (selectTable->tableName != NULL) {
+//            if (catalog->GetSchema(tableName, scanSchema)) {
+//                if (scanSchema.Index(currAnd->left->left->value) != -1) {
+//                    break;
+//                }
+//                selectSchema = NULL;
+//            }
+//        }
+        
         // TODO
         AndList temp; // temp variable to get code to compile for now
         
-        if (selectPredicate.ExtractCNF(temp/*currAnd*/, selectSchema, selectConst) != 0) {
+        if (selectPredicate.ExtractCNF(*currAnd, selectSchema, selectConst) != 0) {
             cout << "ERROR GETTING CNF IN SELECT - QueryCompiler.cc";
         }
         
@@ -68,11 +80,23 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
 	optimizer->Optimize(_tables, _predicate, root);
 
 	// create join operators based on the optimal order computed by the optimizer
-
-	// create the remaining operators based on the query
-    
-    // PROJECT
     // TODO
+    
+    
+    // create the remaining operators based on the query {
+    // PROJECT
+    NameList* projectSelect = _attsToSelect;
+    while (projectSelect->name != NULL) {
+        Schema projectSchemaIn, projectSchemaOut;
+        int numAttsInput, numAttsOutput;
+        int* keepMe;
+        RelationalOp* projectProducer;
+        
+        // TODO
+        Project(projectSchemaIn, projectSchemaOut, numAttsInput, numAttsOutput, keepMe, projectProducer);
+        
+        projectSelect = projectSelect->next;
+    }
     
     // DISTINCT
     if (_distinctAtts == 1) {
@@ -84,7 +108,15 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
     }
     
     // SUM
-    // TODO
+    if (_finalFunction != NULL) {
+        Schema sumSchemaIn, sumSchemaOut;
+        RelationalOp* sumProducer;
+        Function sumCompute;
+        // TODO
+        sumCompute.GrowFromParseTree(_finalFunction, sumSchemaIn);
+        
+        Sum sum(sumSchemaIn, sumSchemaOut, sumCompute, sumProducer);
+    }
     
     // GROUP BY
     if (_groupingAtts != NULL) {
@@ -101,8 +133,9 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
             // TODO
             OrderMaker om(groupSchema, groupAtts, noGroupAtts);
         }
-        else
+        else {
             cout << "ERROR GETTING SCHEMA IN GROUP BY - QueryCompiler.cc";
+        }
         
         // TODO
         GroupBy groupBy(schemaIn, schemaOut, om, compute, groupByProducer);
@@ -110,6 +143,11 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
 
     // WRITE OUT
     // TODO
+    Schema schemaWO;
+    string outFile;
+    RelationalOp* woProducer;
+    WriteOut writeOut(schemaWO, outFile, woProducer);
+    // }
     
     
 	// connect everything in the query execution tree and return
