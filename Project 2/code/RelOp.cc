@@ -31,14 +31,24 @@ Select::Select(Schema& _schema, CNF& _predicate, Record& _constants, RelationalO
     predicate = _predicate;
     constant = _constants;
     producer = _producer;
+    
+    
+    
+    
 }
 
 Select::~Select() {
 
+
+
 }
 
 ostream& Select::print(ostream& _os) {
-	return _os << "SELECT";
+	_os << "SELECT";
+	
+	_os << "Schema : " << schema ;
+	-os << "Evaulation : " << predcate << " " << producer << " " << constant;
+	 return _os;
 }
 
 
@@ -75,7 +85,7 @@ ostream& Project::print(ostream& _os) {
 
 Join::Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut, CNF& _predicate, RelationalOp* _left, RelationalOp* _right) { // Michael
 
-    schemaLeft = _schema;
+    schemaLeft = _schemaLeft;
     schemaRight = _schemaRight;
     schemaOut = _schemaOut;
     predicat = _predicate;
@@ -89,7 +99,16 @@ Join::~Join() {
 }
 
 ostream& Join::print(ostream& _os) {
-	return _os << "JOIN";
+	_os << "JOIN";
+	
+	_os << "SchemaLeft : " << schemaLeft;
+	_os << "SchemaRight : " << schemaRight;	
+	_os << "Final schema : " << schemaOut
+	
+	_os << left << " " << predcate << " " << right;
+	
+	return _os;
+	
 }
 
 
@@ -122,7 +141,13 @@ Sum::~Sum() {
 }
 
 ostream& Sum::print(ostream& _os) {
-	return _os << "SUM";
+	_os << "SUM";
+	
+	_os << "schema IN : " << schemaIn;
+	_os << "Final Schema : " << schemaOut;
+	_os << "Compute : " << compute << " , " << producer;
+	
+	return _os;
 }
 
 
@@ -154,6 +179,10 @@ ostream& GroupBy::print(ostream& _os) {
 
 WriteOut::WriteOut(Schema& _schema, string& _outFile, RelationalOp* _producer) {    // Michael
 
+	schema = _schema;
+	outFile = _outFile;
+	produce = _producer;
+
 }
 
 WriteOut::~WriteOut() {
@@ -161,7 +190,13 @@ WriteOut::~WriteOut() {
 }
 
 ostream& WriteOut::print(ostream& _os) {
-	return _os << "OUTPUT";
+	
+	_os << "OUTPUT";
+	
+	_os << "FInal Schema : " << schema;
+ 	_os << "File : " << outFile;
+	
+	return _os;
 }
 
 
