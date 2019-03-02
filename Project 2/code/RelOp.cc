@@ -21,7 +21,10 @@ Scan::~Scan() {
 }
 
 ostream& Scan::print(ostream& _os) {
-    return _os << "SCAN: " << schema;
+    
+    _os << "SCAN" << endl;
+    _os << "Schema : " << schema << endl;
+    return _os;
 }
 
 
@@ -38,11 +41,13 @@ Select::~Select() {
 }
 
 ostream& Select::print(ostream& _os) {
-	_os << "SELECT";
-	
-	_os << "Schema : " << schema ;
-    // TODO
-	//_os << "Evaulation : " << predicate << " " << producer << " " << constants;
+    
+	_os << "SELECT" << endl;
+	_os << "Schema : " << schema << "\t";
+    _os << "Predicate : " << predicate << /*"\t"*/endl;
+    // TODO Figure Out What to Print Here
+    //_os << "Constants : " << constants << endl;
+	_os << *producer ;
 	 return _os;
 }
 
@@ -64,16 +69,15 @@ Project::~Project() {
 
 ostream& Project::print(ostream& _os) {
     
-    // TODO FIX IF NEEDED
-    _os << "PROJECT:";
-    _os << " IN: " << schemaIn << ", " << numAttsInput << " / ";
-    _os << " OUT: " << schemaOut;
+    _os << "PROJECT" << endl;
+    _os << "Schema IN : " << schemaIn << "\tNumber IN Atts : " << numAttsInput << "\t";
+    _os << "Schema OUT : " << schemaOut << "\tNumber OUT Atts : " << numAttsOutput << "\t";
+    _os << "Keeping : ";
     for (int x = 0; x < numAttsOutput; x++) {
-        _os << " KEEPING" << " = " << keepMe[x];
-        if ((x+1) != numAttsOutput)
-            _os << ",";
+        // Goes through KeepMe array and shows which atts are going to be kept
+        _os << keepMe[x] << "\t";
     }
-    
+    _os << "\n" << *producer;
     return _os;
 }
 
@@ -94,16 +98,15 @@ Join::~Join() {
 }
 
 ostream& Join::print(ostream& _os) {
-	_os << "JOIN";
-	
-	_os << "SchemaLeft : " << schemaLeft;
-	_os << "SchemaRight : " << schemaRight;
-    _os << "Final schema : " << schemaOut;
-	
-	_os << left << " " << predicate << " " << right;
-	
+    
+    _os << "JOIN" << endl;
+	_os << "Schema Left IN : " << schemaLeft << "\t";
+	_os << "Schema Right IN : " << schemaRight << "\t";
+    _os << "Schema OUT : " << schemaOut << "\t";
+    _os << "Predicate : " << predicate << endl;
+    _os << *left;
+    _os << *right;
 	return _os;
-	
 }
 
 
@@ -119,7 +122,11 @@ DuplicateRemoval::~DuplicateRemoval() {
 }
 
 ostream& DuplicateRemoval::print(ostream& _os) {
-    return _os << "DISTINCT: " << schema;
+    
+    _os << "DISTINCT" << endl;
+    _os << "Schema : " << schema << endl;
+    _os << *producer;
+    return _os;
 }
 
 
@@ -136,13 +143,13 @@ Sum::~Sum() {
 }
 
 ostream& Sum::print(ostream& _os) {
-	_os << "SUM";
 	
-	_os << "schema IN : " << schemaIn;
-	_os << "Final Schema : " << schemaOut;
-    // TODO
-	//_os << "Compute : " << compute << " , " << producer;
-	
+    _os << "SUM" << endl;
+    _os << "Schema IN : " << schemaIn << "\t";
+    _os << "Schema OUT : " << schemaOut << /*"\t"*/endl;
+    // TODO Figure Out What to Print Here
+    //_os << "Compute : " << compute << endl;
+    _os << *producer;
 	return _os;
 }
 
@@ -163,12 +170,13 @@ GroupBy::~GroupBy() {
 
 ostream& GroupBy::print(ostream& _os) {
     
-    _os << "GROUP BY:";
-    _os << " IN: " << schemaIn;
-    _os << " OUT: " << schemaOut;
-    // TODO FIX IF NEEDED
-    _os << " GROUPING BY: " << groupingAtts;
-    //_os << " FUNCTION: " << compute;
+    _os << "GROUP BY" << endl;
+    _os << "Schema IN : " << schemaIn << "\t";
+    _os << "Schema OUT : " << schemaOut << "\t";
+    _os << "Grouping Atts : " << groupingAtts << /*"\t"*/endl;
+    // TODO Figure Out What to Print Here
+    //_os << "Compute : " << compute << endl;
+    _os << *producer;
     return _os;
 }
 
@@ -187,19 +195,19 @@ WriteOut::~WriteOut() {
 
 ostream& WriteOut::print(ostream& _os) {
 	
-	_os << "OUTPUT";
-	
-	_os << "FInal Schema : " << schema;
- 	_os << "File : " << outFile;
-	
+	_os << "WRITE OUT" << endl;
+	_os << "Final Schema : " << schema << "\t";
+ 	_os << "File : " << outFile << endl;
+    _os << *producer;
 	return _os;
 }
 
 
 ostream& operator<<(ostream& _os, QueryExecutionTree& _op) {
     
+    // TODO DELETE COMMENT HERE
     // Print tree using preorder tree traversal
     // From root to each child till whole tree complete
     
-	return _os << "QUERY EXECUTION TREE";
+    return _os << "QUERY EXECUTION TREE:\n" << *_op.root << "\n";
 }
