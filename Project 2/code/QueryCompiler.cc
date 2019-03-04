@@ -158,7 +158,7 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         vector<string> sumOutAtt;
         sumOutAtt.push_back("sum");
         vector<string> sumOutType;
-        sumOutType.push_back("INTEGER");
+        sumOutType.push_back("FLOAT");
         vector<unsigned int> sumDistinct;
         sumDistinct.push_back(1);
         Schema sumSchemaOut(sumOutAtt, sumOutType, sumDistinct);
@@ -167,58 +167,113 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         Function sumCompute;
         sumCompute.GrowFromParseTree(_finalFunction, sumSchemaIn);
         
-        // Creates sum and save info to write out
+        // Creates Sum Operator
         Sum sum(sumSchemaIn, sumSchemaOut, sumCompute, sumProducer);
+        
+        // Sets Write Out Variables
         schemaWO = sumSchemaOut;
         // May Cause Problems
         woProducer = &sum;
     }
     // GROUP BY
-    // TODO vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     else if (_groupingAtts != NULL) {
-        Schema groupSchema, schemaIn, schemaOut;
-        string groupName = _groupingAtts->name;
+        
+        // Basic Initializations
+        Schema groupSchemaIn = joinSchema;
+        string* groupName;
         int* groupAtts;
         int noGroupAtts = 0;
+        
+        // Gets number of distincts, grouping attributes, and
+        // sets up our vector to config our grouping atts
+        unsigned int groupDist = 1;
+        vector<int> gbIndex;
+        NameList* tempGB = _groupingAtts;
+        while(tempGB != NULL) {
+            string temp = tempGB->name;
+            groupDist *= groupSchemaIn.GetDistincts(temp);
+            gbIndex.push_back(groupSchemaIn.Index(temp));
+            noGroupAtts++;
+        }
+        
+        // Configures our grouping attributes for order maker
+        for (int i = gbIndex.size()-1; i >= 0; i--) {
+            groupAtts[gbIndex.size()-i-1] = gbIndex[i];
+        }
+        
+        // Creates Criteria for Output Schema
+        vector<string> groupOutAtt;
+        groupOutAtt.push_back("sum");
+        vector<string> groupOutType;
+        groupOutType.push_back("FLOAT");
+        vector<unsigned int> groupDistinct;
+        groupDistinct.push_back(groupDist);
+        Schema groupSchemaOut(groupOutAtt, groupOutType, groupDistinct);
+        
+        // Creates function for group by and initializes remaining variables
         RelationalOp* groupByProducer;
-        Function compute;
-        OrderMaker om;
+        OrderMaker groupOM(groupSchemaIn, groupAtts, noGroupAtts);
+        Function groupCompute;
+        groupCompute.GrowFromParseTree(_finalFunction, groupSchemaIn);
+
+        // Create Group By Operator
+        GroupBy groupBy(groupSchemaIn, groupSchemaOut, groupOM, groupCompute, joinOp);
         
-        // Get schema and make OrderMaker
-        if (catalog->GetSchema(groupName, groupSchema)) {
-            // TODO
-            OrderMaker om(groupSchema, groupAtts, noGroupAtts);
-        }
-        else {
-            cout << "\n\nERROR GETTING SCHEMA IN GROUP BY - QueryCompiler.cc\n\n" << endl;
-        }
-        
-        // TODO
-        GroupBy groupBy(schemaIn, schemaOut, om, compute, groupByProducer);
+        // Sets Write Out Variables
+        schemaWO = groupSchemaOut;
+        // May Cause Problems
+        woProducer = &groupBy;
     }
     // PROJECT W/ or W/O DISTINCT
     else {
         // PROJECT
+        // Basic Initializations
+        Schema projectSchemaIn = joinSchema;
+        Schema projectSchemaOut = joinSchema;
+        int* keepMe;
+        int numAttsInput = projectSchemaIn.GetAtts().size();
+        
+        // Gets number of output attributes and
+        // sets up our vector to config our project atts
+        int numAttsOutput = 0;
+        vector<int> projectIndex;
         NameList* projectSelect = _attsToSelect;
-        while (projectSelect != NULL) {
-            Schema projectSchemaIn, projectSchemaOut;
-            int numAttsInput, numAttsOutput;
-            int* keepMe;
-            RelationalOp* projectProducer;
-            
-            // TODO
-            Project(projectSchemaIn, projectSchemaOut, numAttsInput, numAttsOutput, keepMe, projectProducer);
-            
-            projectSelect = projectSelect->next;
+        while(projectSelect != NULL) {
+            string temp = projectSelect->name;
+            projectIndex.push_back(projectSchemaIn.Index(temp));
+            numAttsOutput++;
         }
+        
+        // Configures our project attributes for project operator
+        for (int i = projectIndex.size()-1; i >= 0; i--) {
+            keepMe[projectIndex.size()-i-1] = projectIndex[i];
+        }
+        
+        // Creates Project Operator
+        Project project(projectSchemaIn, projectSchemaOut, numAttsInput, numAttsOutput, keepMe, joinOp);
         
         // DISTINCT
         if (_distinctAtts == 1) {
-            Schema distinctSchema;
-            RelationalOp* distinctProducer;
+            // Sets projects out schema as distincts schema
+            Schema distinctSchema = projectSchemaOut;
+            // May Cause Problems
+            RelationalOp* distinctOp = &project;
             
-            // TODO
-            DuplicateRemoval distinct(distinctSchema, distinctProducer);
+            // Create Distinct Operator
+            DuplicateRemoval distinct(distinctSchema, distinctOp);
+            
+            // If distinct op then write out set to distinct
+            // Sets Write Out Variables
+            schemaWO = distinctSchema;
+            // May Cause Problems
+            woProducer = &distinct;
+        }
+        else {
+            // If no distinct op then write out set to project
+            // Sets Write Out Variables
+            schemaWO = projectSchemaOut;
+            // May Cause Problems
+            woProducer = &project;
         }
     }
 
