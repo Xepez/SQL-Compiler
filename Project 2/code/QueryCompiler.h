@@ -22,10 +22,17 @@ private:
 	Catalog* catalog;
 	QueryOptimizer* optimizer;
 
+    // Vectors that save our scan and select ops for later use w/ joins
+    vector<Scan*> scanVector;
+    vector<Select*> selectVector;
+    vector<RelationalOp*> deleteMe;
 public:
 	QueryCompiler(Catalog& _catalog, QueryOptimizer& _optimizer);
 	virtual ~QueryCompiler();
 
+    // Custom fcn to traverse a join tree and initialize the joins in proper order
+    RelationalOp* joinMeDaddy(OptimizationTree* tempRoot, Schema &parentSchema, AndList* _predicate);
+    
 	void Compile(TableList* _tables, NameList* _attsToSelect,
 		FuncOperator* _finalFunction, AndList* _predicate,
 		NameList* _groupingAtts, int& _distinctAtts,

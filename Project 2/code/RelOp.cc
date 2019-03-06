@@ -9,15 +9,23 @@ ostream& operator<<(ostream& _os, RelationalOp& _op) {
 }
 
 
-Scan::Scan(Schema& _schema, DBFile& _file) {    // Peyton
+Scan::Scan(Schema& _schema, DBFile& _file, string _table) {    // Peyton
 
     // Saves Data for printing
     schema = _schema;
     file = _file;
+    table = _table;
 }
 
 Scan::~Scan() {
 
+}
+
+bool Scan::tableCheck(string _table) {
+    if (table == _table)
+        return true;
+    else
+        return false;
 }
 
 ostream& Scan::print(ostream& _os) {
@@ -28,16 +36,24 @@ ostream& Scan::print(ostream& _os) {
 }
 
 
-Select::Select(Schema& _schema, CNF& _predicate, Record& _constants, RelationalOp* _producer) { // Michael
+Select::Select(Schema& _schema, CNF& _predicate, Record& _constants, RelationalOp* _producer, string _table) { // Michael
 	
     schema = _schema;
     predicate = _predicate;
     constants = _constants;
     producer = _producer;
+    table = _table;
 }
 
 Select::~Select() {
 
+}
+
+bool Select::tableCheck(string _table) {
+    if (table == _table)
+        return true;
+    else
+        return false;
 }
 
 ostream& Select::print(ostream& _os) {

@@ -44,12 +44,17 @@ private:
 
 	// physical file where data to be scanned are stored
 	DBFile file;
+    
+    // name of table
+    string table;
 
 public:
-	Scan(Schema& _schema, DBFile& _file);
+	Scan(Schema& _schema, DBFile& _file, string _table);
 	virtual ~Scan();
 
 	virtual bool GetNext(Record& _record) {}
+    
+    bool tableCheck(string _table);
 
 	virtual ostream& print(ostream& _os);
 };
@@ -61,18 +66,24 @@ private:
 	
 	// selection predicate in conjunctive normal form
 	CNF predicate;
+    
 	// constant values for attributes in predicate
 	Record constants;
 
 	// operator generating data
 	RelationalOp* producer;
+    
+    // name of table
+    string table;
 
 public:
 	Select(Schema& _schema, CNF& _predicate, Record& _constants,
-		RelationalOp* _producer);
+		RelationalOp* _producer, string _table);
 	virtual ~Select();
 
 	virtual bool GetNext(Record& _record) {}
+    
+    bool tableCheck(string _table);
 
 	virtual ostream& print(ostream& _os);
 };

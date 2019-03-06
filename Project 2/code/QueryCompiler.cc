@@ -20,93 +20,132 @@ QueryCompiler::QueryCompiler(Catalog& _catalog, QueryOptimizer& _optimizer) : ca
 }
 
 QueryCompiler::~QueryCompiler() {
+    
+}
+
+RelationalOp* QueryCompiler::joinMeDaddy(OptimizationTree* tempRoot, Schema &parentSchema, AndList* _predicate) {
+    
+    Schema joinSchemaL, joinSchemaR, joinSchemaOut;
+    CNF joinPredicate;
+    RelationalOp* joinROPL;
+    RelationalOp* joinROPR;
+    
+    /*
+     Both checks continue to recursively check each child
+     allowing us to traverse the optimized join tree and create
+     joins and build our execution tree.
+    */
+    if (tempRoot->leftChild != NULL) {
+        joinROPL = joinMeDaddy(tempRoot->leftChild, joinSchemaL, _predicate);
+    }
+    if (tempRoot->rightChild != NULL) {
+        joinROPR = joinMeDaddy(tempRoot->rightChild, joinSchemaR, _predicate);
+    }
+    
+    if (tempRoot->tables.size() <= 1) {
+        // Not a Join Op
+        // Finds the scan or select the parent join will connect to
+        
+        // Run through select first so we are farthest in the tree
+        for (vector<Select*>::iterator x = selectVector.begin(); x != selectVector.end(); x++) {
+            if ((*x)->tableCheck(tempRoot->tables[0])) {
+                // TODO: REMOVE
+                cout << "Got in Select - " << tempRoot->tables[0] << endl;
+                return (*x);
+            }
+        }
+        
+        // If not found in select
+        // Runs through scan as a last resort
+        for (vector<Scan*>::iterator x = scanVector.begin(); x != scanVector.end(); x++) {
+            if ((*x)->tableCheck(tempRoot->tables[0])) {
+                // TODO: REMOVE
+                cout << "Got in Select - " << tempRoot->tables[0] << endl;
+                return (*x);
+            }
+        }
+    }
+    
+    // Gets CNF using left and right schemas and prexisting where predicate
+    if (joinPredicate.ExtractCNF(*_predicate, joinSchemaL, joinSchemaR) != 0) {
+        // Check to ensure runs correctly
+        cout << "\n\nERROR GETTING CNF IN JOIN - QueryCompiler.cc\n\n" << endl;
+    }
+    
+    // Checks to make sure there are joins
+    if (joinPredicate.numAnds > 0) {
+        // TODO: REMOVE
+        cout << "JOIN WORKING - " << endl;
+        cout << joinSchemaL << "\t" << joinSchemaR << endl << endl;
+        
+        // Creates our out schema by unioning the two input schemas
+        joinSchemaOut = joinSchemaR;
+        joinSchemaOut.Append(joinSchemaL);
+        
+        // Creates our join op
+        Join* join = new Join(joinSchemaL, joinSchemaR, joinSchemaOut, joinPredicate, joinROPL, joinROPR);
+        deleteMe.push_back(join);
+        
+        // Saves this schema
+        parentSchema = joinSchemaOut;
+        // Returns our current join op
+        return join;
+    }
 }
 
 void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOperator* _finalFunction, AndList* _predicate, NameList* _groupingAtts, int& _distinctAtts, QueryExecutionTree& _queryTree) {
     
-    // TODO: ADD TO .h if correct
-    vector<Scan> scanVector;
-    vector<Select> selectVector;
-    
-	
     // create a SCAN operator for each table in the query
     TableList* scanTable = _tables;
     while (scanTable != NULL) {
+        // Basic initialization
         Schema scanSchema;
         DBFile db;
         RelationalOp* ropScan;
         string tableName = scanTable->tableName;
         
+        // Gets Schema of table
         if (catalog->GetSchema(tableName, scanSchema)) {
-            Scan scan(scanSchema, db);
-            // May Cause Problems
-            ropScan = &scan;
+            // TODO: REMOVE
+            cout << "Got a scan" << endl;
+            
+            // If get schema successful
+            // Creates scan and saves to our scan vector
+            Scan* scan = new Scan(scanSchema, db, tableName);
+            deleteMe.push_back(scan);
+            ropScan = scan;
             scanVector.push_back(scan);
         }
         else {
+            // Unsuccessful in gettin schema
             cout << "\n\nERROR GETTING SCHEMA IN SCAN - QueryCompiler.cc\n\n" << endl;
             continue;
         }
         
         // push-down selections: create a SELECT operator wherever necessary
-//        AndList* selectWhere = _predicate;
-//        while (selectWhere != NULL) {
         Record selectConst;
         CNF selectPredicate;
         
+        // Gets CNF and Record using scanSchema and prexisting where predicate
         if (selectPredicate.ExtractCNF(*_predicate, scanSchema, selectConst) != 0) {
+            // Check to ensure runs correctly
             cout << "\n\nERROR GETTING CNF IN SELECT - QueryCompiler.cc\n\n" << endl;
         }
     
+        // Makes sure there are where statements that aren't joins
         if (selectPredicate.numAnds > 0) {
-            //cout << "WHERE SELECTION WORKING - " << endl;
-            //cout << scanSchema << endl << endl;
+            // TODO: REMOVE
+            cout << "Got a Select" << endl;
             
-            Select select(scanSchema, selectPredicate, selectConst, ropScan);
+            // Creates select operateor and saves to a select vector
+            Select* select = new Select(scanSchema, selectPredicate, selectConst, ropScan, tableName);
+            deleteMe.push_back(select);
             selectVector.push_back(select);
         }
-//            selectWhere = selectWhere->rightAnd;
-//        }
         
+        // Moves on to next table to create a scan of it
         scanTable = scanTable->next;
     }
-    
-
-//    // push-down selections: create a SELECT operator wherever necessary
-//    AndList* currAnd = _predicate;
-//    while(currAnd != NULL) {
-//        Schema selectSchema;
-//        Record selectConst;
-//        CNF selectPredicate;
-//        RelationalOp* selectProducer;
-//
-//        // Finds schema used
-//        // TODO
-//        TableList* selectTable = _tables;
-//        string selName = selectTable->tableName;
-//        while (selectTable != NULL) {
-//            if (catalog->GetSchema(selName, selectSchema)) {
-//                string selLeft = currAnd->left->left->value;
-//                string selRight = currAnd->left->right->value;
-//                if (selectSchema.Index(selLeft) != -1 || selectSchema.Index(selRight) != -1) {
-//                    break;
-//                }
-//            }
-//            selectTable = selectTable->next;
-//        }
-//
-//        if (selectPredicate.ExtractCNF(*currAnd, selectSchema, selectConst) != 0) {
-//            cout << "ERROR GETTING CNF IN SELECT - QueryCompiler.cc";
-//        }
-//
-//        cout << "WE GOT HERE WOOO!" << endl;
-//        cout << selectSchema << endl << endl;
-//
-//        // TODO
-//        Select select(selectSchema, selectPredicate, selectConst, selectProducer);
-//
-//        currAnd = currAnd->rightAnd;
-//    }
     
 
 	// call the optimizer to compute the join order
@@ -114,34 +153,14 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
     optimizer->Optimize(_tables, _predicate, root);
 
 	// create join operators based on the optimal order computed by the optimizer
-    // TODO
-//    AndList* joinWhere = _predicate;
-//    while (joinWhere != NULL) {
-    Schema joinSchemaL, joinSchemaR, joinSchemaOut;
-    CNF joinPredicate;
-    RelationalOp* joinROPL;
-    RelationalOp* joinROPR;
-    
-    
-    if (joinPredicate.ExtractCNF(*_predicate, joinSchemaL, joinSchemaR) != 0) {
-        cout << "\n\nERROR GETTING CNF IN JOIN - QueryCompiler.cc\n\n" << endl;
-    }
-    
-    if (joinPredicate.numAnds > 0) {
-        cout << "JOIN WORKING - " << endl;
-        cout << joinSchemaL << "\t" << joinSchemaR << endl << endl;
-        
-        Join join(joinSchemaL, joinSchemaR, joinSchemaOut, joinPredicate, joinROPL, joinROPR);
-    }
-    
-    Schema joinSchema; // Set equal to final join
-    RelationalOp* joinOp;
-//        joinWhere = joinWhere->rightAnd;
-//    }
+    // Is set equal to final join op and schema;
+    cout << "Starting Join" << endl;
+    Schema joinSchema;
+    RelationalOp* joinOp = joinMeDaddy(root, joinSchema, _predicate);
+    cout << "Finishing join" << endl;
     
     
     // create the remaining operators based on the query
-    
     // Pre-WriteOut Initialization
     // So we can save our write out choices depending on Project/Sum/Distinct/GroupBy
     Schema schemaWO;
@@ -168,12 +187,12 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         sumCompute.GrowFromParseTree(_finalFunction, sumSchemaIn);
         
         // Creates Sum Operator
-        Sum sum(sumSchemaIn, sumSchemaOut, sumCompute, sumProducer);
+        Sum* sum = new Sum(sumSchemaIn, sumSchemaOut, sumCompute, sumProducer);
+        deleteMe.push_back(sum);
         
         // Sets Write Out Variables
         schemaWO = sumSchemaOut;
-        // May Cause Problems
-        woProducer = &sum;
+        woProducer = sum;
     }
     // GROUP BY
     else if (_groupingAtts != NULL) {
@@ -217,12 +236,12 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         groupCompute.GrowFromParseTree(_finalFunction, groupSchemaIn);
 
         // Create Group By Operator
-        GroupBy groupBy(groupSchemaIn, groupSchemaOut, groupOM, groupCompute, joinOp);
+        GroupBy* groupBy = new GroupBy(groupSchemaIn, groupSchemaOut, groupOM, groupCompute, joinOp);
+        deleteMe.push_back(groupBy);
         
         // Sets Write Out Variables
         schemaWO = groupSchemaOut;
-        // May Cause Problems
-        woProducer = &groupBy;
+        woProducer = groupBy;
     }
     // PROJECT W/ or W/O DISTINCT
     else {
@@ -250,41 +269,43 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         }
         
         // Creates Project Operator
-        Project project(projectSchemaIn, projectSchemaOut, numAttsInput, numAttsOutput, keepMe, joinOp);
+        Project* project = new Project(projectSchemaIn, projectSchemaOut, numAttsInput, numAttsOutput, keepMe, joinOp);
+        deleteMe.push_back(project);
         
         // DISTINCT
         if (_distinctAtts == 1) {
             // Sets projects out schema as distincts schema
             Schema distinctSchema = projectSchemaOut;
-            // May Cause Problems
-            RelationalOp* distinctOp = &project;
+            RelationalOp* distinctOp = project;
             
             // Create Distinct Operator
-            DuplicateRemoval distinct(distinctSchema, distinctOp);
+            DuplicateRemoval* distinct = new DuplicateRemoval(distinctSchema, distinctOp);
+            deleteMe.push_back(distinct);
             
             // If distinct op then write out set to distinct
             // Sets Write Out Variables
             schemaWO = distinctSchema;
-            // May Cause Problems
-            woProducer = &distinct;
+            woProducer = distinct;
         }
         else {
             // If no distinct op then write out set to project
             // Sets Write Out Variables
             schemaWO = projectSchemaOut;
-            // May Cause Problems
-            woProducer = &project;
+            woProducer = project;
         }
     }
 
     // WRITE OUT
-    WriteOut writeOut(schemaWO, outFile, woProducer);
+    WriteOut* writeOut = new WriteOut(schemaWO, outFile, woProducer);
+    deleteMe.push_back(writeOut);
     
     
 	// connect everything in the query execution tree and return
-    _queryTree.SetRoot(writeOut);
+    _queryTree.SetRoot(*writeOut);
     
     
 	// free the memory occupied by the parse tree since it is not necessary anymore
-    // NO!
+    for (int x = 0; x < deleteMe.size(); x++) {
+        delete deleteMe[x];
+    }
 }
