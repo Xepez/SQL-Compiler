@@ -33,3 +33,6 @@
 
 # Custom
 .DS_Store
+.project
+.cdproject
+.settings/
