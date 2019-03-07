@@ -30,6 +30,8 @@ struct OptimizationTree {
 class QueryOptimizer {
 private:
 	Catalog* catalog;
+	vector<Scan*> scanTables;
+	vector<Scan*> scanTuples;
 
 public:
 	QueryOptimizer(Catalog& _catalog);
