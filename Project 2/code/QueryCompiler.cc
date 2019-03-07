@@ -20,10 +20,12 @@ QueryCompiler::QueryCompiler(Catalog& _catalog, QueryOptimizer& _optimizer) : ca
 }
 
 QueryCompiler::~QueryCompiler() {
-    
+    for (int x = 0; x < deleteMe.size(); x++) {
+        delete deleteMe[x];
+    }
 }
 
-RelationalOp* QueryCompiler::joinMeDaddy(OptimizationTree* tempRoot, Schema &parentSchema, AndList* _predicate) {
+RelationalOp* QueryCompiler::joiner(OptimizationTree* tempRoot, Schema &parentSchema, AndList* _predicate) {
     
     Schema joinSchemaL, joinSchemaR, joinSchemaOut;
     CNF joinPredicate;
@@ -36,21 +38,25 @@ RelationalOp* QueryCompiler::joinMeDaddy(OptimizationTree* tempRoot, Schema &par
      joins and build our execution tree.
     */
     if (tempRoot->leftChild != NULL) {
-        joinROPL = joinMeDaddy(tempRoot->leftChild, joinSchemaL, _predicate);
+        joinROPL = joiner(tempRoot->leftChild, joinSchemaL, _predicate);
     }
     if (tempRoot->rightChild != NULL) {
-        joinROPR = joinMeDaddy(tempRoot->rightChild, joinSchemaR, _predicate);
+        joinROPR = joiner(tempRoot->rightChild, joinSchemaR, _predicate);
     }
     
     if (tempRoot->tables.size() <= 1) {
         // Not a Join Op
         // Finds the scan or select the parent join will connect to
         
+        // Gets schema for our table
+        catalog->GetSchema(tempRoot->tables[0], parentSchema);
+        
         // Run through select first so we are farthest in the tree
         for (vector<Select*>::iterator x = selectVector.begin(); x != selectVector.end(); x++) {
             if ((*x)->tableCheck(tempRoot->tables[0])) {
                 // TODO: REMOVE
-                cout << "Got in Select - " << tempRoot->tables[0] << endl;
+                //cout << "Got in Select - " << tempRoot->tables[0] << endl;
+//                cout << (*x) << endl;
                 return (*x);
             }
         }
@@ -60,7 +66,8 @@ RelationalOp* QueryCompiler::joinMeDaddy(OptimizationTree* tempRoot, Schema &par
         for (vector<Scan*>::iterator x = scanVector.begin(); x != scanVector.end(); x++) {
             if ((*x)->tableCheck(tempRoot->tables[0])) {
                 // TODO: REMOVE
-                cout << "Got in Select - " << tempRoot->tables[0] << endl;
+                //cout << "Got in Scan - " << tempRoot->tables[0] << endl;
+//                cout << (*x) << endl;
                 return (*x);
             }
         }
@@ -73,13 +80,15 @@ RelationalOp* QueryCompiler::joinMeDaddy(OptimizationTree* tempRoot, Schema &par
     }
     
     // Checks to make sure there are joins
-    if (joinPredicate.numAnds > 0) {
+    //if (joinPredicate.numAnds > 0) {
         // TODO: REMOVE
-        cout << "JOIN WORKING - " << endl;
-        cout << joinSchemaL << "\t" << joinSchemaR << endl << endl;
+        //cout << "JOIN WORKING - " << endl;
+        //cout << joinSchemaL << "\t" << joinSchemaR << endl << endl;
         
         // Creates our out schema by unioning the two input schemas
-        joinSchemaOut = joinSchemaR;
+        // TODO: If works keep if not uncomment
+        //joinSchemaOut = joinSchemaR;
+        joinSchemaOut.Append(joinSchemaR);
         joinSchemaOut.Append(joinSchemaL);
         
         // Creates our join op
@@ -90,7 +99,7 @@ RelationalOp* QueryCompiler::joinMeDaddy(OptimizationTree* tempRoot, Schema &par
         parentSchema = joinSchemaOut;
         // Returns our current join op
         return join;
-    }
+    //}
 }
 
 void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOperator* _finalFunction, AndList* _predicate, NameList* _groupingAtts, int& _distinctAtts, QueryExecutionTree& _queryTree) {
@@ -107,7 +116,7 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         // Gets Schema of table
         if (catalog->GetSchema(tableName, scanSchema)) {
             // TODO: REMOVE
-            cout << "Got a scan" << endl;
+            //cout << "Got a scan" << endl;
             
             // If get schema successful
             // Creates scan and saves to our scan vector
@@ -119,7 +128,6 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         else {
             // Unsuccessful in gettin schema
             cout << "\n\nERROR GETTING SCHEMA IN SCAN - QueryCompiler.cc\n\n" << endl;
-            continue;
         }
         
         // push-down selections: create a SELECT operator wherever necessary
@@ -135,7 +143,7 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         // Makes sure there are where statements that aren't joins
         if (selectPredicate.numAnds > 0) {
             // TODO: REMOVE
-            cout << "Got a Select" << endl;
+            //cout << "Got a Select" << endl;
             
             // Creates select operateor and saves to a select vector
             Select* select = new Select(scanSchema, selectPredicate, selectConst, ropScan, tableName);
@@ -149,16 +157,22 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
     
 
 	// call the optimizer to compute the join order
-    OptimizationTree* root;
+    OptimizationTree* root = new OptimizationTree();
+    //cout << "Optimizing" << endl;
     optimizer->Optimize(_tables, _predicate, root);
+    //cout << "Optimizing finished" << endl;
 
 	// create join operators based on the optimal order computed by the optimizer
     // Is set equal to final join op and schema;
-    cout << "Starting Join" << endl;
+    //cout << "Starting Join" << endl;
     Schema joinSchema;
-    RelationalOp* joinOp = joinMeDaddy(root, joinSchema, _predicate);
-    cout << "Finishing join" << endl;
+    RelationalOp* joinOp = joiner(root, joinSchema, _predicate);
+    //cout << "Finishing join" << endl;
     
+//    if (joinOp == NULL) {
+//        cout << "This is why testing is important" << endl;
+//    }
+
     
     // create the remaining operators based on the query
     // Pre-WriteOut Initialization
@@ -175,10 +189,10 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         
         // Creates Criteria for Output Schema
         vector<string> sumOutAtt;
-        sumOutAtt.push_back("sum");
         vector<string> sumOutType;
-        sumOutType.push_back("FLOAT");
         vector<unsigned int> sumDistinct;
+        sumOutAtt.push_back("sum");
+        sumOutType.push_back("FLOAT");
         sumDistinct.push_back(1);
         Schema sumSchemaOut(sumOutAtt, sumOutType, sumDistinct);
 
@@ -222,10 +236,10 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
         
         // Creates Criteria for Output Schema
         vector<string> groupOutAtt;
-        groupOutAtt.push_back("sum");
         vector<string> groupOutType;
-        groupOutType.push_back("FLOAT");
         vector<unsigned int> groupDistinct;
+        groupOutAtt.push_back("sum");
+        groupOutType.push_back("FLOAT");
         groupDistinct.push_back(groupDist);
         Schema groupSchemaOut(groupOutAtt, groupOutType, groupDistinct);
         
@@ -305,7 +319,5 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect, FuncOpe
     
     
 	// free the memory occupied by the parse tree since it is not necessary anymore
-    for (int x = 0; x < deleteMe.size(); x++) {
-        delete deleteMe[x];
-    }
+    // No!
 }

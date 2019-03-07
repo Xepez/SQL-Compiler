@@ -3,7 +3,6 @@
 
 using namespace std;
 
-
 ostream& operator<<(ostream& _os, RelationalOp& _op) {
 	return _op.print(_os);
 }
@@ -30,8 +29,8 @@ bool Scan::tableCheck(string _table) {
 
 ostream& Scan::print(ostream& _os) {
     
-    _os << "SCAN" << endl;
-    _os << "Schema : " << schema << endl;
+    _os << "SCAN {";
+    _os << "Schema : " << schema << "}\n" << endl;
     return _os;
 }
 
@@ -58,9 +57,9 @@ bool Select::tableCheck(string _table) {
 
 ostream& Select::print(ostream& _os) {
     
-	_os << "SELECT" << endl;
-	_os << "Schema : " << schema << "\t";
-    _os << "Predicate : " << predicate << /*"\t"*/endl;
+    _os << "SELECT {";
+	_os << "Schema : " << schema << " ";
+    _os << "Predicate : " << predicate << "}\n" << endl;
     // TODO Figure Out What to Print Here
     //_os << "Constants : " << constants << endl;
 	_os << *producer ;
@@ -85,15 +84,15 @@ Project::~Project() {
 
 ostream& Project::print(ostream& _os) {
     
-    _os << "PROJECT" << endl;
-    _os << "Schema IN : " << schemaIn << "\tNumber IN Atts : " << numAttsInput << "\t";
-    _os << "Schema OUT : " << schemaOut << "\tNumber OUT Atts : " << numAttsOutput << "\t";
+    _os << "PROJECT {";
+    _os << "Schema IN : " << schemaIn << " Number IN Atts : " << numAttsInput << " ";
+    _os << "Schema OUT : " << schemaOut << " Number OUT Atts : " << numAttsOutput << " ";
     _os << "Keeping : ";
     for (int x = 0; x < numAttsOutput; x++) {
         // Goes through KeepMe array and shows which atts are going to be kept
-        _os << keepMe[x] << "\t";
+        _os << keepMe[x] << " ";
     }
-    _os << "\n" << *producer;
+    _os << "}\n\n" << *producer;
     return _os;
 }
 
@@ -115,11 +114,11 @@ Join::~Join() {
 
 ostream& Join::print(ostream& _os) {
     
-    _os << "JOIN" << endl;
-	_os << "Schema Left IN : " << schemaLeft << "\t";
-	_os << "Schema Right IN : " << schemaRight << "\t";
-    _os << "Schema OUT : " << schemaOut << "\t";
-    _os << "Predicate : " << predicate << endl;
+    _os << "JOIN {";
+	_os << "Schema Left IN : " << schemaLeft << " ";
+	_os << "Schema Right IN : " << schemaRight << " ";
+    _os << "Schema OUT : " << schemaOut << " ";
+    _os << "Predicate : " << predicate << "}\n" << endl;
     _os << *left;
     _os << *right;
 	return _os;
@@ -139,8 +138,8 @@ DuplicateRemoval::~DuplicateRemoval() {
 
 ostream& DuplicateRemoval::print(ostream& _os) {
     
-    _os << "DISTINCT" << endl;
-    _os << "Schema : " << schema << endl;
+    _os << "DISTINCT {";
+    _os << "Schema : " << schema << "}\n" << endl;
     _os << *producer;
     return _os;
 }
@@ -160,9 +159,9 @@ Sum::~Sum() {
 
 ostream& Sum::print(ostream& _os) {
 	
-    _os << "SUM" << endl;
-    _os << "Schema IN : " << schemaIn << "\t";
-    _os << "Schema OUT : " << schemaOut << /*"\t"*/endl;
+    _os << "SUM {";
+    _os << "Schema IN : " << schemaIn << " ";
+    _os << "Schema OUT : " << schemaOut << "}\n" << endl;
     // TODO Figure Out What to Print Here
     //_os << "Compute : " << compute << endl;
     _os << *producer;
@@ -186,10 +185,10 @@ GroupBy::~GroupBy() {
 
 ostream& GroupBy::print(ostream& _os) {
     
-    _os << "GROUP BY" << endl;
-    _os << "Schema IN : " << schemaIn << "\t";
-    _os << "Schema OUT : " << schemaOut << "\t";
-    _os << "Grouping Atts : " << groupingAtts << /*"\t"*/endl;
+    _os << "GROUP BY {";
+    _os << "Schema IN : " << schemaIn << " ";
+    _os << "Schema OUT : " << schemaOut << " ";
+    _os << "Grouping Atts : " << groupingAtts << "}\n" << endl;
     // TODO Figure Out What to Print Here
     //_os << "Compute : " << compute << endl;
     _os << *producer;
@@ -211,9 +210,14 @@ WriteOut::~WriteOut() {
 
 ostream& WriteOut::print(ostream& _os) {
 	
-	_os << "WRITE OUT" << endl;
-	_os << "Final Schema : " << schema << "\t";
- 	_os << "File : " << outFile << endl;
+    Record rec;
+    
+    _os << "WRITE OUT {";
+	_os << "Final Schema : " << schema << " ";
+    _os << "File : " << outFile << "}\n" << endl;
+    
+    //rec.print(_os, schema); // ????
+    
     _os << *producer;
 	return _os;
 }

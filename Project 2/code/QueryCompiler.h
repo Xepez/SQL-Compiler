@@ -31,7 +31,7 @@ public:
 	virtual ~QueryCompiler();
 
     // Custom fcn to traverse a join tree and initialize the joins in proper order
-    RelationalOp* joinMeDaddy(OptimizationTree* tempRoot, Schema &parentSchema, AndList* _predicate);
+    RelationalOp* joiner(OptimizationTree* tempRoot, Schema &parentSchema, AndList* _predicate);
     
 	void Compile(TableList* _tables, NameList* _attsToSelect,
 		FuncOperator* _finalFunction, AndList* _predicate,

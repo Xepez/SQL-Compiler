@@ -36,6 +36,8 @@ private:
 public:
 	QueryOptimizer(Catalog& _catalog);
 	virtual ~QueryOptimizer();
+    
+    bool getTable(TableList* _tables, string _att, string& _tableName, unsigned int& _distinct);
 
 	void Optimize(TableList* _tables, AndList* _predicate, OptimizationTree* _root);
 };
