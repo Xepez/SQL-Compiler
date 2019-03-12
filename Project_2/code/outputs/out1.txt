@@ -1,0 +1,11 @@
+Connection successful
+OK!
+QUERY EXECUTION TREE:
+WRITE OUT {Final Schema : (sum:FLOAT [1]) File : out.txt}
+
+SUM {Schema IN : () Schema OUT : (sum:FLOAT [1])}
+
+JOIN {Schema Left IN : () Schema Right IN : () Schema OUT : () Predicate : }
+
+JOIN {Schema Left IN : () Schema Right IN : () Schema OUT : () Predicate : }
+
