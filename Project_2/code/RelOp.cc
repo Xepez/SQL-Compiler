@@ -55,6 +55,22 @@ bool Select::tableCheck(string _table) {
         return false;
 }
 
+bool Select::GetNext(Record& _record){
+
+	while(producer->GetNext(_record)){
+
+		if(predicate.Run(_record,constants)){
+
+			return true;
+
+		}
+
+	}
+
+	return false;
+
+}
+
 ostream& Select::print(ostream& _os) {
     
     _os << "SELECT {";
@@ -96,6 +112,21 @@ ostream& Project::print(ostream& _os) {
     return _os;
 }
 
+bool::Project::GetNext(Record& _record){
+
+	if(producer->GetNext(_record)){
+
+		_record.Project(keepMe,numAttsOutput,numAttsInput);
+		return true;
+
+	}
+
+	else{
+
+		return false;
+
+	}
+}
 
 Join::Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut, CNF& _predicate, RelationalOp* _left, RelationalOp* _right) { // Michael
 
@@ -222,6 +253,17 @@ ostream& WriteOut::print(ostream& _os) {
 	return _os;
 }
 
+bool WriteOut::GetNext(Record& _record){
+
+	if(producer->GetNext(_record)){
+		//do not know what to put in print since _os is not working
+		//_record.print(_os,schema);
+		return true;
+
+	}
+
+	return false;
+}
 
 ostream& operator<<(ostream& _os, QueryExecutionTree& _op) {
     

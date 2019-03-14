@@ -218,6 +218,7 @@ private:
 	// operator generating data
 	RelationalOp* producer;
 
+
 public:
 	WriteOut(Schema& _schema, string& _outFile, RelationalOp* _producer);
 	virtual ~WriteOut();
