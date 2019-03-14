@@ -15,6 +15,9 @@ class DBFile {
 private:
 	File file;
 	string fileName;
+	FileType fileType;
+	Page currPage;
+	off_t filePointer;
 
 public:
 	DBFile ();
