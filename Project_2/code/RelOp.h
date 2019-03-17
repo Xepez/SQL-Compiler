@@ -11,18 +11,22 @@
 
 using namespace std;
 
-
 class RelationalOp {
 protected:
 	// the number of pages that can be used by the operator in execution
 	int noPages;
 public:
 	// empty constructor & destructor
-	RelationalOp() : noPages(-1) {}
-	virtual ~RelationalOp() {}
+	RelationalOp() :
+			noPages(-1) {
+	}
+	virtual ~RelationalOp() {
+	}
 
 	// set the number of pages the operator can use
-	void SetNoPages(int _noPages) {noPages = _noPages;}
+	void SetNoPages(int _noPages) {
+		noPages = _noPages;
+	}
 
 	// every operator has to implement this method
 	virtual bool GetNext(Record& _record) = 0;
@@ -30,65 +34,66 @@ public:
 	/* Virtual function for polymorphic printing using operator<<.
 	 * Each operator has to implement its specific version of print.
 	 */
-    virtual ostream& print(ostream& _os) = 0;
+	virtual ostream& print(ostream& _os) = 0;
 
-    /* Overload operator<< for printing.
-     */
-    friend ostream& operator<<(ostream& _os, RelationalOp& _op);
+	/* Overload operator<< for printing.
+	 */
+	friend ostream& operator<<(ostream& _os, RelationalOp& _op);
 };
 
-class Scan : public RelationalOp {
+class Scan: public RelationalOp {
 private:
 	// schema of records in operator
 	Schema schema;
 
 	// physical file where data to be scanned are stored
 	DBFile file;
-    
-    // name of table
-    string table;
+
+	// name of table
+	string table;
 
 public:
 	Scan(Schema& _schema, DBFile& _file, string _table);
 	virtual ~Scan();
 
-	virtual bool GetNext(Record& _record) {}
-    
-    bool tableCheck(string _table);
+	virtual bool GetNext(Record& _record) {
+	}
+
+	bool tableCheck(string _table);
 
 	virtual ostream& print(ostream& _os);
 };
 
-class Select : public RelationalOp {
+class Select: public RelationalOp {
 private:
 	// schema of records in operator
 	Schema schema;
-	
+
 	// selection predicate in conjunctive normal form
 	CNF predicate;
-    
+
 	// constant values for attributes in predicate
 	Record constants;
 
 	// operator generating data
 	RelationalOp* producer;
-    
-    // name of table
-    string table;
+
+	// name of table
+	string table;
 
 public:
 	Select(Schema& _schema, CNF& _predicate, Record& _constants,
-		RelationalOp* _producer, string _table);
+			RelationalOp* _producer, string _table);
 	virtual ~Select();
 
-	virtual bool GetNext(Record& _record) {}
-    
-    bool tableCheck(string _table);
+	virtual bool GetNext(Record& _record);
+
+	bool tableCheck(string _table);
 
 	virtual ostream& print(ostream& _os);
 };
 
-class Project : public RelationalOp {
+class Project: public RelationalOp {
 private:
 	// schema of records input to operator
 	Schema schemaIn;
@@ -108,15 +113,15 @@ private:
 
 public:
 	Project(Schema& _schemaIn, Schema& _schemaOut, int _numAttsInput,
-		int _numAttsOutput, int* _keepMe, RelationalOp* _producer);
+			int _numAttsOutput, int* _keepMe, RelationalOp* _producer);
 	virtual ~Project();
 
-	virtual bool GetNext(Record& _record) {}
+	virtual bool GetNext(Record& _record);
 
 	virtual ostream& print(ostream& _os);
 };
 
-class Join : public RelationalOp {
+class Join: public RelationalOp {
 private:
 	// schema of records in left operand
 	Schema schemaLeft;
@@ -124,7 +129,7 @@ private:
 	Schema schemaRight;
 	// schema of records output by operator
 	Schema schemaOut;
-	
+
 	// selection predicate in conjunctive normal form
 	CNF predicate;
 
@@ -134,15 +139,16 @@ private:
 
 public:
 	Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut,
-		CNF& _predicate, RelationalOp* _left, RelationalOp* _right);
+			CNF& _predicate, RelationalOp* _left, RelationalOp* _right);
 	virtual ~Join();
 
-	virtual bool GetNext(Record& _record) {}
+	virtual bool GetNext(Record& _record) {
+	}
 
 	virtual ostream& print(ostream& _os);
 };
 
-class DuplicateRemoval : public RelationalOp {
+class DuplicateRemoval: public RelationalOp {
 private:
 	// schema of records in operator
 	Schema schema;
@@ -154,12 +160,13 @@ public:
 	DuplicateRemoval(Schema& _schema, RelationalOp* _producer);
 	virtual ~DuplicateRemoval();
 
-	virtual bool GetNext(Record& _record) {}
+	virtual bool GetNext(Record& _record) {
+	}
 
 	virtual ostream& print(ostream& _os);
 };
 
-class Sum : public RelationalOp {
+class Sum: public RelationalOp {
 private:
 	// schema of records input to operator
 	Schema schemaIn;
@@ -171,18 +178,19 @@ private:
 
 	// operator generating data
 	RelationalOp* producer;
-	
+
 public:
 	Sum(Schema& _schemaIn, Schema& _schemaOut, Function& _compute,
-		RelationalOp* _producer);
+			RelationalOp* _producer);
 	virtual ~Sum();
 
-	virtual bool GetNext(Record& _record) {}
+	virtual bool GetNext(Record& _record) {
+	}
 
 	virtual ostream& print(ostream& _os);
 };
 
-class GroupBy : public RelationalOp {
+class GroupBy: public RelationalOp {
 private:
 	// schema of records input to operator
 	Schema schemaIn;
@@ -199,15 +207,16 @@ private:
 
 public:
 	GroupBy(Schema& _schemaIn, Schema& _schemaOut, OrderMaker& _groupingAtts,
-		Function& _compute,	RelationalOp* _producer);
+			Function& _compute, RelationalOp* _producer);
 	virtual ~GroupBy();
 
-	virtual bool GetNext(Record& _record) {}
+	virtual bool GetNext(Record& _record) {
+	}
 
 	virtual ostream& print(ostream& _os);
 };
 
-class WriteOut : public RelationalOp {
+class WriteOut: public RelationalOp {
 private:
 	// schema of records in operator
 	Schema schema;
@@ -218,29 +227,44 @@ private:
 	// operator generating data
 	RelationalOp* producer;
 
+	ostream _os;
 
 public:
 	WriteOut(Schema& _schema, string& _outFile, RelationalOp* _producer);
 	virtual ~WriteOut();
 
-	virtual bool GetNext(Record& _record) {}
+	virtual bool GetNext(Record& _record);
 
 	virtual ostream& print(ostream& _os);
 };
-
 
 class QueryExecutionTree {
 private:
 	RelationalOp* root;
 
 public:
-	QueryExecutionTree() {}
-	virtual ~QueryExecutionTree() {}
+	QueryExecutionTree() {
+	}
+	virtual ~QueryExecutionTree() {
+	}
 
-	void ExecuteQuery() {}
-	void SetRoot(RelationalOp& _root) {root = &_root;}
+	void ExecuteQuery() {
 
-    friend ostream& operator<<(ostream& _os, QueryExecutionTree& _op);
+		while(true){
+
+			Record record;
+			if(!root->GetNext(record)){
+				break;
+			}
+
+		}
+
+	}
+	void SetRoot(RelationalOp& _root) {
+		root = &_root;
+	}
+
+	friend ostream& operator<<(ostream& _os, QueryExecutionTree& _op);
 };
 
 #endif //_REL_OP_H

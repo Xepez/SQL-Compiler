@@ -68,6 +68,7 @@ int main () {
 		groupingAtts, distinctAtts, queryTree);
 
 	cout << queryTree << endl;
+	queryTree.ExecuteQuery();
 
 /*
 	vector<string> attributes;

@@ -44,7 +44,7 @@ RelationalOp* QueryCompiler::joiner(OptimizationTree* tempRoot, Schema &parentSc
         joinROPR = joiner(tempRoot->rightChild, joinSchemaR, _predicate);
     }
     
-    if (tempRoot->tables.size() <= 1) {
+    if (tempRoot->tables.size() <= 2) {
         // Not a Join Op
         // Finds the scan or select the parent join will connect to
         
