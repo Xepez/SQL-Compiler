@@ -21,6 +21,9 @@ Scan::~Scan() {
 
 bool Scan::GetNext(Record& _record) {
     // TODO
+    if (file.GetNext(_record)) {
+        
+    }
     return false;
 }
 
