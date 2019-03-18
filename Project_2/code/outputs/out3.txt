@@ -1,7 +1,0 @@
-Connection successful
-OK!
-
-
-ERROR GETTING CNF IN SELECT - QueryCompiler.cc
-
-
