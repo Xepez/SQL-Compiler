@@ -17,8 +17,13 @@ Scan::Scan(Schema& _schema, DBFile& _file, string _tableName) {
 	tableName = _tableName;
 }
 Scan::~Scan() {
-
 }
+
+bool Scan::GetNext(Record& _record) {
+    // TODO
+    return false;
+}
+
 string Scan::getTableName() {
 	return tableName;
 }

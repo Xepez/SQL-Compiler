@@ -1,17 +1,13 @@
 #ifndef _CATALOG_H
 #define _CATALOG_H
 
-#include <iostream>
-#include <sqlite3.h>
 #include <string>
 #include <vector>
+#include <iostream>
+#include "sqlite3.h"
+//#include <sqlite3.h>
 
-#include "Keyify.h"
-#include "EfficientMap.h"
-#include "EfficientMap.cc"
 #include "Schema.h"
-#include "DataTypeClass.h"
-
 
 using namespace std;
 
@@ -23,25 +19,12 @@ private:
 	 * Efficient data structures are recommended.
 	 * Avoid linear traversals when possible.
 	 */
-
-	int rc;
-	sqlite3 *db;
-	char* zErrMsg;
-	sqlite3_stmt* statement;
-
-	EfficientMap<KeyString, TableInfo> tables;
-	const char* file_name;
-
-	void open_database(const char*_filename);
-	void close_database();
-	void print_error_message();
-	void check_query(string query);
-	void get_data_from_meta_tables();
-	void get_data_from_meta_attributes();
-	void delete_contents_of_database();
-
-
+    
 public:
+    
+    // Database var
+    sqlite3 *db;
+    
 	/* Catalog constructor.
 	 * Initialize the catalog with the persistent data stored in _fileName.
 	 * _fileName is a SQLite database containing data on tables and their attributes.
@@ -49,7 +32,6 @@ public:
 	 * Populate in-memory data structures with data from the SQLite database.
 	 * All the functions work with the in-memory data structures.
 	 */
-
 	Catalog(string& _fileName);
 
 	/* Catalog destructor.
