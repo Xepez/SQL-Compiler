@@ -123,8 +123,28 @@ void DBFile::AppendRecord(Record& rec) {
 int DBFile::GetNext(Record& rec) {
 
 	//MoveFirst();
-
-
+	
+	if(page->GetFirst(rec){
+		
+		return 1;
+		
+	}
+	else{
+	
+		if(currPage == file.GetLength(){
+		
+			return 0;
+			
+		}
+		else{
+			
+			currPage++;
+			file.GetPage(page, currPage);
+			//ret = page.GetFirst(rec);
+			return 1;
+			
+		}
+	}
 
 
 }
