@@ -61,7 +61,7 @@ bool Select::GetNext(Record& _record) {
 }
 
 bool Select::tableCheck(string _table) {
-    if (table == _table)
+    if (tableName == _table)
         return true;
     else
         return false;
@@ -268,12 +268,8 @@ WriteOut::~WriteOut() {
 
 bool WriteOut::GetNext(Record& _record) {
     
-    //does not compile with this _os
-    
-    //ostream _os;
-    
     if (producer->GetNext(_record)) {
-        _record.print(_os, schema);
+        _record.print(cout, schema);
         return true;
         
     }

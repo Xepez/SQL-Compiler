@@ -50,7 +50,7 @@ public:
 
 	virtual ~Scan();
 
-	virtual bool GetNext(Record& _record) {}
+    virtual bool GetNext(Record& _record);
 	
 	string getTableName();
 	DBFile& getfile();
@@ -80,6 +80,7 @@ public:
 
 	virtual ~Select();
 
+    bool tableCheck(string _table);
 
 	Schema& getSchema();
 	CNF& getPredicate();
@@ -87,7 +88,7 @@ public:
 	RelationalOp* getProducer();
 	string getTableName();
 
-	virtual bool GetNext(Record& _record) {}
+    virtual bool GetNext(Record& _record);
 
 	virtual ostream& print(ostream& _os);
 };
@@ -115,7 +116,7 @@ public:
 		int _numAttsOutput, int* _keepMe, RelationalOp* _producer);
 	virtual ~Project();
 
-	virtual bool GetNext(Record& _record) {}
+    virtual bool GetNext(Record& _record);
 	
 	Schema& getSchemaIn();
 	Schema& getSchemaOut();
@@ -257,7 +258,7 @@ public:
 	string& getOutFile();
 	RelationalOp* getProducer();
 
-	virtual bool GetNext(Record& _record) {}
+    virtual bool GetNext(Record& _record);
 
 	virtual ostream& print(ostream& _os);
 };
