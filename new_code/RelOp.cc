@@ -20,9 +20,8 @@ Scan::~Scan() {
 }
 
 bool Scan::GetNext(Record& _record) {
-    // TODO
-    if (file.GetNext(_record)) {
-        
+    if (file.GetNext(_record) == 1) {
+        return true;
     }
     return false;
 }
@@ -53,7 +52,7 @@ Select::~Select() {
 }
 
 bool Select::GetNext(Record& _record) {
-    
+    cout << "Select GN" << endl;
     while (producer->GetNext(_record)) {
         
         if (predicate.Run(_record, constants)) {
@@ -275,7 +274,7 @@ WriteOut::~WriteOut() {
 }
 
 bool WriteOut::GetNext(Record& _record) {
-    
+    cout << "WO GN" << endl;
     if (producer->GetNext(_record)) {
         _record.print(cout, schema);
         return true;
@@ -300,6 +299,17 @@ ostream& WriteOut::print(ostream& _os) {
 
 
 //---------------------------------------------------------------------------------------------------------------------------------------------
+void QueryExecutionTree::ExecuteQuery() {
+    Record rec;
+    int count = 0;
+    cout << "-------------------------" << endl;
+    cout << "Executing Query" << endl;
+    while(root->GetNext(rec)) {
+        // Dont think I add anything here?
+        count++;
+    }
+}
+
 ostream& operator<<(ostream& _os, QueryExecutionTree& _op) {
 	return _os << "QUERY EXECUTION TREE";
 }

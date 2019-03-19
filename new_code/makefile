@@ -4,7 +4,7 @@ tag = -n
 
 main.out:	QueryParser.o QueryLexer.o Schema.o Record.o File.o DBFile.o Comparison.o Function.o RelOp.o Catalog.o QueryOptimizer.o QueryCompiler.o main.o
 	$(CC) -o main.out main.o QueryParser.o QueryLexer.o Schema.o Record.o File.o DBFile.o Comparison.o Function.o RelOp.o Catalog.o QueryOptimizer.o QueryCompiler.o -ll -lsqlite3
-	
+
 main.o:	main.cc
 	$(CC) -c main.cc
 	
@@ -28,6 +28,9 @@ Function.o: Schema.cc Record.cc Function.cc
 
 RelOp.o: Schema.cc Record.cc Comparison.cc RelOp.cc	
 	$(CC) -c RelOp.cc
+	
+tblLoad.o: tblLoad.cc DBFile.cc Catalog.cc Schema.cc File.cc
+	$(CC) -c tblLoad.cc
 	
 QueryOptimizer.o: Schema.cc Record.cc Comparison.cc RelOp.cc QueryOptimizer.cc	
 	$(CC) -c QueryOptimizer.cc
