@@ -122,16 +122,15 @@ void DBFile::AppendRecord(Record& rec) {
 
 int DBFile::GetNext(Record& rec) {
 
-	//MoveFirst();
 	
-	if(page->GetFirst(rec){
+	if(currPage.GetFirst(rec)){
 		
 		return 1;
 		
 	}
 	else{
 	
-		if(currPage == file.GetLength(){
+		if(currPage == file.GetLength()){
 		
 			return 0;
 			
@@ -139,12 +138,12 @@ int DBFile::GetNext(Record& rec) {
 		else{
 			
 			currPage++;
-			file.GetPage(page, currPage);
-			//ret = page.GetFirst(rec);
+			file.GetPage(currPage, filePointer);
 			return 1;
 			
 		}
 	}
+
 
 
 }
