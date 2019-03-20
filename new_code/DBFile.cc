@@ -69,7 +69,7 @@ void DBFile::Load(Schema& schema, char* textFile) {
 	char * txt = textFile;
 
 	MoveFirst();
-	FILE* newfile = fopen(txt, "r+");
+	FILE* newfile = fopen(txt, "r");
 
 	while(true){
 
@@ -89,7 +89,7 @@ void DBFile::Load(Schema& schema, char* textFile) {
 
 	}
 
-	file.AddPage(currPage,filePointer);
+	file.AddPage(currPage,filecount);
 	currPage.EmptyItOut();
 	fclose(newfile);
 
@@ -103,16 +103,16 @@ int DBFile::Close() {
 
 void DBFile::MoveFirst() {
 
-	filePointer = 0;
+	filecount = 0;
 	currPage.EmptyItOut();
 
 }
 
 void DBFile::AppendRecord(Record& rec) {
 
-	if (currPage.Append(rec) == 0) {
+	if (!currPage.Append(rec)) {
 
-		file.AddPage(currPage, filePointer++);
+		file.AddPage(currPage, filecount++);
 		currPage.EmptyItOut();
 		currPage.Append(rec);
 
@@ -122,29 +122,28 @@ void DBFile::AppendRecord(Record& rec) {
 
 int DBFile::GetNext(Record& rec) {
 
-	//MoveFirst();
+
 	
-	if(currPage.GetFirst(rec)) {
+	if(currPage.GetFirst(rec)){
 		
 		return 1;
 		
 	}
 	else{
 	
-		if(filePointer == file.GetLength()){
+		if(filecount == file.GetLength()){
 		
-			return 0;
+			return -1;
 			
 		}
 		else{
 			
-			filePointer++;
-			file.GetPage(currPage, filePointer);
-			//ret = page.GetFirst(rec);
-			return 1;
+			file.GetPage(currPage, filecount++);
 			
+			return 0;
 		}
 	}
+
 
 
 }
