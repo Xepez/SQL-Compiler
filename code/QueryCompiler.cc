@@ -225,14 +225,17 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 	while (tempTables != NULL) {
 		Schema tableSchema;
 		string tableName = tempTables->tableName;
-		DBFile dataFile = DBFile();
 
-        string dataPath;
 		catalog->GetSchema(tableName, tableSchema);
+        
+        // Sets Up Data File
+        DBFile dataFile = DBFile();
+        string dataPath;
         catalog->GetDataFile(tableName, dataPath);
-		
+        //cout << "Data Path: " << dataPath << endl;
         char* stringPath = &dataPath[0];
         dataFile.Open(stringPath);
+        
 		Scan *tableScan = new Scan(tableSchema, dataFile, tableName);
 
 		// push-down selections: create a SELECT operator wherever necessary

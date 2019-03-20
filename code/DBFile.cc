@@ -7,8 +7,8 @@
 
 using namespace std;
 
-DBFile::DBFile() :
-		fileName("") {
+DBFile::DBFile() : fileName("") {
+    filecount = 0;
 }
 
 DBFile::~DBFile() {
@@ -48,7 +48,7 @@ int DBFile::Create(char* f_path, FileType f_type) {
 int DBFile::Open(char* f_path) {
     if (file.Open(1, f_path) == 0) {
         // Success at opening file
-        cout << "Success Opening DB File" << endl;
+        cout << "Success Opening DB File - " << fileName << endl;
         
         // Initialize all needed variables
         filecount = 0;
@@ -71,12 +71,12 @@ void DBFile::Load(Schema& schema, char* textFile) {
 	MoveFirst();
 	FILE* newfile = fopen(textFile, "r");
 
-    cout << "Load" << endl;
+    //cout << "Load" << endl;
     
 	while(true){
-
+        //cout << "REE " << filecount << endl;
 		Record record;
-		if(record.ExtractNextRecord(schema, *newfile)){
+		if(record.ExtractNextRecord(schema, *newfile) == 1){
             if (currPage.Append(record) == 0) {
                 file.AddPage(currPage, filecount);
                 filecount++;
@@ -92,7 +92,7 @@ void DBFile::Load(Schema& schema, char* textFile) {
 		}
 
 	}
-    
+    cout << file.GetLength() << endl;
 	fclose(newfile);
 }
 
@@ -124,12 +124,23 @@ void DBFile::AppendRecord(Record& rec) {
 int DBFile::GetNext(Record& rec) {
     cout << "Geddet" << endl;
     if(currPage.GetFirst(rec) != 0){
+        cout << "F" << endl;
         return 1;
     }
-    else if(filecount == file.GetLength() || file.GetPage(currPage, filecount++) == -1){
+//    else if(filecount == file.GetLength() || file.GetPage(currPage, filecount) == -1){
+//        cout << "S" << endl;
+//        return 0;
+//    }
+    else if(filecount == file.GetLength()){
+        cout << "S " << filecount << " = " << file.GetLength() << endl;
+        return 0;
+    }
+    else if (file.GetPage(currPage, filecount) == -1) {
+        cout << "F" << endl;
         return 0;
     }
     else{
+        cout << "T" << endl;
         currPage.GetFirst(rec);
         filecount++;
         return 1;
