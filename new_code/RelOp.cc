@@ -20,6 +20,7 @@ Scan::~Scan() {
 }
 
 bool Scan::GetNext(Record& _record) {
+    cout << "Scan GN" << endl;
     if (file.GetNext(_record) == 1) {
         return true;
     }
@@ -54,17 +55,11 @@ Select::~Select() {
 bool Select::GetNext(Record& _record) {
     cout << "Select GN" << endl;
     while (producer->GetNext(_record)) {
-        
         if (predicate.Run(_record, constants)) {
-            
             return true;
-            
         }
-        
     }
-    
     return false;
-    
 }
 
 bool Select::tableCheck(string _table) {
