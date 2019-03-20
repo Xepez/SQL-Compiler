@@ -56,7 +56,7 @@ int DBFile::Open (char* f_path) {
     else {
         // Fail
         cout << "Failure to Open DB File" << endl;
-        return -1;
+        return Create(f_path, Heap);
     }
 }
 
@@ -69,6 +69,8 @@ void DBFile::Load (Schema& schema, char* textFile) {
     while(tempRec.ExtractNextRecord(schema, tempFile) != 0) {
         page.Append(rec);
     }
+    
+    fclose(tempFile);
 }
 
 int DBFile::Close () {
@@ -96,7 +98,7 @@ int DBFile::GetNext (Record& rec) {
         }
         else {
             // Gets next page w/ current length
-            file.GetPage(page, currLen) == 0
+            file.GetPage(page, currLen);
             // Increase length by one
             currLen++;
             // Retry's Getting rec w/ new page
