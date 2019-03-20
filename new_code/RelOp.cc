@@ -301,7 +301,7 @@ ostream& WriteOut::print(ostream& _os) {
 //---------------------------------------------------------------------------------------------------------------------------------------------
 void QueryExecutionTree::ExecuteQuery() {
     Record rec;
-    int count = 0;
+    int count = 0;  // Here to just have something inside the while loop
     cout << "-------------------------" << endl;
     cout << "Executing Query" << endl;
     while(root->GetNext(rec)) {
