@@ -22,6 +22,7 @@ Scan::~Scan() {
 bool Scan::GetNext(Record& _record) {
     cout << "Scan GN" << endl;
     if (file.GetNext(_record) == 1) {
+        cout << "Ran" << endl;
         return true;
     }
     return false;

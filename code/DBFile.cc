@@ -52,7 +52,9 @@ int DBFile::Open(char* f_path) {
         
         // Initialize all needed variables
         filecount = 0;
-        file.AddPage(currPage, 0);
+        //file.GetPage(currPage, 0);
+        //currPage.EmptyItOut();
+        //file.AddPage(currPage, 0);
         
         return 0;
     }
@@ -67,15 +69,14 @@ int DBFile::Open(char* f_path) {
 void DBFile::Load(Schema& schema, char* textFile) {
     
 	MoveFirst();
-    filecount = 0;
 	FILE* newfile = fopen(textFile, "r");
 
+    cout << "Load" << endl;
+    
 	while(true){
 
 		Record record;
-        //cout << "Check" << endl;
 		if(record.ExtractNextRecord(schema, *newfile)){
-            //cout << "Got" << endl;
             if (currPage.Append(record) == 0) {
                 file.AddPage(currPage, filecount);
                 filecount++;
@@ -110,7 +111,7 @@ void DBFile::MoveFirst() {
 
 void DBFile::AppendRecord(Record& rec) {
 
-	if (!currPage.Append(rec)) {
+	if (currPage.Append(rec) != 1) {
 
 		file.AddPage(currPage, filecount++);
 		currPage.EmptyItOut();
@@ -121,29 +122,16 @@ void DBFile::AppendRecord(Record& rec) {
 }
 
 int DBFile::GetNext(Record& rec) {
-
-
-	
-	if(currPage.GetFirst(rec)){
-		
-		return 1;
-		
-	}
-	else{
-	
-		if(filecount == file.GetLength()){
-		
-			return -1;
-			
-		}
-		else{
-			
-			file.GetPage(currPage, filecount++);
-			
-			return 0;
-		}
-	}
-
-
-
+    cout << "Geddet" << endl;
+    if(currPage.GetFirst(rec) != 0){
+        return 1;
+    }
+    else if(filecount == file.GetLength() || file.GetPage(currPage, filecount++) == -1){
+        return 0;
+    }
+    else{
+        currPage.GetFirst(rec);
+        filecount++;
+        return 1;
+    }
 }

@@ -227,9 +227,12 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 		string tableName = tempTables->tableName;
 		DBFile dataFile = DBFile();
 
+        string dataPath;
 		catalog->GetSchema(tableName, tableSchema);
+        catalog->GetDataFile(tableName, dataPath);
 		
-
+        char* stringPath = &dataPath[0];
+        dataFile.Open(stringPath);
 		Scan *tableScan = new Scan(tableSchema, dataFile, tableName);
 
 		// push-down selections: create a SELECT operator wherever necessary
