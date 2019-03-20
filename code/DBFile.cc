@@ -52,6 +52,7 @@ int DBFile::Open(char* f_path) {
         
         // Initialize all needed variables
         filecount = 0;
+        file.AddPage(currPage, 0);
         
         return 0;
     }
@@ -64,32 +65,34 @@ int DBFile::Open(char* f_path) {
 }
 
 void DBFile::Load(Schema& schema, char* textFile) {
-
+    
 	MoveFirst();
+    filecount = 0;
 	FILE* newfile = fopen(textFile, "r");
 
 	while(true){
 
 		Record record;
-        cout << "Check" << endl;
+        //cout << "Check" << endl;
 		if(record.ExtractNextRecord(schema, *newfile)){
-            cout << "Got" << endl;
-			AppendRecord(record);
+            //cout << "Got" << endl;
+            if (currPage.Append(record) == 0) {
+                file.AddPage(currPage, filecount);
+                filecount++;
+                currPage.EmptyItOut();
+            }
 
 		}
-
 		else{
-
+            file.AddPage(currPage, filecount);
+            filecount++;
+            currPage.EmptyItOut();
 			break;
-
 		}
 
 	}
-
-	file.AddPage(currPage, filecount);
-	currPage.EmptyItOut();
+    
 	fclose(newfile);
-
 }
 
 int DBFile::Close() {

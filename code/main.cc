@@ -8,7 +8,6 @@ extern "C"{
 #include "QueryOptimizer.h"
 #include "QueryCompiler.h"
 #include "RelOp.h"
-#include "tblLoad.cc"
 
 using namespace std;
 
@@ -377,22 +376,6 @@ int main () {
 
 	
 	cout << queryTree << endl;
-    
-    bool loadData = true;
-    if (loadData) {
-        cout << "---------------------------------------------------" << endl;
-        cout << "Loading Table information" << endl;
-        loadTables("customer", "heap/customer.heap", "tables/customer.tbl");
-        loadTables("lineitem", "heap/lineitem.txt", "tables/lineitem.tbl");
-        loadTables("nation", "heap/nation.txt", "tables/nation.tbl");
-        loadTables("orders", "heap/orders.txt", "tables/orders.tbl");
-        loadTables("part", "heap/part.txt", "tables/part.tbl");
-        loadTables("partsupp", "heap/partsupp.txt", "tables/partsupp.tbl");
-        loadTables("region", "heap/region.txt", "tables/region.tbl");
-        loadTables("supplier", "heap/supplier.txt", "tables/supplier.tbl");
-        cout << "Finshed loading Data" << endl;
-        cout << "---------------------------------------------------" << endl;
-    }
     
     queryTree.ExecuteQuery();
 	

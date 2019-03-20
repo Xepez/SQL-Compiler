@@ -277,12 +277,9 @@ bool WriteOut::GetNext(Record& _record) {
     if (producer->GetNext(_record)) {
         _record.print(cout, schema);
         return true;
-        
     }
     else{
-    
-    return false;
-	    
+        return false;
     }
 }
 
