@@ -17,7 +17,7 @@ private:
 	string fileName;
 	FileType fileType;
 	Page currPage;
-	off_t filePointer;
+	off_t filecount;
 
 public:
 	DBFile ();
