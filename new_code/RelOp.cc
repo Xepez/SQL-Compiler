@@ -54,14 +54,18 @@ Select::~Select() {
 
 bool Select::GetNext(Record& _record) {
     cout << "Select GN" << endl;
-    while (producer->GetNext(_record)) {
-        if (predicate.Run(_record, constants)) {
+while(true){
+    if(!producer->GetNext(_record)) {
+	    return false;
+    }
+    else{
+	    if (predicate.Run(_record, constants)) {
             return true;
         }
     }
-    return false;
+  
 }
-
+}
 bool Select::tableCheck(string _table) {
     if (tableName == _table)
         return true;
@@ -275,8 +279,11 @@ bool WriteOut::GetNext(Record& _record) {
         return true;
         
     }
+    else{
     
     return false;
+	    
+    }
 }
 
 Schema & WriteOut::getSchema() {
