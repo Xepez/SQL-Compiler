@@ -116,9 +116,9 @@ void DBFile::Load(Schema& schema, char* textFile) {
 
 	}
 
-	file.AddPage(page, currPage);
-	page.EmptyItOut();
-
+//    file.AddPage(page, currPage);
+//    page.EmptyItOut();
+    fclose(newfile);
 }
 
 int DBFile::Close() {
