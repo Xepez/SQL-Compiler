@@ -8,7 +8,7 @@
 using namespace std;
 
 DBFile::DBFile() : fileName("") {
-	//currPage = 0;
+	currPage = 0;
 }
 
 DBFile::~DBFile() {
@@ -55,7 +55,7 @@ int DBFile::Open(char* f_path) {
         cout << "Success Opening DB File - " << fileName << endl;
 
         // Initialize all needed variables
-        currPage = 0;
+        //currPage = 0;
         //file.GetPage(page, 0);
         //page.EmptyItOut();
         //file.AddPage(page, 0);
@@ -113,7 +113,7 @@ void DBFile::Load(Schema& schema, char* textFile) {
     }
 
     WriteToPage();
-    //cout << "File Len: " << file.GetLength() << " / PointerLen: " << currPage << endl;
+    cout << "File Len: " << file.GetLength() << " / PointerLen: " << currPage << endl;
     fclose(newfile);
 }
 
