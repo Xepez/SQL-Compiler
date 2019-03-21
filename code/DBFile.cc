@@ -98,13 +98,18 @@ void DBFile::Load(Schema& schema, char* textFile) {
 	while(true){
 
 		Record rec;
-		if(rec.ExtractNextRecord(schema, *newfile)){
-
-			AppendRecord(rec);
+		if(rec.ExtractNextRecord(schema, *newfile) == 1){
+            if (page.Append(rec) == 0) {
+                file.AddPage(page, currPage++);
+                page.EmptyItOut();
+                page.Append(rec);
+            }
 
 		}
 		else{
-
+            file.AddPage(page, currPage++);
+            page.EmptyItOut();
+            page.Append(rec);
 			break;
 
 		}
