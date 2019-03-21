@@ -21,7 +21,7 @@ Scan::~Scan() {
 
 bool Scan::GetNext(Record& _record) {
     cout << "Scan GN" << endl;
-    if (file.GetNext(_record) == 0) {
+    if (file.GetNext(_record) == 1) {
         cout << "Ran" << endl;
         return true;
     }
@@ -57,15 +57,15 @@ Select::~Select() {
 
 bool Select::GetNext(Record& _record) {
     cout << "Select GN" << endl;
-while(!producer->GetNext(_record)) {
-
+    while(producer->GetNext(_record)) {
+        cout << "Back to select" << endl;
 	    if (predicate.Run(_record, constants)) {
 	        cout << "Select GN True " << endl;
 
             return true;
         }
     }
-  
+    cout << "Failed Select" << endl;
 	return false;
 
 }

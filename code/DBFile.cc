@@ -170,14 +170,14 @@ int DBFile::GetNext(Record& rec) {
 
 	if(ret == true){
 		cout << "ret = true " << endl;
-		return true;
+		return 1;
 
 	}else{
 
 		if(currPage == file.GetLength()){
 			cout << "ret = false " << endl;
 			cout << "S " << currPage << " = " << file.GetLength() << endl;
-			return false;
+			return 0;
 
 		}else{
 
@@ -185,7 +185,7 @@ int DBFile::GetNext(Record& rec) {
 			ret = page.GetFirst(rec);
 			cout << "ret = true " << endl;
 
-			return true;
+			return 1;
 		}
 
 	}
