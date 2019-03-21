@@ -19,14 +19,10 @@ Scan::Scan(Schema& _schema, DBFile& _file, string _tableName) {
 Scan::~Scan() {
 }
 
-// DELETE
-Schema temps;
-
 bool Scan::GetNext(Record& _record) {
     cout << "Scan GN" << endl;
     if (file.GetNext(_record) == 1) {
         cout << "Ran" << endl;
-        _record.print(cout, temps);
         return true;
     }
     else {
@@ -282,7 +278,6 @@ WriteOut::~WriteOut() {
 
 bool WriteOut::GetNext(Record& _record) {
     cout << "WO GN" << endl;
-    temps = schema;
     if (producer->GetNext(_record)) {
         _record.print(cout, schema);
 
@@ -313,10 +308,10 @@ void QueryExecutionTree::ExecuteQuery() {
 	//int count = 0;  // Here to just have something inside the while loop
     cout << "---------------------------------------------------" << endl;
     cout << "Executing Query" << endl;
-        Record rec;
-        while(root->GetNext(rec)){
+    Record rec;
+    while(root->GetNext(rec)){
 
-        }
+    }
 
 
 }

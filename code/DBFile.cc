@@ -48,13 +48,14 @@ int DBFile::Create(char* f_path, FileType f_type) {
 int DBFile::Open(char* f_path) {
     if (file.Open(1, f_path) == 0) {
         // Success at opening file
+        fileName = f_path;
         cout << "Success Opening DB File - " << fileName << endl;
-        
+
         // Initialize all needed variables
         currPage = 0;
-        //file.GetPage(currPage, 0);
-        //currPage.EmptyItOut();
-        //file.AddPage(currPage, 0);
+        //file.GetPage(page, 0);
+        //page.EmptyItOut();
+        //file.AddPage(page, 0);
         
         return 0;
     }
@@ -73,65 +74,59 @@ void DBFile::Load(Schema& schema, char* textFile) {
 
     //cout << "Load" << endl;
     
-//	while(true){
-//        //cout << "REE " << filecount << endl;
-//		Record record;
-//		if(record.ExtractNextRecord(schema, *newfile) == 1){
-//            if (Page.Append(record) == 0) {
-//                file.AddPage(Page, currPage);
-//                currPage++;
-//                Page.EmptyItOut();
+//    int tempPointer = 0;
+//    Page tempPage;
+//    while(true){
+//        Record record;
+//        if(record.ExtractNextRecord(schema, *newfile) == 1){
+//            if (tempPage.Append(record) == 0) {
+//                file.AddPage(tempPage, tempPointer);
+//                tempPointer++;
+//                tempPage.EmptyItOut();
 //            }
 //
-//		}
-//		else{
-//            file.AddPage(Page, currPage);
-//            currPage++;
-//            Page.EmptyItOut();
-//			break;
-//		}
+//        }
+//        else{
+//            file.AddPage(tempPage, tempPointer);
+//            tempPointer++;
+//            tempPage.EmptyItOut();
+//            break;
+//        }
 //
-//	}
-//    cout << file.GetLength() << endl;
-//	fclose(newfile);
+//    }
+//    cout << "File Len: " << file.GetLength() << " \ PointerLen: " << tempPointer << endl;
 
-	while(true){
+    while(true){
 
-		Record rec;
-		if(rec.ExtractNextRecord(schema, *newfile) == 1){
+        Record rec;
+        if(rec.ExtractNextRecord(schema, *newfile) == 1){
             if (page.Append(rec) == 0) {
                 file.AddPage(page, currPage++);
                 page.EmptyItOut();
                 page.Append(rec);
             }
+        }
+        else{
+            break;
+        }
 
-		}
-		else{
-            file.AddPage(page, currPage++);
-            page.EmptyItOut();
-            page.Append(rec);
-			break;
+    }
 
-		}
-
-	}
-
-//    file.AddPage(page, currPage);
-//    page.EmptyItOut();
+    file.AddPage(page, currPage++);
+    page.EmptyItOut();
+    //cout << "File Len: " << file.GetLength() << " / PointerLen: " << currPage << endl;
     fclose(newfile);
 }
 
 int DBFile::Close() {
 
 	return file.Close();
-
 }
 
 void DBFile::MoveFirst() {
 
 	currPage = 0;
 	page.EmptyItOut();
-
 }
 
 void DBFile::AppendRecord(Record& rec) {
@@ -166,15 +161,15 @@ int DBFile::GetNext(Record& rec) {
 //    }
 //    else{
 //        cout << "T" << endl;
-//        currPage.GetFirst(rec);
-//        filecount++;
+//        page.GetFirst(rec);
+//        currPage++;
 //        return 1;
 //    }
 
 	int ret = page.GetFirst(rec);
-
+    
 	if(ret != 0){
-		cout << "ret = true " << endl;
+		cout << "F ret = true " << endl;
 		return 1;
 
 	}else{
@@ -188,30 +183,10 @@ int DBFile::GetNext(Record& rec) {
 
 			currPage++;
 			ret = page.GetFirst(rec);
-			cout << "ret = true " << endl;
+			cout << "T ret = true " << endl;
 
 			return 1;
 		}
 
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
