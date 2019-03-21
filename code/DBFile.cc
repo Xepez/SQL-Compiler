@@ -112,7 +112,7 @@ void DBFile::Load(Schema& schema, char* textFile) {
 
     }
 
-WriteToPage();
+    WriteToPage();
     //cout << "File Len: " << file.GetLength() << " / PointerLen: " << currPage << endl;
     fclose(newfile);
 }
@@ -148,26 +148,26 @@ void DBFile::WriteToPage(){
 }
 
 int DBFile::GetNext(Record& rec) {
-    cout << "Geddet" << endl;
+    cout << "Running DBFile GetNext()" << endl;
     //MoveFirst();
     if(page.GetFirst(rec) != 0){
-        cout << "F" << endl;
+        cout << "GetFirst Succeeded! First Try!" << endl;
         return 1;
     }
-    else if(currPage == file.GetLength() || file.GetPage(page, currPage) == -1){
-        cout << "S" << endl;
+//    else if(currPage == file.GetLength() || file.GetPage(page, currPage) == -1){
+//        cout << "Failed" << endl;
+//        return 0;
+//    }
+    else if(currPage == file.GetLength()){
+        cout << "Failed cuz: " << currPage << " = " << file.GetLength() << endl;
         return 0;
     }
-//    else if(currPage == file.GetLength()){
-//        cout << "S " << currPage << " = " << file.GetLength() << endl;
-//        return 0;
-//    }
-//    else if (file.GetPage(page, currPage) == -1) {
-//        cout << "F" << endl;
-//        return 0;
-//    }
+    else if (file.GetPage(page, currPage) == -1) {
+        cout << "Failed cuz: GetPage returned -1" << endl;
+        return 0;
+    }
     else{
-        cout << "T" << endl;
+        cout << "Succeeded! Second Try!" << endl;
         page.GetFirst(rec);
         currPage++;
         return 1;

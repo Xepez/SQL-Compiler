@@ -20,9 +20,9 @@ Scan::~Scan() {
 }
 
 bool Scan::GetNext(Record& _record) {
-    cout << "Scan GN" << endl;
+    cout << "Scan GetNext" << endl;
     if (file.GetNext(_record) == 1) {
-        cout << "Ran" << endl;
+        cout << "Got Scan Record" << endl;
         return true;
     }
     else {
@@ -56,11 +56,11 @@ Select::~Select() {
 }
 
 bool Select::GetNext(Record& _record) {
-    cout << "Select GN" << endl;
+    cout << "Select GetNext" << endl;
     while(producer->GetNext(_record)) {
         cout << "Back to select" << endl;
 	    if (predicate.Run(_record, constants)) {
-	        cout << "Select GN True " << endl;
+	        cout << "Success at Select" << endl;
 
             return true;
         }
@@ -113,18 +113,17 @@ Project::~Project() {
 }
 
 bool Project::GetNext(Record& _record) {
-    
+    cout << "Project GetNext" << endl;
     if (producer->GetNext(_record)) {
-        
+        cout << "Back to Project" << endl;
         _record.Project(keepMe, numAttsOutput, numAttsInput);
+        cout << "Success at Project" << endl;
         return true;
-        
+
     }
-    
     else {
-        
+        cout << "Failed Project" << endl;
         return false;
-        
     }
 }
 
@@ -277,13 +276,15 @@ WriteOut::~WriteOut() {
 }
 
 bool WriteOut::GetNext(Record& _record) {
-    cout << "WO GN" << endl;
+    cout << "Write Out GetNext" << endl;
     if (producer->GetNext(_record)) {
+        cout << "Back to Write Out" << endl;
         _record.print(cout, schema);
-
+        cout << "Success at Write Out" << endl;
         return true;
     }
     else{
+        cout << "Failed Write Out" << endl;
         return false;
     }
 }
@@ -309,11 +310,7 @@ void QueryExecutionTree::ExecuteQuery() {
     cout << "---------------------------------------------------" << endl;
     cout << "Executing Query" << endl;
     Record rec;
-    while(root->GetNext(rec)){
-
-    }
-
-
+    while(root->GetNext(rec)){ }
 }
 
 ostream& operator<<(ostream& _os, QueryExecutionTree& _op) {

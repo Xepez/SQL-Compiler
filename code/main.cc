@@ -367,7 +367,7 @@ int main () {
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     bool loadData = false;
     
-    if (!loadData) {
+    if (!loadData) { // Run the Query
         //cout << catalog << endl;
         // this is the query optimizer
         // it is not invoked directly but rather passed to the query compiler
@@ -418,7 +418,7 @@ int main () {
         
         queryTree.ExecuteQuery();
     }
-    else {
+    else { // Load the Data
         cout << "---------------------------------------------------" << endl;
         cout << "Loading Table information" << endl;
         loadTables(catalog, "customer", "heap/customer.heap", "tables/customer.tbl");
