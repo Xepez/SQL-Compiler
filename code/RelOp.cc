@@ -21,11 +21,13 @@ Scan::~Scan() {
 
 bool Scan::GetNext(Record& _record) {
     cout << "Scan GN" << endl;
-    if (file.GetNext(_record) == 1) {
+    if (file.GetNext(_record) == 0) {
         cout << "Ran" << endl;
         return true;
     }
-    return false;
+    else {
+    	return false;
+    }
 }
 
 string Scan::getTableName() {
@@ -55,18 +57,19 @@ Select::~Select() {
 
 bool Select::GetNext(Record& _record) {
     cout << "Select GN" << endl;
-while(true){
-    if(!producer->GetNext(_record)) {
-	    return false;
-    }
-    else{
+while(!producer->GetNext(_record)) {
+
 	    if (predicate.Run(_record, constants)) {
+	        cout << "Select GN True " << endl;
+
             return true;
         }
     }
   
+	return false;
+
 }
-}
+
 bool Select::tableCheck(string _table) {
     if (tableName == _table)
         return true;
@@ -277,6 +280,7 @@ bool WriteOut::GetNext(Record& _record) {
     cout << "WO GN" << endl;
     if (producer->GetNext(_record)) {
         _record.print(cout, schema);
+
         return true;
     }
     else{
@@ -300,14 +304,16 @@ ostream& WriteOut::print(ostream& _os) {
 
 //---------------------------------------------------------------------------------------------------------------------------------------------
 void QueryExecutionTree::ExecuteQuery() {
-    Record rec;
-    int count = 0;  // Here to just have something inside the while loop
+
+	//int count = 0;  // Here to just have something inside the while loop
     cout << "---------------------------------------------------" << endl;
     cout << "Executing Query" << endl;
-    while(root->GetNext(rec)) {
-        // Dont think I add anything here?
-        count++;
-    }
+        Record rec;
+        while(root->GetNext(rec)){
+
+        }
+
+
 }
 
 ostream& operator<<(ostream& _os, QueryExecutionTree& _op) {
