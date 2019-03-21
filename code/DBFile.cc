@@ -168,7 +168,7 @@ int DBFile::GetNext(Record& rec) {
 
 	int ret = page.GetFirst(rec);
 
-	if(ret == true){
+	if(ret != 0){
 		cout << "ret = true " << endl;
 		return 1;
 
