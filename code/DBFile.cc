@@ -100,13 +100,8 @@ void DBFile::Load(Schema& schema, char* textFile) {
         
         Record rec;
         if(rec.ExtractNextRecord(schema, *newfile) == 1){
-            if (page.Append(rec) == 0) {
-                file.AddPage(page, currPage++);
-                page.EmptyItOut();
-                page.Append(rec);
-            }
-            else
-                continue;
+
+            		AppendRecord(rec);
         }
         else{
             break;
@@ -114,8 +109,7 @@ void DBFile::Load(Schema& schema, char* textFile) {
 
     }
 
-    file.AddPage(page, currPage++);
-    page.EmptyItOut();
+WriteToPage();
     //cout << "File Len: " << file.GetLength() << " / PointerLen: " << currPage << endl;
     fclose(newfile);
 }
@@ -141,6 +135,13 @@ void DBFile::AppendRecord(Record& rec) {
 		page.Append(rec);
 
 	}
+
+}
+
+void DBFile::WriteToPage(){
+
+	file.AddPage(page,currPage);
+	page.EmptyItOut();
 
 }
 

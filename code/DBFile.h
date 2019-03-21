@@ -32,6 +32,7 @@ public:
 	int Close ();
 
 	void Load (Schema& _schema, char* textFile);
+	void WriteToPage();
 
 	void MoveFirst ();
 	void AppendRecord (Record& _addMe);
