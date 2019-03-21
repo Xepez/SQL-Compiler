@@ -16,8 +16,10 @@ private:
 	File file;
 	string fileName;
 	FileType fileType;
-	Page currPage;
-	off_t filecount;
+	//currPage turned to Page for simplicity
+	Page page;
+	//filecount turned to currpage for simplicity
+	off_t currPage;
 
 public:
 	DBFile ();

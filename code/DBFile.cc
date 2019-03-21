@@ -8,7 +8,7 @@
 using namespace std;
 
 DBFile::DBFile() : fileName("") {
-    filecount = 0;
+	//currPage = 0;
 }
 
 DBFile::~DBFile() {
@@ -51,7 +51,7 @@ int DBFile::Open(char* f_path) {
         cout << "Success Opening DB File - " << fileName << endl;
         
         // Initialize all needed variables
-        filecount = 0;
+        currPage = 0;
         //file.GetPage(currPage, 0);
         //currPage.EmptyItOut();
         //file.AddPage(currPage, 0);
@@ -73,27 +73,47 @@ void DBFile::Load(Schema& schema, char* textFile) {
 
     //cout << "Load" << endl;
     
+//	while(true){
+//        //cout << "REE " << filecount << endl;
+//		Record record;
+//		if(record.ExtractNextRecord(schema, *newfile) == 1){
+//            if (Page.Append(record) == 0) {
+//                file.AddPage(Page, currPage);
+//                currPage++;
+//                Page.EmptyItOut();
+//            }
+//
+//		}
+//		else{
+//            file.AddPage(Page, currPage);
+//            currPage++;
+//            Page.EmptyItOut();
+//			break;
+//		}
+//
+//	}
+//    cout << file.GetLength() << endl;
+//	fclose(newfile);
+
 	while(true){
-        //cout << "REE " << filecount << endl;
-		Record record;
-		if(record.ExtractNextRecord(schema, *newfile) == 1){
-            if (currPage.Append(record) == 0) {
-                file.AddPage(currPage, filecount);
-                filecount++;
-                currPage.EmptyItOut();
-            }
+
+		Record rec;
+		if(rec.ExtractNextRecord(schema, *newfile)){
+
+			AppendRecord(rec);
 
 		}
 		else{
-            file.AddPage(currPage, filecount);
-            filecount++;
-            currPage.EmptyItOut();
+
 			break;
+
 		}
 
 	}
-    cout << file.GetLength() << endl;
-	fclose(newfile);
+
+	file.AddPage(page, currPage);
+	page.EmptyItOut();
+
 }
 
 int DBFile::Close() {
@@ -104,45 +124,89 @@ int DBFile::Close() {
 
 void DBFile::MoveFirst() {
 
-	filecount = 0;
-	currPage.EmptyItOut();
+	currPage = 0;
+	page.EmptyItOut();
 
 }
 
 void DBFile::AppendRecord(Record& rec) {
 
-	if (currPage.Append(rec) != 1) {
+	if (!page.Append(rec)) {
 
-		file.AddPage(currPage, filecount++);
-		currPage.EmptyItOut();
-		currPage.Append(rec);
+		file.AddPage(page, currPage++);
+		page.EmptyItOut();
+		page.Append(rec);
 
 	}
 
 }
 
 int DBFile::GetNext(Record& rec) {
-    cout << "Geddet" << endl;
-    if(currPage.GetFirst(rec) != 0){
-        cout << "F" << endl;
-        return 1;
-    }
-//    else if(filecount == file.GetLength() || file.GetPage(currPage, filecount) == -1){
-//        cout << "S" << endl;
+//    cout << "Geddet" << endl;
+//    if(currPage.GetFirst(rec) != 0){
+//        cout << "F" << endl;
+//        return 1;
+//    }
+////    else if(filecount == file.GetLength() || file.GetPage(currPage, filecount) == -1){
+////        cout << "S" << endl;
+////        return 0;
+////    }
+//    else if(filecount == file.GetLength()){
+//        cout << "S " << filecount << " = " << file.GetLength() << endl;
 //        return 0;
 //    }
-    else if(filecount == file.GetLength()){
-        cout << "S " << filecount << " = " << file.GetLength() << endl;
-        return 0;
-    }
-    else if (file.GetPage(currPage, filecount) == -1) {
-        cout << "F" << endl;
-        return 0;
-    }
-    else{
-        cout << "T" << endl;
-        currPage.GetFirst(rec);
-        filecount++;
-        return 1;
-    }
+//    else if (file.GetPage(currPage, filecount) == -1) {
+//        cout << "F" << endl;
+//        return 0;
+//    }
+//    else{
+//        cout << "T" << endl;
+//        currPage.GetFirst(rec);
+//        filecount++;
+//        return 1;
+//    }
+
+	int ret = page.GetFirst(rec);
+
+	if(ret == true){
+		cout << "ret = true " << endl;
+		return true;
+
+	}else{
+
+		if(currPage == file.GetLength()){
+			cout << "ret = false " << endl;
+			cout << "S " << currPage << " = " << file.GetLength() << endl;
+			return false;
+
+		}else{
+
+			currPage++;
+			ret = page.GetFirst(rec);
+			cout << "ret = true " << endl;
+
+			return true;
+		}
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
