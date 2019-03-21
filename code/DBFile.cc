@@ -37,6 +37,9 @@ int DBFile::Create(char* f_path, FileType f_type) {
     fileType = f_type;
 
     return file.Open(0, f_path);
+//    int temp = file.Open(0, f_path);
+//    file.Close();
+//    return temp;
 //    }
 //    else {
 //        cout << "Failed Create - " << f_type << endl;

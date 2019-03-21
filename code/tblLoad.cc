@@ -8,6 +8,11 @@
 
 using namespace std;
 
+/*
+        IGNORE THIS FILE. IT HAS BEEN COMBINED WITH main.cc TO TRY AND FIX
+        ANNOYING ERRORS. - Peyton
+*/
+
 // Compile:
 // g++ tblLoad.cc DBFile.cc File.cc Schema.cc Catalog.cc Record.cc -o tblLoad.out -lsqlite3
 // -----------------------------------------------------------------------------------
@@ -27,16 +32,16 @@ void loadTables(string tblName, char* heapLoc, char* txtFile) {
     
     // Creates Heap File for Table
     //cout << "Creating File" << endl;
-    DBFile dbFile = DBFile();
-    dbFile.Create(heapLoc, Heap);
+    DBFile dbF = DBFile();
+    dbF.Create(heapLoc, Heap);
     
     // Opens Head File
     //cout << "Opening File" << endl;
-    dbFile.Open(heapLoc);
+    dbF.Open(heapLoc);
     
     // Loads Data
     //cout << "Loading Data" << endl;
-    dbFile.Load(schema, txtFile);
+    dbF.Load(schema, txtFile);
     
     // Updates Catalog Info
     //cout << "Updating Catalog" << endl;
@@ -45,7 +50,7 @@ void loadTables(string tblName, char* heapLoc, char* txtFile) {
     
     // Closes File
     //cout << "Closing File" << endl;
-    dbFile.Close();
+    dbF.Close();
 }
 
 int main() {

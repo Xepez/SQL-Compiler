@@ -23,7 +23,39 @@ extern int distinctAtts; // 1 if there is a DISTINCT in a non-aggregate query
 extern "C" int yyparse();
 extern "C" int yylex_destroy();
 
-
+void loadTables(Catalog& catalog, string tblName, char* heapLoc, char* txtFile) {
+    
+    // Open our catalog
+//    string db = "catalog.sqlite";
+//    Catalog catalog(db);
+    
+    // Get the tables schema
+    //cout << "Getting table Schema" << endl;
+    Schema schema;
+    catalog.GetSchema(tblName, schema);
+    
+    // Creates Heap File for Table
+    //cout << "Creating File" << endl;
+    DBFile dbF = DBFile();
+    dbF.Create(heapLoc, Heap);
+    
+    // Opens Head File
+    //cout << "Opening File" << endl;
+    dbF.Open(heapLoc);
+    
+    // Loads Data
+    //cout << "Loading Data" << endl;
+    dbF.Load(schema, txtFile);
+    
+    // Updates Catalog Info
+    //cout << "Updating Catalog" << endl;
+    string stringLoc = heapLoc;
+    catalog.SetDataFile(tblName, stringLoc);
+    
+    // Closes File
+    //cout << "Closing File" << endl;
+    dbF.Close();
+}
 
 void printStructureData() {
 	//first check what is in each of the structures and how the values from the parser are bgin stored
@@ -329,55 +361,85 @@ bool checkIfFunctionAttsExists(Catalog&catalog) {
 int main () {
 	string dbFile = "catalog.sqlite";
 	Catalog catalog(dbFile);
-	//cout << catalog << endl;
-	// this is the query optimizer
-	// it is not invoked directly but rather passed to the query compiler
-	QueryOptimizer optimizer(catalog);
-
-	// this is the query compiler
-	// it includes the catalog and the query optimizer
-	QueryCompiler compiler(catalog, optimizer);
-
-
-	// the query parser is accessed directly through yyparse
-	// this populates the extern data structures
-	int parse = -1;
-	
-	if (yyparse () == 0) {
-		cout << "OK!" << endl;
-
-		//checkIfAttributesExists();
-		parse = 0;
-		
-	}
-	else {
-		cout << "Error: Query is not correct!" << endl;
-		parse = -1;
-	}
-
-	//this is just a function for printing out what is inside the variables for creating our tree
-	//printStructureData();
-
-	//checkIfTablesExists(catalog);
-	yylex_destroy();
-
-	if (parse != 0) return -1;
-
-	// at this point we have the parse tree in the ParseTree data structures
-	// we are ready to invoke the query compiler with the given query
-	// the result is the execution tree built from the parse tree and optimized
-	if (!checkIfTablesExists(catalog) || !checkIfPredicatesExists(catalog) || !checkIfGroupingAttsExists(catalog) || !checkIfSelectAttsExists(catalog) || !checkIfFunctionAttsExists(catalog)) {
-		cout << "Query is INVALID" << endl;
-		return 1;
-	}
-	QueryExecutionTree queryTree;
-	compiler.Compile(tables, attsToSelect, finalFunction, predicate,
-		groupingAtts, distinctAtts, queryTree);
-
-	
-	cout << queryTree << endl;
     
-    queryTree.ExecuteQuery();
-	
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // !CHANGE THIS VALUE TO FALSE TO RUN QUERY OR TRUE TO LOAD DATA FROM .tbl FILES!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    bool loadData = false;
+    
+    if (!loadData) {
+        //cout << catalog << endl;
+        // this is the query optimizer
+        // it is not invoked directly but rather passed to the query compiler
+        QueryOptimizer optimizer(catalog);
+
+        // this is the query compiler
+        // it includes the catalog and the query optimizer
+        QueryCompiler compiler(catalog, optimizer);
+
+
+        // the query parser is accessed directly through yyparse
+        // this populates the extern data structures
+        int parse = -1;
+        
+        if (yyparse () == 0) {
+            cout << "OK!" << endl;
+
+            //checkIfAttributesExists();
+            parse = 0;
+            
+        }
+        else {
+            cout << "Error: Query is not correct!" << endl;
+            parse = -1;
+        }
+
+        //this is just a function for printing out what is inside the variables for creating our tree
+        //printStructureData();
+
+        //checkIfTablesExists(catalog);
+        yylex_destroy();
+
+        if (parse != 0) return -1;
+
+        // at this point we have the parse tree in the ParseTree data structures
+        // we are ready to invoke the query compiler with the given query
+        // the result is the execution tree built from the parse tree and optimized
+        if (!checkIfTablesExists(catalog) || !checkIfPredicatesExists(catalog) || !checkIfGroupingAttsExists(catalog) || !checkIfSelectAttsExists(catalog) || !checkIfFunctionAttsExists(catalog)) {
+            cout << "Query is INVALID" << endl;
+            return 1;
+        }
+        QueryExecutionTree queryTree;
+        compiler.Compile(tables, attsToSelect, finalFunction, predicate,
+            groupingAtts, distinctAtts, queryTree);
+
+        
+        cout << queryTree << endl;
+        
+        queryTree.ExecuteQuery();
+    }
+    else {
+        cout << "---------------------------------------------------" << endl;
+        cout << "Loading Table information" << endl;
+        loadTables(catalog, "customer", "heap/customer.heap", "tables/customer.tbl");
+        loadTables(catalog, "lineitem", "heap/lineitem.heap", "tables/lineitem.tbl");
+        loadTables(catalog, "nation", "heap/nation.heap", "tables/nation.tbl");
+        loadTables(catalog, "orders", "heap/orders.heap", "tables/orders.tbl");
+        loadTables(catalog, "part", "heap/part.heap", "tables/part.tbl");
+        loadTables(catalog, "partsupp", "heap/partsupp.heap", "tables/partsupp.tbl");
+        loadTables(catalog, "region", "heap/region.heap", "tables/region.tbl");
+        loadTables(catalog, "supplier", "heap/supplier.heap", "tables/supplier.tbl");
+        //    loadTables(catalog, "customer", "customer.heap", "customer.tbl");
+        //    loadTables(catalog, "lineitem", "lineitem.heap", "lineitem.tbl");
+        //    loadTables(catalog, "nation", "nation.heap", "nation.tbl");
+        //    loadTables(catalog, "orders", "orders.heap", "orders.tbl");
+        //    loadTables(catalog, "part", "part.heap", "part.tbl");
+        //    loadTables(catalog, "partsupp", "partsupp.heap", "partsupp.tbl");
+        //    loadTables(catalog, "region", "region.heap", "region.tbl");
+        //    loadTables(catalog, "supplier", "supplier.heap", "supplier.tbl");
+        cout << "Finshed loading Data" << endl;
+        cout << "---------------------------------------------------" << endl;
+    }
+        
 	return 0;
 }
