@@ -365,7 +365,7 @@ int main () {
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // !CHANGE THIS VALUE TO FALSE TO RUN QUERY OR TRUE TO LOAD DATA FROM .tbl FILES!
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    bool loadData = false;
+    bool loadData = false; /*true;*/
     
     if (!loadData) { // Run the Query
         //cout << catalog << endl;

@@ -21,6 +21,7 @@ Scan::~Scan() {
 
 bool Scan::GetNext(Record& _record) {
     cout << "Scan GetNext" << endl;
+//    file.MoveFirst();
     if (file.GetNext(_record) == 1) {
         cout << "Got Scan Record" << endl;
         return true;

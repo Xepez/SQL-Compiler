@@ -19,7 +19,7 @@ private:
 	//currPage turned to Page for simplicity
 	Page page;
 	//filecount turned to currpage for simplicity
-	int currPage;
+	off_t currPage;
 
 public:
 	DBFile ();

@@ -150,6 +150,7 @@ void DBFile::WriteToPage(){
 int DBFile::GetNext(Record& rec) {
     cout << "Running DBFile GetNext()" << endl;
     //MoveFirst();
+//    file.GetPage(page, currPage);
     if(page.GetFirst(rec) != 0){
         cout << "GetFirst Succeeded! First Try!" << endl;
         return 1;
@@ -172,7 +173,22 @@ int DBFile::GetNext(Record& rec) {
         currPage++;
         return 1;
     }
-
+//---------------------------------------------------------------------------
+    
+//    if (page.GetFirst(rec) == 0) {
+//        file.GetPage(page, currPage);
+//        currPage++;
+//
+//        if(page.GetFirst(rec) == 0) {
+//            return 0;
+//        }
+//        else {
+//            return 1;
+//        }
+//    }
+//    return 1;
+    
+//---------------------------------------------------------------------------
 //    int ret = page.GetFirst(rec);
 //
 //    if(ret != 0){
