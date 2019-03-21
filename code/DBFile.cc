@@ -155,18 +155,18 @@ int DBFile::GetNext(Record& rec) {
         cout << "GetFirst Succeeded! First Try!" << endl;
         return 1;
     }
-//    else if(currPage == file.GetLength() || file.GetPage(page, currPage) == -1){
-//        cout << "Failed" << endl;
+    else if(currPage == file.GetLength() || file.GetPage(page, currPage) == -1){
+        cout << "Failed" << endl;
+        return 0;
+    }
+//    else if(currPage == file.GetLength()){
+//        cout << "Failed cuz: " << currPage << " = " << file.GetLength() << endl;
 //        return 0;
 //    }
-    else if(currPage == file.GetLength()){
-        cout << "Failed cuz: " << currPage << " = " << file.GetLength() << endl;
-        return 0;
-    }
-    else if (file.GetPage(page, currPage) == -1) {
-        cout << "Failed cuz: GetPage returned -1" << endl;
-        return 0;
-    }
+//    else if (file.GetPage(page, currPage) == -1) {
+//        cout << "Failed cuz: GetPage returned -1" << endl;
+//        return 0;
+//    }
     else{
         cout << "Succeeded! Second Try!" << endl;
         page.GetFirst(rec);
