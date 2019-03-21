@@ -130,8 +130,7 @@ void DBFile::AppendRecord(Record& rec) {
 
 	if (!page.Append(rec)) {
 
-		file.AddPage(page, currPage++);
-		page.EmptyItOut();
+		WriteToPage();
 		page.Append(rec);
 
 	}
