@@ -95,9 +95,9 @@ void DBFile::Load(Schema& schema, char* textFile) {
 //
 //    }
 //    cout << "File Len: " << file.GetLength() << " \ PointerLen: " << tempPointer << endl;
-
+    
     while(true){
-
+        
         Record rec;
         if(rec.ExtractNextRecord(schema, *newfile) == 1){
             if (page.Append(rec) == 0) {
@@ -105,6 +105,8 @@ void DBFile::Load(Schema& schema, char* textFile) {
                 page.EmptyItOut();
                 page.Append(rec);
             }
+            else
+                continue;
         }
         else{
             break;
@@ -127,6 +129,7 @@ void DBFile::MoveFirst() {
 
 	currPage = 0;
 	page.EmptyItOut();
+//    file.GetPage(page, currPage);
 }
 
 void DBFile::AppendRecord(Record& rec) {
@@ -142,51 +145,52 @@ void DBFile::AppendRecord(Record& rec) {
 }
 
 int DBFile::GetNext(Record& rec) {
-//    cout << "Geddet" << endl;
-//    if(currPage.GetFirst(rec) != 0){
-//        cout << "F" << endl;
-//        return 1;
-//    }
-////    else if(filecount == file.GetLength() || file.GetPage(currPage, filecount) == -1){
-////        cout << "S" << endl;
-////        return 0;
-////    }
-//    else if(filecount == file.GetLength()){
-//        cout << "S " << filecount << " = " << file.GetLength() << endl;
+    cout << "Geddet" << endl;
+    //MoveFirst();
+    if(page.GetFirst(rec) != 0){
+        cout << "F" << endl;
+        return 1;
+    }
+    else if(currPage == file.GetLength() || file.GetPage(page, currPage) == -1){
+        cout << "S" << endl;
+        return 0;
+    }
+//    else if(currPage == file.GetLength()){
+//        cout << "S " << currPage << " = " << file.GetLength() << endl;
 //        return 0;
 //    }
-//    else if (file.GetPage(currPage, filecount) == -1) {
+//    else if (file.GetPage(page, currPage) == -1) {
 //        cout << "F" << endl;
 //        return 0;
 //    }
-//    else{
-//        cout << "T" << endl;
-//        page.GetFirst(rec);
-//        currPage++;
+    else{
+        cout << "T" << endl;
+        page.GetFirst(rec);
+        currPage++;
+        return 1;
+    }
+
+//    int ret = page.GetFirst(rec);
+//
+//    if(ret != 0){
+//        cout << "F ret = true " << endl;
 //        return 1;
+//
+//    }else{
+//
+//        if(currPage == file.GetLength()){
+//            cout << "ret = false " << endl;
+//            cout << "S " << currPage << " = " << file.GetLength() << endl;
+//            return 0;
+//
+//        }else{
+//
+//            currPage++;
+//            ret = page.GetFirst(rec);
+//            cout << "T ret = true " << endl;
+//
+//            return 1;
+//        }
+//
 //    }
-
-	int ret = page.GetFirst(rec);
-    
-	if(ret != 0){
-		cout << "F ret = true " << endl;
-		return 1;
-
-	}else{
-
-		if(currPage == file.GetLength()){
-			cout << "ret = false " << endl;
-			cout << "S " << currPage << " = " << file.GetLength() << endl;
-			return 0;
-
-		}else{
-
-			currPage++;
-			ret = page.GetFirst(rec);
-			cout << "T ret = true " << endl;
-
-			return 1;
-		}
-
-	}
 }

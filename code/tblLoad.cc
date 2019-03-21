@@ -51,14 +51,22 @@ void loadTables(string tblName, char* heapLoc, char* txtFile) {
 int main() {
     cout << "---------------------------------------------------" << endl;
     cout << "Loading Table information" << endl;
-    loadTables("customer", "heap/customer.txt", "tables/customer.tbl");
-    loadTables("lineitem", "heap/lineitem.txt", "tables/lineitem.tbl");
-    loadTables("nation", "heap/nation.txt", "tables/nation.tbl");
-    loadTables("orders", "heap/orders.txt", "tables/orders.tbl");
-    loadTables("part", "heap/part.txt", "tables/part.tbl");
-    loadTables("partsupp", "heap/partsupp.txt", "tables/partsupp.tbl");
-    loadTables("region", "heap/region.txt", "tables/region.tbl");
-    loadTables("supplier", "heap/supplier.txt", "tables/supplier.tbl");
+    loadTables("customer", "heap/customer.heap", "tables/customer.tbl");
+    loadTables("lineitem", "heap/lineitem.heap", "tables/lineitem.tbl");
+    loadTables("nation", "heap/nation.heap", "tables/nation.tbl");
+    loadTables("orders", "heap/orders.heap", "tables/orders.tbl");
+    loadTables("part", "heap/part.heap", "tables/part.tbl");
+    loadTables("partsupp", "heap/partsupp.heap", "tables/partsupp.tbl");
+    loadTables("region", "heap/region.heap", "tables/region.tbl");
+    loadTables("supplier", "heap/supplier.heap", "tables/supplier.tbl");
+//    loadTables("customer", "customer.heap", "customer.tbl");
+//    loadTables("lineitem", "lineitem.heap", "lineitem.tbl");
+//    loadTables("nation", "nation.heap", "nation.tbl");
+//    loadTables("orders", "orders.heap", "orders.tbl");
+//    loadTables("part", "part.heap", "part.tbl");
+//    loadTables("partsupp", "partsupp.heap", "partsupp.tbl");
+//    loadTables("region", "region.heap", "region.tbl");
+//    loadTables("supplier", "supplier.heap", "supplier.tbl");
     cout << "Finshed loading Data" << endl;
     cout << "---------------------------------------------------" << endl;
     
