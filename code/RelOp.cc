@@ -21,7 +21,6 @@ Scan::~Scan() {
 
 bool Scan::GetNext(Record& _record) {
     cout << "Scan GetNext" << endl;
-//    file.MoveFirst();
     if (file.GetNext(_record) == 1) {
         cout << "Got Scan Record" << endl;
         return true;
@@ -116,6 +115,10 @@ Project::~Project() {
 bool Project::GetNext(Record& _record) {
     cout << "Project GetNext" << endl;
     if (producer->GetNext(_record)) {
+        
+        cout << "Out: " << numAttsOutput << " In: " << numAttsInput << endl;
+        cout << "Keep Me: " << keepMe[0] << endl;
+        
         cout << "Back to Project" << endl;
         _record.Project(keepMe, numAttsOutput, numAttsInput);
         cout << "Success at Project" << endl;

@@ -378,7 +378,10 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 		}
 
 	}
-
+    
+    int* keepMe;
+    int count = 0;
+    
 	while (tempAttsToSelect != NULL) {
 		//cout << tempAttsToSelect->name << endl;
 		for (int i = 0; i < myAttributeInputs.size(); i++) {
@@ -387,6 +390,8 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 				attributes.push_back(myAttributeInputs[i].name);
 				attributeTypes.push_back(convertType(myAttributeInputs[i].type));
 				distincts.push_back(myAttributeInputs[i].noDistinct);
+                keepMe[count] = i;
+                count++;
 			}
 		}
 
@@ -397,7 +402,6 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 	int numAttsInput;
 	int numAttsOutput;
 	Schema schemaOut(attributes, attributeTypes, distincts);
-	int * keepMe;
 
 	numAttsInput = schemaIn.GetNumAtts();
 	numAttsOutput = schemaOut.GetNumAtts();
