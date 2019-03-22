@@ -148,65 +148,73 @@ void DBFile::WriteToPage(){
 }
 
 int DBFile::GetNext(Record& rec) {
-    cout << "Running DBFile GetNext()" << endl;
+    //cout << "Running DBFile GetNext()" << endl;
     //MoveFirst();
 //    file.GetPage(page, currPage);
-    if(page.GetFirst(rec) != 0){
-        cout << "GetFirst Succeeded! First Try!" << endl;
-        return 1;
-    }
-    else if(currPage == file.GetLength() || file.GetPage(page, currPage) == -1){
-        cout << "Failed" << endl;
-        return 0;
-    }
-//    else if(currPage == file.GetLength()){
-//        cout << "Failed cuz: " << currPage << " = " << file.GetLength() << endl;
+//    if(page.GetFirst(rec) != 0){
+//        //cout << "GetFirst Succeeded! First Try!" << endl;
+//        return 1;
+//    }
+//    else if(currPage == file.GetLength() || file.GetPage(page, currPage) == -1){
+//        //cout << "Failed" << endl;
 //        return 0;
 //    }
-//    else if (file.GetPage(page, currPage) == -1) {
-//        cout << "Failed cuz: GetPage returned -1" << endl;
-//        return 0;
+////    else if(currPage == file.GetLength()){
+////        cout << "Failed cuz: " << currPage << " = " << file.GetLength() << endl;
+////        return 0;
+////    }
+////    else if (file.GetPage(page, currPage) == -1) {
+////        cout << "Failed cuz: GetPage returned -1" << endl;
+////        return 0;
+////    }
+//    else{
+//        //cout << "Succeeded! Second Try!" << endl;
+//        page.GetFirst(rec);
+//        currPage++;
+//        return 1;
 //    }
-    else{
-        cout << "Succeeded! Second Try!" << endl;
-        page.GetFirst(rec);
-        currPage++;
-        return 1;
-    }
 //---------------------------------------------------------------------------
     
-//    if (page.GetFirst(rec) == 0) {
-//        file.GetPage(page, currPage);
-//        currPage++;
-//
-//        if(page.GetFirst(rec) == 0) {
-//            return 0;
-//        }
-//        else {
-//            return 1;
-//        }
-//    }
-//    return 1;
+    int ret = page.GetFirst(rec);
+    if (ret == 1) {
+        return 1;
+    }
+    else {
+        if (currPage == file.GetLength()) {
+            return 0;
+        }
+        else {
+            file.GetPage(page, currPage++);
+            ret = page.GetFirst(rec);
+            if (ret == 1)
+                return 1;
+            else
+                return 0;
+        }
+    }
     
 //---------------------------------------------------------------------------
 //    int ret = page.GetFirst(rec);
 //
 //    if(ret != 0){
-//        cout << "F ret = true " << endl;
+//        //cout << "F ret = true " << endl;
 //        return 1;
 //
 //    }else{
 //
 //        if(currPage == file.GetLength()){
-//            cout << "ret = false " << endl;
-//            cout << "S " << currPage << " = " << file.GetLength() << endl;
+//            //cout << "ret = false " << endl;
+//            //cout << "S " << currPage << " = " << file.GetLength() << endl;
 //            return 0;
 //
 //        }else{
 //
 //            currPage++;
+//            if (file.GetPage(page, currPage) == -1) {
+//                return 0;
+//            }
 //            ret = page.GetFirst(rec);
-//            cout << "T ret = true " << endl;
+//            //cout << "T ret = true " << endl;
 //
 //            return 1;
 //        }

@@ -20,9 +20,9 @@ Scan::~Scan() {
 }
 
 bool Scan::GetNext(Record& _record) {
-    cout << "Scan GetNext" << endl;
+    //cout << "Scan GetNext" << endl;
     if (file.GetNext(_record) == 1) {
-        cout << "Got Scan Record" << endl;
+        //cout << "Got Scan Record" << endl;
         return true;
     }
     else {
@@ -56,16 +56,16 @@ Select::~Select() {
 }
 
 bool Select::GetNext(Record& _record) {
-    cout << "Select GetNext" << endl;
+    //cout << "Select GetNext" << endl;
     while(producer->GetNext(_record)) {
-        cout << "Back to select" << endl;
+        //cout << "Back to select" << endl;
 	    if (predicate.Run(_record, constants)) {
-	        cout << "Success at Select" << endl;
+	        //cout << "Success at Select" << endl;
 
             return true;
         }
     }
-    cout << "Failed Select" << endl;
+    //cout << "Failed Select" << endl;
 	return false;
 
 }
@@ -113,20 +113,19 @@ Project::~Project() {
 }
 
 bool Project::GetNext(Record& _record) {
-    cout << "Project GetNext" << endl;
+    //cout << "Project GetNext" << endl;
     if (producer->GetNext(_record)) {
+        //cout << "Out: " << numAttsOutput << " In: " << numAttsInput << endl;
+        //cout << "Keep Me: " << keepMe[0] << endl;
         
-        cout << "Out: " << numAttsOutput << " In: " << numAttsInput << endl;
-        cout << "Keep Me: " << keepMe[0] << endl;
-        
-        cout << "Back to Project" << endl;
+        //cout << "Back to Project" << endl;
         _record.Project(keepMe, numAttsOutput, numAttsInput);
-        cout << "Success at Project" << endl;
+        //cout << "Success at Project" << endl;
         return true;
 
     }
     else {
-        cout << "Failed Project" << endl;
+        //cout << "Failed Project" << endl;
         return false;
     }
 }
@@ -280,15 +279,16 @@ WriteOut::~WriteOut() {
 }
 
 bool WriteOut::GetNext(Record& _record) {
-    cout << "Write Out GetNext" << endl;
+    //cout << "Write Out GetNext" << endl;
     if (producer->GetNext(_record)) {
-        cout << "Back to Write Out" << endl;
+        //cout << "Back to Write Out" << endl;
         _record.print(cout, schema);
-        cout << "Success at Write Out" << endl;
+        cout << "}" << endl;
+        //cout << "Success at Write Out" << endl;
         return true;
     }
     else{
-        cout << "Failed Write Out" << endl;
+        //cout << "Failed Write Out" << endl;
         return false;
     }
 }
