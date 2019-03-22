@@ -1,0 +1,22 @@
+Connection successful
+OK!
+SUCCESS TABLE: part WAS FOUND
+SUCCESS ATTRIBUTE: p_size WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: p_size WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: p_retailprice WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: p_retailprice WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: p_type WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: p_brand WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: p_mfgr WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: p_name WAS FOUND IN THE DATABASE
+Success Opening DB File - heap/part.heap
+WRITEOUT: FILE: queryOutput.txt SCHEMA: (p_type:STRING [150], p_brand:STRING [25], p_mfgr:STRING [5], p_name:STRING [199996])
+-----PROJECT: SCHEMA IN: (p_partkey:INTEGER [200000], p_name:STRING [199996], p_mfgr:STRING [5], p_brand:STRING [25], p_type:STRING [150], p_size:INTEGER [50], p_container:STRING [40], p_retailprice:FLOAT [20899], p_comment:STRING [131753]) SCHEMA OUT: (p_type:STRING [150], p_brand:STRING [25], p_mfgr:STRING [5], p_name:STRING [199996])
+----------SELECT: SCHEMA IN/OUT: (p_partkey:INTEGER [200000], p_name:STRING [199996], p_mfgr:STRING [5], p_brand:STRING [25], p_type:STRING [150], p_size:INTEGER [50], p_container:STRING [40], p_retailprice:FLOAT [20899], p_comment:STRING [131753])
+---------------SCAN: SCHEMA IN/OUT: (p_partkey:INTEGER [200000], p_name:STRING [199996], p_mfgr:STRING [5], p_brand:STRING [25], p_type:STRING [150], p_size:INTEGER [50], p_container:STRING [40], p_retailprice:FLOAT [20899], p_comment:STRING [131753])
+No grouping atts
+No Sum Function
+QUERY EXECUTION TREE
+---------------------------------------------------
+Executing Query
+Database Closed

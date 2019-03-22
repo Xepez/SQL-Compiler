@@ -1,0 +1,18 @@
+Connection successful
+OK!
+SUCCESS TABLE: customer WAS FOUND
+SUCCESS ATTRIBUTE: c_name WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: c_acctbal WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: c_address WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: c_name WAS FOUND IN THE DATABASE
+Success Opening DB File - heap/customer.heap
+WRITEOUT: FILE: queryOutput.txt SCHEMA: (c_acctbal:INTEGER [140187], c_address:STRING [150000], c_name:STRING [150000])
+-----PROJECT: SCHEMA IN: (c_custkey:INTEGER [150000], c_name:STRING [150000], c_address:STRING [150000], c_nationkey:INTEGER [25], c_phone:STRING [150000], c_acctbal:INTEGER [140187], c_mktsegment:STRING [5], c_comment:STRING [149968]) SCHEMA OUT: (c_acctbal:INTEGER [140187], c_address:STRING [150000], c_name:STRING [150000])
+----------SELECT: SCHEMA IN/OUT: (c_custkey:INTEGER [150000], c_name:STRING [150000], c_address:STRING [150000], c_nationkey:INTEGER [25], c_phone:STRING [150000], c_acctbal:INTEGER [140187], c_mktsegment:STRING [5], c_comment:STRING [149968])
+---------------SCAN: SCHEMA IN/OUT: (c_custkey:INTEGER [150000], c_name:STRING [150000], c_address:STRING [150000], c_nationkey:INTEGER [25], c_phone:STRING [150000], c_acctbal:INTEGER [140187], c_mktsegment:STRING [5], c_comment:STRING [149968])
+No grouping atts
+No Sum Function
+QUERY EXECUTION TREE
+---------------------------------------------------
+Executing Query
+Database Closed

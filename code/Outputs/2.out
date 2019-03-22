@@ -1,0 +1,25 @@
+Connection successful
+OK!
+SUCCESS TABLE: lineitem WAS FOUND
+SUCCESS LEFT ATTRIBUTE: l_orderkey WAS FOUND IN THE DATABASE
+SUCCESS RIGHT ATTRIBUTE: l_suppkey WAS FOUND IN THE DATABASE
+SUCCESS LEFT ATTRIBUTE: l_orderkey WAS FOUND IN THE DATABASE
+SUCCESS RIGHT ATTRIBUTE: l_partkey WAS FOUND IN THE DATABASE
+SUCCESS LEFT ATTRIBUTE: l_partkey WAS FOUND IN THE DATABASE
+SUCCESS RIGHT ATTRIBUTE: l_suppkey WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: l_partkey WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: l_suppkey WAS FOUND IN THE DATABASE
+SUCCESS ATTRIBUTE: l_orderkey WAS FOUND IN THE DATABASE
+Success Opening DB File - heap/lineitem.heap
+WRITEOUT: FILE: queryOutput.txt SCHEMA: (l_partkey:INTEGER [200000], l_suppkey:INTEGER [10000], l_orderkey:INTEGER [1500000])
+-----PROJECT: SCHEMA IN: (l_orderkey:INTEGER [1500000], l_partkey:INTEGER [200000], l_suppkey:INTEGER [10000], l_linenumber:INTEGER [7], l_quantity:INTEGER [50], l_extendedprice:INTEGER [933900], l_discount:FLOAT [11], l_tax:INTEGER [9], l_returnflag:STRING [3], l_linestatus:STRING [2], l_shipdate:UNKNOWN [2526], l_commitdate:UNKNOWN [2466], l_receiptdate:UNKNOWN [2554], l_shipinstruct:STRING [4], l_shipmode:STRING [7], l_comment:STRING [4580667]) SCHEMA OUT: (l_partkey:INTEGER [200000], l_suppkey:INTEGER [10000], l_orderkey:INTEGER [1500000])
+----------SELECT: SCHEMA IN/OUT: (l_orderkey:INTEGER [1500000], l_partkey:INTEGER [200000], l_suppkey:INTEGER [10000], l_linenumber:INTEGER [7], l_quantity:INTEGER [50], l_extendedprice:INTEGER [933900], l_discount:FLOAT [11], l_tax:INTEGER [9], l_returnflag:STRING [3], l_linestatus:STRING [2], l_shipdate:UNKNOWN [2526], l_commitdate:UNKNOWN [2466], l_receiptdate:UNKNOWN [2554], l_shipinstruct:STRING [4], l_shipmode:STRING [7], l_comment:STRING [4580667])
+---------------SCAN: SCHEMA IN/OUT: (l_orderkey:INTEGER [1500000], l_partkey:INTEGER [200000], l_suppkey:INTEGER [10000], l_linenumber:INTEGER [7], l_quantity:INTEGER [50], l_extendedprice:INTEGER [933900], l_discount:FLOAT [11], l_tax:INTEGER [9], l_returnflag:STRING [3], l_linestatus:STRING [2], l_shipdate:UNKNOWN [2526], l_commitdate:UNKNOWN [2466], l_receiptdate:UNKNOWN [2554], l_shipinstruct:STRING [4], l_shipmode:STRING [7], l_comment:STRING [4580667])
+No grouping atts
+No Sum Function
+QUERY EXECUTION TREE
+---------------------------------------------------
+Executing Query
+{l_partkey: 22, l_suppkey: 48, l_orderkey: 1}
+{l_partkey: 71, l_suppkey: 97, l_orderkey: 68}
+Database Closed
