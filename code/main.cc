@@ -429,14 +429,6 @@ int main () {
         loadTables(catalog, "partsupp", "heap/partsupp.heap", "tables/partsupp.tbl");
         loadTables(catalog, "region", "heap/region.heap", "tables/region.tbl");
         loadTables(catalog, "supplier", "heap/supplier.heap", "tables/supplier.tbl");
-        //    loadTables(catalog, "customer", "customer.heap", "customer.tbl");
-        //    loadTables(catalog, "lineitem", "lineitem.heap", "lineitem.tbl");
-        //    loadTables(catalog, "nation", "nation.heap", "nation.tbl");
-        //    loadTables(catalog, "orders", "orders.heap", "orders.tbl");
-        //    loadTables(catalog, "part", "part.heap", "part.tbl");
-        //    loadTables(catalog, "partsupp", "partsupp.heap", "partsupp.tbl");
-        //    loadTables(catalog, "region", "region.heap", "region.tbl");
-        //    loadTables(catalog, "supplier", "supplier.heap", "supplier.tbl");
         cout << "Finshed loading Data" << endl;
         cout << "---------------------------------------------------" << endl;
     }

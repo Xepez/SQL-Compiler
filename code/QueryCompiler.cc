@@ -379,7 +379,7 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 
 	}
     
-    int* keepMe;    // New
+    int* keepMe = new int[myAttributeInputs.size()];    // New
     int count = 0;  // New
     
 	while (tempAttsToSelect != NULL) {
