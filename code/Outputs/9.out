@@ -1,24 +1,3 @@
-Connection successful
-OK!
-SUCCESS TABLE: partsupp WAS FOUND
-SUCCESS ATTRIBUTE: ps_partkey WAS FOUND IN THE DATABASE
-SUCCESS ATTRIBUTE: ps_suppkey WAS FOUND IN THE DATABASE
-SUCCESS ATTRIBUTE: ps_suppkey WAS FOUND IN THE DATABASE
-SUCCESS ATTRIBUTE: ps_supplycost WAS FOUND IN THE DATABASE
-SUCCESS ATTRIBUTE: ps_availqty WAS FOUND IN THE DATABASE
-SUCCESS ATTRIBUTE: ps_suppkey WAS FOUND IN THE DATABASE
-SUCCESS ATTRIBUTE: ps_partkey WAS FOUND IN THE DATABASE
-Success Opening DB File - heap/partsupp.heap
-WRITEOUT: FILE: queryOutput.txt SCHEMA: (ps_supplycost:INTEGER [99865], ps_availqty:INTEGER [9999], ps_suppkey:INTEGER [10000], ps_partkey:INTEGER [200000])
------PROJECT: SCHEMA IN: (ps_partkey:INTEGER [200000], ps_suppkey:INTEGER [10000], ps_availqty:INTEGER [9999], ps_supplycost:INTEGER [99865], ps_comment:STRING [799124]) SCHEMA OUT: (ps_supplycost:INTEGER [99865], ps_availqty:INTEGER [9999], ps_suppkey:INTEGER [10000], ps_partkey:INTEGER [200000])
-----------SELECT: SCHEMA IN/OUT: (ps_partkey:INTEGER [200000], ps_suppkey:INTEGER [10000], ps_availqty:INTEGER [9999], ps_supplycost:INTEGER [99865], ps_comment:STRING [799124])
----------------SCAN: SCHEMA IN/OUT: (ps_partkey:INTEGER [200000], ps_suppkey:INTEGER [10000], ps_availqty:INTEGER [9999], ps_supplycost:INTEGER [99865], ps_comment:STRING [799124])
-No grouping atts
-No Sum Function
-QUERY EXECUTION TREE
----------------------------------------------------
-Executing Query
-{ps_supplycost: 107, ps_availqty: 9881, ps_suppkey: 24, ps_partkey: 123}
-{ps_supplycost: 818, ps_availqty: 5638, ps_suppkey: 50, ps_partkey: 123}
-{ps_supplycost: 217, ps_availqty: 2692, ps_suppkey: 76, ps_partkey: 123}
-Database Closed
+{ps_supplycost: 2.09674e-310, ps_availqty: 9881, ps_suppkey: 24, ps_partkey: 123}
+{ps_supplycost: 1.19638e-310, ps_availqty: 5638, ps_suppkey: 50, ps_partkey: 123}
+{ps_supplycost: 5.71241e-311, ps_availqty: 2692, ps_suppkey: 76, ps_partkey: 123}
