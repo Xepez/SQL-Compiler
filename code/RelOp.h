@@ -157,7 +157,7 @@ public:
 	RelationalOp* getLeftRelationalOp();
 	RelationalOp* getRightRelationalOp();
 
-	virtual bool GetNext(Record& _record) {}
+    virtual bool GetNext(Record& _record);
 
 	virtual ostream& print(ostream& _os);
 };
@@ -204,7 +204,7 @@ public:
 	Function& getCompute();
 	RelationalOp* getProducer();
 
-	virtual bool GetNext(Record& _record) {}
+    virtual bool GetNext(Record& _record);
 
 	virtual ostream& print(ostream& _os);
 };
@@ -235,7 +235,7 @@ public:
 	Function& getCompute();
 	RelationalOp* getProducer();
 
-	virtual bool GetNext(Record& _record) {}
+    virtual bool GetNext(Record& _record);
 
 	virtual ostream& print(ostream& _os);
 };

@@ -196,8 +196,12 @@ DuplicateRemoval::DuplicateRemoval(Schema& _schema, RelationalOp* _producer) {
 	producer = _producer;
 }
 DuplicateRemoval::~DuplicateRemoval() {
-
 }
+
+bool DuplicateRemoval::GetNext(Record& _record) {
+    
+}
+
 Schema& DuplicateRemoval::getSchema() {
 	return schema;
 }
@@ -218,8 +222,12 @@ Sum::Sum(Schema& _schemaIn, Schema& _schemaOut, Function& _compute,
 	producer = _producer;
 }
 Sum::~Sum() {
-
 }
+
+bool Sum::GetNext(Record& _record) {
+    
+}
+
 Schema& Sum::getSchemaIn() {
 	return schemaIn;
 }
@@ -247,8 +255,12 @@ GroupBy::GroupBy(Schema& _schemaIn, Schema& _schemaOut, OrderMaker& _groupingAtt
 	producer = _producer;
 }
 GroupBy::~GroupBy() {
-
 }
+
+bool GroupBy::GetNext(Record& _record) {
+    
+}
+
 Schema& GroupBy::getSchemaIn() {
 	return schemaIn;
 }
