@@ -2,6 +2,7 @@
 #define _REL_OP_H
 
 #include <iostream>
+#include <set>
 
 #include "Schema.h"
 #include "Record.h"
@@ -167,6 +168,9 @@ private:
 	// schema of records in operator
 	Schema schema;
 
+    // Set Data Structure to store our Records
+    set<Record> distinctSet;
+    
 	// operator generating data
 	RelationalOp* producer;
 
@@ -191,6 +195,9 @@ private:
 	// function to compute
 	Function compute;
 
+    // Stores if the sum has been computed already
+    bool hasComp;
+    
 	// operator generating data
 	RelationalOp* producer;
 

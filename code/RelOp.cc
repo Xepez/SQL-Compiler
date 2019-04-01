@@ -200,6 +200,18 @@ DuplicateRemoval::~DuplicateRemoval() {
 
 bool DuplicateRemoval::GetNext(Record& _record) {
     
+    while (producer->GetNext(_record)) {
+        // OrderMaker om;
+        // if (om(_record, savedRec) == 0) {
+        if (distinctSet.find(_record) == distinctSet.end()) {
+            // Dont have this in our set
+            distinctSet.insert(_record);
+            return true;
+        }
+    }
+    
+    // No More records to check
+    return false;
 }
 
 Schema& DuplicateRemoval::getSchema() {
@@ -220,12 +232,38 @@ Sum::Sum(Schema& _schemaIn, Schema& _schemaOut, Function& _compute,
 	schemaOut = _schemaOut;
 	compute = _compute;
 	producer = _producer;
+    hasComp = false;
 }
 Sum::~Sum() {
 }
 
 bool Sum::GetNext(Record& _record) {
     
+    Record temp;
+    double runSum = 0;
+    
+    // If sum not computed
+    if (!hasComp) {
+        while (producer->GetNext(temp)) {
+            int runIntSum = 0;
+            double runDoubSum = 0.0;
+            Type retType = Function.Apply(temp, runIntSum, runDoubSum);
+            
+            // Gets return type and adds to the running sum depending on that type
+            if (retType == Float)
+                runSum += runDoubSum;
+            else if (retType == Integer)
+                runSum += (double)runIntSum;
+        }
+        
+        // Creates a record of only the sum to pass
+        //_record
+        
+        // We have now comuted the sum once
+        hasComp = true;
+    }
+    
+    return hasComp;
 }
 
 Schema& Sum::getSchemaIn() {
