@@ -203,13 +203,10 @@ bool DuplicateRemoval::GetNext(Record& _record) {
     
     while (producer->GetNext(_record)) {
         
-        stringstream currKey;
-        _record.print(currKey, schema);
+        stringstream currKey;           // Our Key
+        _record.print(currKey, schema); // Fills our unique key
         
-        // OrderMaker om;
-        // if (om(_record, savedRec) == 0) {                    // OM
-        //if (distinctSet.find(_record) == distinctSet.end()) { // Sets
-        if (distinctSet.find(currKey.str()) == distinctSet.end()) {                       // Maps
+        if (distinctSet.find(currKey.str()) == distinctSet.end()) {
             // Dont have this in our set
             distinctSet[currKey.str()] = _record;
             return true;
