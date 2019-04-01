@@ -2,7 +2,7 @@
 #define _REL_OP_H
 
 #include <iostream>
-#include <set>
+#include <map>
 
 #include "Schema.h"
 #include "Record.h"
@@ -158,7 +158,7 @@ public:
 	RelationalOp* getLeftRelationalOp();
 	RelationalOp* getRightRelationalOp();
 
-    virtual bool GetNext(Record& _record);
+    virtual bool GetNext(Record& _record) {}
 
 	virtual ostream& print(ostream& _os);
 };
@@ -169,7 +169,7 @@ private:
 	Schema schema;
 
     // Set Data Structure to store our Records
-    set<Record> distinctSet;
+    map<string, Record> distinctSet;
     
 	// operator generating data
 	RelationalOp* producer;
@@ -180,7 +180,7 @@ public:
 
 	Schema& getSchema();
 	RelationalOp* getProducer();
-	virtual bool GetNext(Record& _record) {}
+    virtual bool GetNext(Record& _record);
 
 	virtual ostream& print(ostream& _os);
 };

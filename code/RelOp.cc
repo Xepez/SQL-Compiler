@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "RelOp.h"
 
 using namespace std;
@@ -201,11 +202,16 @@ DuplicateRemoval::~DuplicateRemoval() {
 bool DuplicateRemoval::GetNext(Record& _record) {
     
     while (producer->GetNext(_record)) {
+        
+        stringstream currKey;
+        _record.print(currKey, schema);
+        
         // OrderMaker om;
-        // if (om(_record, savedRec) == 0) {
-        if (distinctSet.find(_record) == distinctSet.end()) {
+        // if (om(_record, savedRec) == 0) {                    // OM
+        //if (distinctSet.find(_record) == distinctSet.end()) { // Sets
+        if (distinctSet.find(currKey.str()) == distinctSet.end()) {                       // Maps
             // Dont have this in our set
-            distinctSet.insert(_record);
+            distinctSet[currKey.str()] = _record;
             return true;
         }
     }
@@ -247,7 +253,7 @@ bool Sum::GetNext(Record& _record) {
         while (producer->GetNext(temp)) {
             int runIntSum = 0;
             double runDoubSum = 0.0;
-            Type retType = Function.Apply(temp, runIntSum, runDoubSum);
+            Type retType = compute.Apply(temp, runIntSum, runDoubSum);
             
             // Gets return type and adds to the running sum depending on that type
             if (retType == Float)
@@ -360,11 +366,12 @@ ostream& WriteOut::print(ostream& _os) {
 //---------------------------------------------------------------------------------------------------------------------------------------------
 void QueryExecutionTree::ExecuteQuery() {
 
-	//int count = 0;  // Here to just have something inside the while loop
+	int count = 0;  // Here to just have something inside the while loop
     cout << "---------------------------------------------------" << endl;
     cout << "Executing Query" << endl;
     Record rec;
-    while(root->GetNext(rec)){ }
+    while(root->GetNext(rec)){ count++; }
+    cout << count << endl;
 }
 
 ostream& operator<<(ostream& _os, QueryExecutionTree& _op) {

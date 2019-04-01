@@ -149,7 +149,7 @@ void DBFile::WriteToPage(){
 
 int DBFile::GetNext(Record& rec) {
     //cout << "Running DBFile GetNext()" << endl;
-    //MoveFirst();
+//    MoveFirst();
 //    file.GetPage(page, currPage);
 //    if(page.GetFirst(rec) != 0){
 //        //cout << "GetFirst Succeeded! First Try!" << endl;
