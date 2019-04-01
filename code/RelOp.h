@@ -227,6 +227,9 @@ private:
 	OrderMaker groupingAtts;
 	// function to compute
 	Function compute;
+    
+    // Map to store grouping atts
+    map<Record, int> groups;
 
 	// operator generating data
 	RelationalOp* producer;

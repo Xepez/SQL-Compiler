@@ -11,6 +11,9 @@ main.o:	main.cc
 Schema.o: Schema.cc	
 	$(CC) -c Schema.cc
 
+# EfficientMap.o: EfficientMap.cc
+# 	$(CC) -c EfficientMap.cc
+
 Record.o: Schema.cc Record.cc
 	$(CC) -c Record.cc
 

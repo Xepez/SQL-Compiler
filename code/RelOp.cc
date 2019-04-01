@@ -205,10 +205,11 @@ bool DuplicateRemoval::GetNext(Record& _record) {
         
         stringstream currKey;           // Our Key
         _record.print(currKey, schema); // Fills our unique key
+        string key = currKey.str();
         
-        if (distinctSet.find(currKey.str()) == distinctSet.end()) {
+        if (distinctSet.find(key) == distinctSet.end()) {
             // Dont have this in our set
-            distinctSet[currKey.str()] = _record;
+            distinctSet[key] = _record;
             return true;
         }
     }
@@ -255,7 +256,7 @@ bool Sum::GetNext(Record& _record) {
             // Gets return type and adds to the running sum depending on that type
             if (retType == Float)
                 runSum += runDoubSum;
-            else if (retType == Integer)
+            if (retType == Integer)
                 runSum += (double)runIntSum;
         }
         
@@ -300,6 +301,25 @@ GroupBy::~GroupBy() {
 
 bool GroupBy::GetNext(Record& _record) {
     
+    // TODO: Some implementation but not working
+//    while (producer->GetNext(_record)) {
+//        // setOrderMaker(_record);
+//
+//        int intGB = 0;
+//        double doubleGB = 0;
+//        compute.Apply(_record, intGB, doubleGB);
+//
+//        if (groups.find(_record) != groups.end()) {
+//            // Combines to the group
+//            groups(_record) = doubleGB + groups(_record) + intGB;
+//        }
+//        else {
+//            // Creates new record
+//            groups(_record) = doubleGB + intGB;
+//        }
+//    }
+    
+    return false;
 }
 
 Schema& GroupBy::getSchemaIn() {
