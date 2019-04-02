@@ -205,11 +205,10 @@ bool DuplicateRemoval::GetNext(Record& _record) {
         
         stringstream currKey;           // Our Key
         _record.print(currKey, schema); // Fills our unique key
-        string key = currKey.str();
         
-        if (distinctSet.find(key) == distinctSet.end()) {
+        if (distinctSet.find(currKey.str()) == distinctSet.end()) {
             // Dont have this in our set
-            distinctSet[key] = _record;
+            distinctSet[currKey.str()] = _record;
             return true;
         }
     }
