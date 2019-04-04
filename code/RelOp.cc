@@ -242,15 +242,15 @@ Sum::~Sum() {
 
 bool Sum::GetNext(Record& _record) {
     
-    Record temp;
+    Record tempRec;
     double runSum = 0;
     
     // If sum not computed
     if (!hasComp) {
-        while (producer->GetNext(temp)) {
+        while (producer->GetNext(tempRec)) {
             int runIntSum = 0;
             double runDoubSum = 0.0;
-            Type retType = compute.Apply(temp, runIntSum, runDoubSum);
+            Type retType = compute.Apply(tempRec, runIntSum, runDoubSum);
             
             // Gets return type and adds to the running sum depending on that type
             if (retType == Float)
@@ -260,13 +260,22 @@ bool Sum::GetNext(Record& _record) {
         }
         
         // Creates a record of only the sum to pass
-        //_record
+        // recContent creates record of our runnning sum
+        // Rusu Did This vvvvv
+        char* recContent = new char[2*sizeof(int)+sizeof(double)];
+        ((int *) recContent)[0] = 2*sizeof(int)+sizeof(double);
+        ((int *) recContent)[1] = 2*sizeof(int);
+        ((double *) (recContent+2*sizeof(int)))[0] = runSum;
+        _record.Consume(recContent);
         
         // We have now comuted the sum once
+        // Make sure we dont run again
         hasComp = true;
+        return true;
     }
     
-    return hasComp;
+    // We have already ran through sum before
+    return false;
 }
 
 Schema& Sum::getSchemaIn() {
