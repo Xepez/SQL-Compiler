@@ -38,3 +38,4 @@
 .settings/
 TPCH/
 *.xcworkspace
+makefile
