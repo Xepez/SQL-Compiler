@@ -31,9 +31,10 @@
 *.out
 *.app
 
-# Custom
+# Custom Bullshit
 .DS_Store
 .project
 .cproject
 .settings/
 TPCH/
+*.xcworkspace
