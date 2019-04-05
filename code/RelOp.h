@@ -9,6 +9,9 @@
 #include "DBFile.h"
 #include "Function.h"
 #include "Comparison.h"
+//#include "EfficientMap.h"
+//#include "EfficientMap.cc"
+//#include "Keyify.h"
 
 using namespace std;
 
@@ -170,6 +173,7 @@ private:
 
     // Set Data Structure to store our Records
     map<string, Record> distinctSet;
+//    EfficientMap<string, Record> distinctSet;
     
 	// operator generating data
 	RelationalOp* producer;

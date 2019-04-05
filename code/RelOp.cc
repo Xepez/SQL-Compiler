@@ -1,6 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include "RelOp.h"
+//#include "Keyify.h"
+//#include "EfficientMap.h"
 
 using namespace std;
 
@@ -212,6 +214,12 @@ bool DuplicateRemoval::GetNext(Record& _record) {
             distinctSet[currKey.str()] = _record;
             return true;
         }
+        
+//        if (distinctSet.IsThere(currKey.str()) == 0) {
+//            // Dont have this in our set
+//            distinctSet.Insert(currKey.str(), _record);
+//            return true;
+//        }
     }
     
     // No More records to check

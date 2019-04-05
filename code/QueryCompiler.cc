@@ -464,7 +464,6 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
         index += 1;
     }
 
-
     Schema schemaOut = schemaIn;
     schemaOut.Project(km);
 
