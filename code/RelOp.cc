@@ -113,8 +113,9 @@ Project::Project(Schema& _schemaIn, Schema& _schemaOut, int _numAttsInput,
 Project::~Project() {
 }
 
-bool Project::GetNext(Record& _record) {
+bool Project::GetNext(Record& _record) {    // TODO: May be a problem here
     //cout << "Project GetNext" << endl;
+    //cout << "Out: " << numAttsOutput << " In: " << numAttsInput << endl;
     if (producer->GetNext(_record)) {
         //cout << "Out: " << numAttsOutput << " In: " << numAttsInput << endl;
         //cout << "Keep Me: " << keepMe[0] << endl;
@@ -200,7 +201,7 @@ DuplicateRemoval::~DuplicateRemoval() {
 }
 
 bool DuplicateRemoval::GetNext(Record& _record) {
-    
+    //cout << "Distinct GetNext" << endl;
     while (producer->GetNext(_record)) {
         
         stringstream currKey;           // Our Key
@@ -241,10 +242,10 @@ Sum::~Sum() {
 }
 
 bool Sum::GetNext(Record& _record) {
-    
+    cout << "Sum GetNext" << endl;
     Record tempRec;
-    double runSum = 0;
-    
+    double runSum = 0.0;
+    int c = 0;
     // If sum not computed
     if (!hasComp) {
         while (producer->GetNext(tempRec)) {
@@ -253,19 +254,26 @@ bool Sum::GetNext(Record& _record) {
             Type retType = compute.Apply(tempRec, runIntSum, runDoubSum);
             
             // Gets return type and adds to the running sum depending on that type
-            if (retType == Float)
+            if (retType == Float) {
                 runSum += runDoubSum;
-            if (retType == Integer)
+                cout << "Double: " << runDoubSum << endl;
+                c++;            }
+            if (retType == Integer) {
                 runSum += (double)runIntSum;
+                cout << "Int: " << runIntSum << endl;
+            }
         }
-        
+        cout << "Count: " << c << "\tSum: " << runSum << endl;
         // Creates a record of only the sum to pass
         // recContent creates record of our runnning sum
         // Rusu Did This vvvvv
-        char* recContent = new char[2*sizeof(int)+sizeof(double)];
+        char* recContent = new char[(2*sizeof(int))+sizeof(double)];
         ((int *) recContent)[0] = 2*sizeof(int)+sizeof(double);
+        //cout << "A: " << ((int *) recContent)[0] << endl;
         ((int *) recContent)[1] = 2*sizeof(int);
+        //cout << "B: " << ((int *) recContent)[1] << endl;
         ((double *) (recContent+2*sizeof(int)))[0] = runSum;
+        //cout << ((double *) (recContent+2*sizeof(int)))[0] << endl;
         _record.Consume(recContent);
         
         // We have now comuted the sum once

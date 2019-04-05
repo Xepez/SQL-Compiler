@@ -379,36 +379,100 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 
 	}
     
-    int* keepMe = new int[myAttributeInputs.size()];    // New
-    int count = 0;  // New
+    // Prof
+//    int count = 0;
+//    tempAttsToSelect = _attsToSelect;
+//    while (tempAttsToSelect != NULL) {
+//        count += 1;
+//        tempAttsToSelect = tempAttsToSelect->next;
+//    }
+//
+//
+//    int* keepMe = new int[count];
+//    vector<int> km;
+//
+//    tempAttsToSelect = _attsToSelect;
+//    int index = 0;
+//    while (tempAttsToSelect != NULL) {
+//        string an = tempAttsToSelect->name;
+//        keepMe[index] = schemaIn.Index(an);
+//        km.push_back(schemaIn.Index(an));
+//
+//        tempAttsToSelect = tempAttsToSelect->next;
+//        index += 1;
+//    }
+//
+//
+//    Schema schemaOut = schemaIn;
+//    schemaOut.Project(km);
+//
+//    int numAttsInput = schemaIn.GetNumAtts();
+//    int numAttsOutput = schemaOut.GetNumAtts();
+//
+//    RelationalOp* secondLastRelOp;
     
-	while (tempAttsToSelect != NULL) {
-		//cout << tempAttsToSelect->name << endl;
-		for (int i = 0; i < myAttributeInputs.size(); i++) {
+    // Mine
+//    int* keepMe = new int[myAttributeInputs.size()];    // New
+//    int count = 0;  // New
+//
+//    while (tempAttsToSelect != NULL) {
+//        //cout << tempAttsToSelect->name << endl;
+//        for (int i = 0; i < myAttributeInputs.size(); i++) {
+//
+//            if (tempAttsToSelect->name == myAttributeInputs[i].name) {
+//                attributes.push_back(myAttributeInputs[i].name);
+//                attributeTypes.push_back(convertType(myAttributeInputs[i].type));
+//                distincts.push_back(myAttributeInputs[i].noDistinct);
+//                keepMe[count] = i;  // New
+//                count++;    //New
+//            }
+//        }
+//
+//        tempAttsToSelect = tempAttsToSelect->next;
+//
+//    }
+//
+//    // Removed int * keepMe around here
+//    int numAttsInput;
+//    int numAttsOutput;
+//    Schema schemaOut(attributes, attributeTypes, distincts);
+//
+//    numAttsInput = schemaIn.GetNumAtts();
+//    numAttsOutput = schemaOut.GetNumAtts();
+//
+//    RelationalOp* secondLastRelOp;
 
-			if (tempAttsToSelect->name == myAttributeInputs[i].name) {
-				attributes.push_back(myAttributeInputs[i].name);
-				attributeTypes.push_back(convertType(myAttributeInputs[i].type));
-				distincts.push_back(myAttributeInputs[i].noDistinct);
-                keepMe[count] = i;  // New
-                count++;    //New
-			}
-		}
+    //int* keepMe = new int[myAttributeInputs.size()];    // New
+    int count = 0;  // New
+    NameList* tempAS = _attsToSelect;
+    while (tempAS != NULL) {
+        count += 1;
+        tempAS = tempAS->next;
+    }
+    
+    int* keepMe = new int[count];
+    vector<int> km;
 
-		tempAttsToSelect = tempAttsToSelect->next;
-	
-	}
+    tempAttsToSelect = _attsToSelect;
+    int index = 0;
+    while (tempAttsToSelect != NULL) {
+        string an = tempAttsToSelect->name;
+        keepMe[index] = schemaIn.Index(an);
+        km.push_back(schemaIn.Index(an));
 
-    // Removed int * keepMe around here
-	int numAttsInput;
-	int numAttsOutput;
-	Schema schemaOut(attributes, attributeTypes, distincts);
+        tempAttsToSelect = tempAttsToSelect->next;
+        index += 1;
+    }
 
-	numAttsInput = schemaIn.GetNumAtts();
-	numAttsOutput = schemaOut.GetNumAtts();
 
-	RelationalOp* secondLastRelOp;
+    Schema schemaOut = schemaIn;
+    schemaOut.Project(km);
 
+    int numAttsInput = schemaIn.GetNumAtts();
+    int numAttsOutput = schemaOut.GetNumAtts();
+
+    RelationalOp* secondLastRelOp;
+    
 	// - Project -
 
 	if (_groupingAtts == NULL && _finalFunction == NULL) {
@@ -421,7 +485,7 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 	else if (_groupingAtts == NULL && _finalFunction != NULL) {
 		Function compute;
 		// I have no idea if this is needed for proj 2. Included it for now.
-		// compute.GrowFromParseTree(_finalFunction, schemaOut)
+        compute.GrowFromParseTree(_finalFunction, schemaIn);
 		Sum *sumRelOp = new Sum(schemaIn, schemaOut, compute, rootJoinRelationalOp);
 		secondLastRelOp = sumRelOp;
 	}
