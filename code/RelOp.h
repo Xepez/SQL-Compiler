@@ -9,9 +9,10 @@
 #include "DBFile.h"
 #include "Function.h"
 #include "Comparison.h"
-//#include "EfficientMap.h"
-//#include "EfficientMap.cc"
-//#include "Keyify.h"
+#include "EfficientMap.h"
+#include "EfficientMap.cc"
+#include "Keyify.h"
+#include "Keyify.cc"
 
 using namespace std;
 
@@ -173,7 +174,6 @@ private:
 
     // Set Data Structure to store our Records
     map<string, Record> distinctSet;
-//    EfficientMap<string, Record> distinctSet;
     
 	// operator generating data
 	RelationalOp* producer;
@@ -231,12 +231,15 @@ private:
 	OrderMaker groupingAtts;
 	// function to compute
 	Function compute;
-    
-    // Map to store grouping atts
-    map<Record, int> groups;
 
 	// operator generating data
 	RelationalOp* producer;
+
+	EfficientMap<Record, KeyDouble> hashtable;
+
+	bool atBeginning;
+
+	int count;
 
 public:
 	GroupBy(Schema& _schemaIn, Schema& _schemaOut, OrderMaker& _groupingAtts,

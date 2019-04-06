@@ -380,45 +380,45 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 	}
     
     // Prof
-//    int count = 0;
-//    tempAttsToSelect = _attsToSelect;
-//    while (tempAttsToSelect != NULL) {
-//        count += 1;
-//        tempAttsToSelect = tempAttsToSelect->next;
-//    }
-//
-//
-//    int* keepMe = new int[count];
-//    vector<int> km;
-//
-//    tempAttsToSelect = _attsToSelect;
-//    int index = 0;
-//    while (tempAttsToSelect != NULL) {
-//        string an = tempAttsToSelect->name;
-//        keepMe[index] = schemaIn.Index(an);
-//        km.push_back(schemaIn.Index(an));
-//
-//        tempAttsToSelect = tempAttsToSelect->next;
-//        index += 1;
-//    }
-//
-//
-//    Schema schemaOut = schemaIn;
-//    schemaOut.Project(km);
-//
-//    int numAttsInput = schemaIn.GetNumAtts();
-//    int numAttsOutput = schemaOut.GetNumAtts();
-//
-//    RelationalOp* secondLastRelOp;
+   int count = 0;
+   tempAttsToSelect = _attsToSelect;
+   while (tempAttsToSelect != NULL) {
+       count += 1;
+       tempAttsToSelect = tempAttsToSelect->next;
+   }
+
+
+   int* keepMe = new int[count];
+   vector<int> km;
+
+   tempAttsToSelect = _attsToSelect;
+   int index = 0;
+   while (tempAttsToSelect != NULL) {
+       string an = tempAttsToSelect->name;
+       keepMe[index] = schemaIn.Index(an);
+       km.push_back(schemaIn.Index(an));
+
+       tempAttsToSelect = tempAttsToSelect->next;
+       index += 1;
+   }
+
+
+   Schema schemaOut = schemaIn;
+   schemaOut.Project(km);
+
+   int numAttsInput = schemaIn.GetNumAtts();
+   int numAttsOutput = schemaOut.GetNumAtts();
+
+   RelationalOp* secondLastRelOp;
     
     // Mine
 //    int* keepMe = new int[myAttributeInputs.size()];    // New
 //    int count = 0;  // New
-//
+
 //    while (tempAttsToSelect != NULL) {
 //        //cout << tempAttsToSelect->name << endl;
 //        for (int i = 0; i < myAttributeInputs.size(); i++) {
-//
+
 //            if (tempAttsToSelect->name == myAttributeInputs[i].name) {
 //                attributes.push_back(myAttributeInputs[i].name);
 //                attributeTypes.push_back(convertType(myAttributeInputs[i].type));
@@ -427,50 +427,52 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 //                count++;    //New
 //            }
 //        }
-//
+
 //        tempAttsToSelect = tempAttsToSelect->next;
-//
+
 //    }
-//
+
 //    // Removed int * keepMe around here
 //    int numAttsInput;
 //    int numAttsOutput;
 //    Schema schemaOut(attributes, attributeTypes, distincts);
-//
+
 //    numAttsInput = schemaIn.GetNumAtts();
 //    numAttsOutput = schemaOut.GetNumAtts();
-//
+
 //    RelationalOp* secondLastRelOp;
 
-    //int* keepMe = new int[myAttributeInputs.size()];    // New
-    int count = 0;  // New
-    NameList* tempAS = _attsToSelect;
-    while (tempAS != NULL) {
-        count += 1;
-        tempAS = tempAS->next;
-    }
+	// ////////////////////////////////////////////////////////////////////////////////////////////
+    // int count = 0;  // New
+    // NameList* tempAS = _attsToSelect;
+    // while (tempAS != NULL) {
+    //     count += 1;
+    //     tempAS = tempAS->next;
+    // }
     
-    int* keepMe = new int[count];
-    vector<int> km;
+    // int* keepMe = new int[count];
+    // vector<int> km;
 
-    tempAttsToSelect = _attsToSelect;
-    int index = 0;
-    while (tempAttsToSelect != NULL) {
-        string an = tempAttsToSelect->name;
-        keepMe[index] = schemaIn.Index(an);
-        km.push_back(schemaIn.Index(an));
+    // tempAttsToSelect = _attsToSelect;
+    // int index = 0;
+    // while (tempAttsToSelect != NULL) {
+    //     string an = tempAttsToSelect->name;
+    //     keepMe[index] = schemaIn.Index(an);
+    //     km.push_back(schemaIn.Index(an));
 
-        tempAttsToSelect = tempAttsToSelect->next;
-        index += 1;
-    }
+    //     tempAttsToSelect = tempAttsToSelect->next;
+    //     index += 1;
+    // }
 
-    Schema schemaOut = schemaIn;
-    schemaOut.Project(km);
 
-    int numAttsInput = schemaIn.GetNumAtts();
-    int numAttsOutput = schemaOut.GetNumAtts();
+    // Schema schemaOut = schemaIn;
+    // schemaOut.Project(km);
 
-    RelationalOp* secondLastRelOp;
+    // int numAttsInput = schemaIn.GetNumAtts();
+    // int numAttsOutput = schemaOut.GetNumAtts();
+
+    // RelationalOp* secondLastRelOp;
+	////////////////////////////////////////////////////////////////////////////////////////////////
     
 	// - Project -
 
@@ -484,21 +486,69 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 	else if (_groupingAtts == NULL && _finalFunction != NULL) {
 		Function compute;
 		// I have no idea if this is needed for proj 2. Included it for now.
+	
+		vector<string> atts;
+		vector<string> attType;
+		vector<unsigned int> noDistincts;
+		atts.push_back("sum");
+		attType.push_back("Float");
+		noDistincts.push_back(1);
+		Schema sumSchema(atts, attType, noDistincts);
         compute.GrowFromParseTree(_finalFunction, schemaIn);
-		Sum *sumRelOp = new Sum(schemaIn, schemaOut, compute, rootJoinRelationalOp);
+		Sum *sumRelOp = new Sum(schemaIn, sumSchema, compute, rootJoinRelationalOp);
 		secondLastRelOp = sumRelOp;
+
+		schemaOut = sumSchema;
 	}
 
 	// - GroupBy -
 	else if (_groupingAtts != NULL) {
-		OrderMaker attsToGroup;
+		int count = 0;
+		struct NameList* groupedAtts = _groupingAtts;
+		while (groupedAtts != NULL) {
+			count += 1;
+			groupedAtts = groupedAtts->next;
+		}
+
+
+		int* keepMe = new int[count];
+		vector<int> km;
+
+		groupedAtts = _groupingAtts;
+		int index = 0;
+		while (groupedAtts != NULL) {
+			string an = groupedAtts->name;
+			keepMe[index] = schemaIn.Index(an);
+			km.push_back(schemaIn.Index(an));
+
+			groupedAtts = groupedAtts->next;
+			index += 1;
+		}
+
+		Schema groupedSchema = schemaIn;
+   		groupedSchema.Project(km);
+
+		vector<string> atts;
+		vector<string> attType;
+		vector<unsigned int> noDistincts;
+		atts.push_back("sum");
+		attType.push_back("Float");
+		noDistincts.push_back(1);
+		Schema sumSchema(atts, attType, noDistincts);
+
+		sumSchema.Append(groupedSchema);
+		schemaOut = sumSchema;
+
+		OrderMaker attsToGroup(schemaIn, keepMe, count);
 		// I have no idea if we need to use the constructor with the Schema parameter. (Get the schema for the atts that are on the group by).
 		// I think the default constructor will worked fine.
 
 		Function compute;
+        compute.GrowFromParseTree(_finalFunction, schemaIn);
 		// I have no idea if this is needed for proj 2. Included it for now.
 		// NOTE, for groupby, only execute the line below IF there is a _finalFunction. (Check if _finalFunction is NULL or not). Can't growFromParseTree if _finalFunction is NULL.
 		// compute.GrowFromParseTree(_finalFunction, schemaOut)
+
 		GroupBy *groupByRealOp = new GroupBy(schemaIn, schemaOut, attsToGroup, compute, rootJoinRelationalOp);
 		secondLastRelOp = groupByRealOp;
 	}

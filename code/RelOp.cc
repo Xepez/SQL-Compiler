@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include "RelOp.h"
-//#include "Keyify.h"
-//#include "EfficientMap.h"
+#include "Keyify.h"
+#include "EfficientMap.h"
 
 using namespace std;
 
@@ -214,12 +214,6 @@ bool DuplicateRemoval::GetNext(Record& _record) {
             distinctSet[currKey.str()] = _record;
             return true;
         }
-        
-//        if (distinctSet.IsThere(currKey.str()) == 0) {
-//            // Dont have this in our set
-//            distinctSet.Insert(currKey.str(), _record);
-//            return true;
-//        }
     }
     
     // No More records to check
@@ -272,9 +266,10 @@ bool Sum::GetNext(Record& _record) {
             }
         }
         cout << "Count: " << c << "\tSum: " << runSum << endl;
+
+		
         // Creates a record of only the sum to pass
         // recContent creates record of our runnning sum
-        // Rusu Did This vvvvv
         char* recContent = new char[(2*sizeof(int))+sizeof(double)];
         ((int *) recContent)[0] = 2*sizeof(int)+sizeof(double);
         //cout << "A: " << ((int *) recContent)[0] << endl;
@@ -288,9 +283,11 @@ bool Sum::GetNext(Record& _record) {
         // Make sure we dont run again
         hasComp = true;
         return true;
+		
     }
     
     // We have already ran through sum before
+	cout << schemaOut << endl;
     return false;
 }
 
@@ -322,8 +319,6 @@ GroupBy::GroupBy(Schema& _schemaIn, Schema& _schemaOut, OrderMaker& _groupingAtt
 }
 GroupBy::~GroupBy() {
 }
-
-bool GroupBy::GetNext(Record& _record) {
     
     // TODO: Some implementation but not working
 //    while (producer->GetNext(_record)) {
@@ -342,8 +337,48 @@ bool GroupBy::GetNext(Record& _record) {
 //            groups(_record) = doubleGB + intGB;
 //        }
 //    }
-    
-    return false;
+
+bool GroupBy::GetNext(Record& _record) {
+    /*
+	if(atBeginning){
+
+		//Creating dummy variables
+		Record rec;
+		Record temp;
+		int intResult = 0;
+		double doubleResult = 0.0;
+		KeyDouble kd;
+
+		//For all getnexts
+		while(producer->GetNext(rec)){
+
+			//Apply, and set as runningSum
+			int applied = compute.Apply(rec, intResult, doubleResult);
+			double runningSum = intResult + doubleResult;
+			temp = rec;
+			kd = KeyDouble(runningSum);
+
+			//Check if this record exists
+			if(hashtable.IsThere(temp)) //KeyDouble it
+				hashtable.Find(temp) = KeyDouble(hashtable.Find(temp) + runningSum);
+			else //Insert it into table
+				hashtable.Insert(temp, kd);
+
+			//reset dummy vars
+			intResult = 0;
+			doubleResult = 0;
+		}
+
+		//No longer beginning of table
+		atBeginning = false;
+		//Reset the hashtable
+		hashtable.MoveToStart();
+
+	}
+
+	if(hashtable.AtEnd()) //counldnt get any more
+		return false;
+	*/
 }
 
 Schema& GroupBy::getSchemaIn() {
@@ -385,7 +420,7 @@ bool WriteOut::GetNext(Record& _record) {
         return true;
     }
     else{
-        //cout << "Failed Write Out" << endl;
+        cout << "WO Schema " << schema << endl;
         return false;
     }
 }
@@ -418,3 +453,5 @@ void QueryExecutionTree::ExecuteQuery() {
 ostream& operator<<(ostream& _os, QueryExecutionTree& _op) {
 	return _os << "QUERY EXECUTION TREE";
 }
+
+
