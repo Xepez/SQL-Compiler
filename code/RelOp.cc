@@ -339,7 +339,7 @@ GroupBy::~GroupBy() {
 //    }
 
 bool GroupBy::GetNext(Record& _record) {
-    /*
+    
 	if(atBeginning){
 
 		//Creating dummy variables
@@ -378,7 +378,29 @@ bool GroupBy::GetNext(Record& _record) {
 
 	if(hashtable.AtEnd()) //counldnt get any more
 		return false;
-	*/
+	
+	double tempdouble = hashtable.CurrentData();
+	
+	char* recContent = new char[(2*sizeof(int))+sizeof(double)];
+	((int *) recContent)[0] = 2*sizeof(int)+sizeof(double);
+	//cout << "A: " << ((int *) recContent)[0] << endl;
+	((int *) recContent)[1] = 2*sizeof(int);
+	//cout << "B: " << ((int *) recContent)[1] << endl;
+	((double *) (recContent+2*sizeof(int)))[0] = tempdouble;
+
+	Record r;
+	r.Consume(recContent);
+
+	hashtable.CurrentKey().Project(groupingAtts.whichAtts, groupingAtts.numAtts, schemaIn.GetNumAtts());
+	char* bits = hashtable.CurrentKey().GetBits();
+	int size = hashtable.CurrentKey().GetSize();
+	Record r2;
+	r2.CopyBits(bits, size);
+
+	_record.AppendRecords(r, r2, 1, groupingAtts.numAtts);
+	hashtable.Advance();
+	return true;
+
 }
 
 Schema& GroupBy::getSchemaIn() {
