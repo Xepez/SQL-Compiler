@@ -244,7 +244,7 @@ Sum::~Sum() {
 }
 
 bool Sum::GetNext(Record& _record) {
-    cout << "Sum GetNext" << endl;
+    //cout << "Sum GetNext" << endl;
     Record tempRec;
     double runSum = 0.0;
     int c = 0;
@@ -258,14 +258,14 @@ bool Sum::GetNext(Record& _record) {
             // Gets return type and adds to the running sum depending on that type
             if (retType == Float) {
                 runSum += runDoubSum;
-                cout << "Double: " << runDoubSum << endl;
+                //cout << "Double: " << runDoubSum << endl;
                 c++;            }
             if (retType == Integer) {
                 runSum += (double)runIntSum;
-                cout << "Int: " << runIntSum << endl;
+                //cout << "Int: " << runIntSum << endl;
             }
         }
-        cout << "Count: " << c << "\tSum: " << runSum << endl;
+        //cout << "Count: " << c << "\tSum: " << runSum << endl;
 
 		
         // Creates a record of only the sum to pass
@@ -287,7 +287,7 @@ bool Sum::GetNext(Record& _record) {
     }
     
     // We have already ran through sum before
-	cout << schemaOut << endl;
+	//cout << schemaOut << endl;
     return false;
 }
 
@@ -313,9 +313,11 @@ GroupBy::GroupBy(Schema& _schemaIn, Schema& _schemaOut, OrderMaker& _groupingAtt
 	Function& _compute,	RelationalOp* _producer) {
 	schemaIn = _schemaIn;
 	schemaOut = _schemaOut;
-	groupingAtts = _groupingAtts;
+//    groupingAtts = _groupingAtts;
+    groupingAtts.Swap(_groupingAtts);
 	compute = _compute;
 	producer = _producer;
+    atBeginning = true;
 }
 GroupBy::~GroupBy() {
 }
@@ -339,7 +341,7 @@ GroupBy::~GroupBy() {
 //    }
 
 bool GroupBy::GetNext(Record& _record) {
-    
+    //cout << "Group By GetNext" << endl;
 	if(atBeginning){
 
 		//Creating dummy variables
@@ -351,11 +353,12 @@ bool GroupBy::GetNext(Record& _record) {
 
 		//For all getnexts
 		while(producer->GetNext(rec)){
-
+            //cout << "CHECK" << endl;
 			//Apply, and set as runningSum
 			int applied = compute.Apply(rec, intResult, doubleResult);
 			double runningSum = intResult + doubleResult;
 			temp = rec;
+            temp.SetOrderMaker(&groupingAtts);
 			kd = KeyDouble(runningSum);
 
 			//Check if this record exists
@@ -373,7 +376,7 @@ bool GroupBy::GetNext(Record& _record) {
 		atBeginning = false;
 		//Reset the hashtable
 		hashtable.MoveToStart();
-
+        //cout << "done" << endl;
 	}
 
 	if(hashtable.AtEnd()) //counldnt get any more
@@ -390,14 +393,17 @@ bool GroupBy::GetNext(Record& _record) {
 
 	Record r;
 	r.Consume(recContent);
-
+    
 	hashtable.CurrentKey().Project(groupingAtts.whichAtts, groupingAtts.numAtts, schemaIn.GetNumAtts());
+    cout << "Checking " << groupingAtts.whichAtts << " " << groupingAtts.numAtts << " " << schemaIn.GetNumAtts() << endl;
 	char* bits = hashtable.CurrentKey().GetBits();
 	int size = hashtable.CurrentKey().GetSize();
+    //cout << "Bits " << bits << "\tSize " << size << endl;
 	Record r2;
 	r2.CopyBits(bits, size);
-
+    
 	_record.AppendRecords(r, r2, 1, groupingAtts.numAtts);
+    //_record.AppendRecords(r, r2, 1, schemaOut.GetNumAtts() - 1);
 	hashtable.Advance();
 	return true;
 
@@ -435,14 +441,14 @@ WriteOut::~WriteOut() {
 bool WriteOut::GetNext(Record& _record) {
     //cout << "Write Out GetNext" << endl;
     if (producer->GetNext(_record)) {
-        //cout << "Back to Write Out" << endl;
+        cout << "Back to Write Out" << endl;
         _record.print(cout, schema);
-        cout << "}" << endl;
-        //cout << "Success at Write Out" << endl;
+        cout << endl;
+        cout << "Success at Write Out" << endl;
         return true;
     }
     else{
-        cout << "WO Schema " << schema << endl;
+        //cout << "WO Schema " << schema << endl;
         return false;
     }
 }
