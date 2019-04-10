@@ -526,8 +526,11 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 		}
 
 		Schema groupedSchema = schemaIn;
+//        cout << endl;
+//        cout << "Old " << groupedSchema << endl;
    		groupedSchema.Project(km);
-
+//        cout << "New " << groupedSchema << endl;
+        
 		vector<string> atts;
 		vector<string> attType;
 		vector<unsigned int> noDistincts;
@@ -537,8 +540,11 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 		Schema sumSchema(atts, attType, noDistincts);
 
 		sumSchema.Append(groupedSchema);
+        schemaOut.Clear();
 		schemaOut = sumSchema;
-
+//        cout << "sum " << sumSchema << endl;
+//        cout << "out " << schemaOut << endl;
+//        cout << endl;
 		OrderMaker attsToGroup(schemaIn, keepMe, count);
 		// I have no idea if we need to use the constructor with the Schema parameter. (Get the schema for the atts that are on the group by).
 		// I think the default constructor will worked fine.

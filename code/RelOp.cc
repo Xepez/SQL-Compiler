@@ -208,7 +208,7 @@ bool DuplicateRemoval::GetNext(Record& _record) {
         
         stringstream currKey;           // Our Key
         _record.print(currKey, schema); // Fills our unique key
-        
+        //cout << currKey.str() << endl;
         if (distinctSet.find(currKey.str()) == distinctSet.end()) {
             // Dont have this in our set
             distinctSet[currKey.str()] = _record;
@@ -321,55 +321,45 @@ GroupBy::GroupBy(Schema& _schemaIn, Schema& _schemaOut, OrderMaker& _groupingAtt
 }
 GroupBy::~GroupBy() {
 }
-    
-    // TODO: Some implementation but not working
-//    while (producer->GetNext(_record)) {
-//        // setOrderMaker(_record);
-//
-//        int intGB = 0;
-//        double doubleGB = 0;
-//        compute.Apply(_record, intGB, doubleGB);
-//
-//        if (groups.find(_record) != groups.end()) {
-//            // Combines to the group
-//            groups(_record) = doubleGB + groups(_record) + intGB;
-//        }
-//        else {
-//            // Creates new record
-//            groups(_record) = doubleGB + intGB;
-//        }
-//    }
 
 bool GroupBy::GetNext(Record& _record) {
     //cout << "Group By GetNext" << endl;
 	if(atBeginning){
 
-		//Creating dummy variables
+		//Creating dummy record variables
 		Record rec;
-		Record temp;
-		int intResult = 0;
-		double doubleResult = 0.0;
-		KeyDouble kd;
+//        Record temp;
 
 		//For all getnexts
 		while(producer->GetNext(rec)){
             //cout << "CHECK" << endl;
-			//Apply, and set as runningSum
+            
+            //Apply and set as runningSum
+            int intResult = 0;
+            double doubleResult = 0.0;
 			int applied = compute.Apply(rec, intResult, doubleResult);
 			double runningSum = intResult + doubleResult;
-			temp = rec;
-            temp.SetOrderMaker(&groupingAtts);
-			kd = KeyDouble(runningSum);
+            
+//             Create new temp Record
+//            temp = rec;
+//            temp.SetOrderMaker(&groupingAtts);
+            rec.SetOrderMaker(&groupingAtts);
+			KeyDouble kd = KeyDouble(runningSum);
+//            cout << kd << endl;
 
 			//Check if this record exists
-			if(hashtable.IsThere(temp)) //KeyDouble it
-				hashtable.Find(temp) = KeyDouble(hashtable.Find(temp) + runningSum);
-			else //Insert it into table
-				hashtable.Insert(temp, kd);
-
-			//reset dummy vars
-			intResult = 0;
-			doubleResult = 0;
+//            if(hashtable.IsThere(temp)){ //KeyDouble it
+//                hashtable.Find(temp) = KeyDouble(hashtable.Find(temp) + runningSum);
+//                cout << hashtable.Find(temp) << endl;
+//            }
+//            else //Insert it into table
+//                hashtable.Insert(temp, kd);
+            if(hashtable.IsThere(rec)){ //KeyDouble it
+                hashtable.Find(rec) = KeyDouble(hashtable.Find(rec) + runningSum);
+                //cout << hashtable.Find(rec) << endl;
+            }
+            else //Insert it into table
+                hashtable.Insert(rec, kd);
 		}
 
 		//No longer beginning of table
@@ -383,6 +373,7 @@ bool GroupBy::GetNext(Record& _record) {
 		return false;
 	
 	double tempdouble = hashtable.CurrentData();
+    //cout << "Temp Dbl: " << tempdouble << endl;
 	
 	char* recContent = new char[(2*sizeof(int))+sizeof(double)];
 	((int *) recContent)[0] = 2*sizeof(int)+sizeof(double);
@@ -394,11 +385,14 @@ bool GroupBy::GetNext(Record& _record) {
 	Record r;
 	r.Consume(recContent);
     
-	hashtable.CurrentKey().Project(groupingAtts.whichAtts, groupingAtts.numAtts, schemaIn.GetNumAtts());
-    cout << "Checking " << groupingAtts.whichAtts << " " << groupingAtts.numAtts << " " << schemaIn.GetNumAtts() << endl;
+    hashtable.CurrentKey().Project(groupingAtts.whichAtts, groupingAtts.numAtts, schemaIn.GetNumAtts());
+//    for (int xxx = 0; xxx < (sizeof(groupingAtts.whichAtts)/sizeof(groupingAtts.whichAtts[0])); xxx++) {
+//        cout << xxx << ": Checking " << groupingAtts.whichAtts[xxx] << " " << groupingAtts.numAtts << " " << schemaIn.GetNumAtts() << endl;
+//    }
+    
 	char* bits = hashtable.CurrentKey().GetBits();
 	int size = hashtable.CurrentKey().GetSize();
-    //cout << "Bits " << bits << "\tSize " << size << endl;
+    //cout << "Bits " << ((double *) (bits+2*sizeof(int)))[0] << "\tSize " << size << endl;
 	Record r2;
 	r2.CopyBits(bits, size);
     
@@ -441,10 +435,10 @@ WriteOut::~WriteOut() {
 bool WriteOut::GetNext(Record& _record) {
     //cout << "Write Out GetNext" << endl;
     if (producer->GetNext(_record)) {
-        cout << "Back to Write Out" << endl;
+        //cout << "Back to Write Out" << endl;
         _record.print(cout, schema);
         cout << endl;
-        cout << "Success at Write Out" << endl;
+        //cout << "Success at Write Out" << endl;
         return true;
     }
     else{
