@@ -301,15 +301,21 @@ bool checkIfFunctionAttsExists(Catalog&catalog) {
 	tempFunctionAtts = finalFunction;
 
 	for (int i = 0; i < currentTables.size(); i++) {
+        //cout << currentTables[i] << endl;
 		catalog.GetAttributes(currentTables[i], attributes);
 	}
+    
+//    for (int x = 0; x < attributes.size(); x++) {
+//        cout << attributes[x] << endl;
+//    }
+    
 	while (tempFunctionAtts != NULL) {
 
 		bool found = false;
 		bool found2 = false;
 
 		if (tempFunctionAtts->code > 0 && tempFunctionAtts->code < 100) {
-//            cout << attributes.size() << endl;
+
 			for (int j = 0; j < attributes.size(); j++) {
 
 				if (attributes[j] == tempFunctionAtts->leftOperator->leftOperand->value) {
@@ -405,10 +411,10 @@ int main () {
         // at this point we have the parse tree in the ParseTree data structures
         // we are ready to invoke the query compiler with the given query
         // the result is the execution tree built from the parse tree and optimized
-        if (!checkIfTablesExists(catalog) || !checkIfPredicatesExists(catalog) || !checkIfGroupingAttsExists(catalog) || !checkIfSelectAttsExists(catalog) || !checkIfFunctionAttsExists(catalog)) {
-            cout << "Query is INVALID" << endl;
-            return 1;
-        }
+//        if (!checkIfTablesExists(catalog) || !checkIfPredicatesExists(catalog) || !checkIfGroupingAttsExists(catalog) || !checkIfSelectAttsExists(catalog) || !checkIfFunctionAttsExists(catalog)) {
+//            cout << "Query is INVALID" << endl;
+//            return 1;
+//        }
         QueryExecutionTree queryTree;
         compiler.Compile(tables, attsToSelect, finalFunction, predicate,
             groupingAtts, distinctAtts, queryTree);

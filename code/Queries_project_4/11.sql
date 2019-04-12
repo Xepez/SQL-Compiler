@@ -1,4 +1,4 @@
-SELECT SUM(ps_supplycost * ps_suppkey), ps_suppkey
-FROM partsupp 
-WHERE ps_suppkey > 2 AND ps_suppkey < 100
-GROUP BY ps_suppkey
+SELECT SUM(l_extendedprice * l_discount * l_tax * l_tax), l_suppkey
+FROM lineitem
+WHERE l_discount < 0.07 AND l_quantity < 12.0
+GROUP BY l_suppkey

@@ -324,20 +324,61 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 			if (tempFuncAtts->code == 47) {
 				code = " / ";
 			}
-
+            
 			for (int i = 0; i < myAttributeInputs.size(); i++) {
+//                cout << i << " : " << tempFuncAtts->leftOperator->leftOperand->value << endl;
+//                cout << i << " : " << tempFuncAtts->right->leftOperator->leftOperand->value << endl;
+//                cout << i << " : " << tempFuncAtts->right->right->leftOperator->leftOperand->value << endl;
+//                cout << i << " : " << tempFuncAtts->right->right->right->leftOperand->value << endl;
+                
+                if (tempFuncAtts->leftOperator->leftOperand->value == myAttributeInputs[i].name) {
+                    cout << i << " : " << tempFuncAtts->leftOperator->leftOperand->value << endl;
+                    attributeName1 = myAttributeInputs[i].name;
+                    attributeType1 = convertType(myAttributeInputs[i].type);
+                    found = true;
+                }
+                
+                // Mark
+                if(tempFuncAtts->right->leftOperator != NULL){
+                    if (tempFuncAtts->right->leftOperator->leftOperand->value == myAttributeInputs[i].name) {
+                        cout << i << " : " << tempFuncAtts->right->leftOperator->leftOperand->value << endl;
+                        attributeName2 = myAttributeInputs[i].name;
+                        attributeType2 = convertType(myAttributeInputs[i].type);
 
-				if (tempFuncAtts->leftOperator->leftOperand->value == myAttributeInputs[i].name) {
-					attributeName1 = myAttributeInputs[i].name;
-					attributeType1 = convertType(myAttributeInputs[i].type);
-					found = true;
-				}
-				if (tempFuncAtts->right->leftOperand->value == myAttributeInputs[i].name) {
-					attributeName2 = myAttributeInputs[i].name;
-					attributeType2 = convertType(myAttributeInputs[i].type);
-				
-					found2 = true;
-				}
+                        found2 = true;
+                    }
+                }
+                else{
+                    if (tempFuncAtts->right->leftOperand->value == myAttributeInputs[i].name) {
+                        cout << i << " : " << tempFuncAtts->right->leftOperand->value << endl;
+                        attributeName2 = myAttributeInputs[i].name;
+                        attributeType2 = convertType(myAttributeInputs[i].type);
+
+                        found2 = true;
+                    }
+                }
+
+                // Peyton
+//                if (tempFuncAtts->right->leftOperand != NULL) {
+//                    cout << i << " : " << tempFuncAtts->right->leftOperand->value << endl;
+//                    cout << "right" << endl;
+//                    if (tempFuncAtts->right->leftOperand->value == myAttributeInputs[i].name) {
+//                        attributeName2 = myAttributeInputs[i].name;
+//                        attributeType2 = convertType(myAttributeInputs[i].type);
+//
+//                        found2 = true;
+//                    }
+//                }
+//                else if (tempFuncAtts->right->leftOperator->leftOperand != NULL) {
+//                    cout << i << " : " << tempFuncAtts->right->leftOperator->leftOperand->value << endl;
+//                    cout << "right-left" << endl;
+//                    if (tempFuncAtts->right->leftOperator->leftOperand->value == myAttributeInputs[i].name) {
+//                        attributeName2 = myAttributeInputs[i].name;
+//                        attributeType2 = convertType(myAttributeInputs[i].type);
+//
+//                        found2 = true;
+//                    }
+//                }
 				
 			}
 			if (found && found2) {
