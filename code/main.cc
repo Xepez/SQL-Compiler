@@ -309,7 +309,7 @@ bool checkIfFunctionAttsExists(Catalog&catalog) {
 		bool found2 = false;
 
 		if (tempFunctionAtts->code > 0 && tempFunctionAtts->code < 100) {
-
+//            cout << attributes.size() << endl;
 			for (int j = 0; j < attributes.size(); j++) {
 
 				if (attributes[j] == tempFunctionAtts->leftOperator->leftOperand->value) {

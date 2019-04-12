@@ -192,14 +192,31 @@ bool Catalog::GetAttributes(string& _table, vector<string>& _attributes) {
     sqlite3_stmt *stmt;
     int step;
     
+    int rc = sqlite3_prepare_v2(db, "SELECT tableid FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
+    if (rc == SQLITE_OK) {
+        // Binds the table we are looking for
+        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
+    } else {
+        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
+        return false;
+    }
+    step = sqlite3_step(stmt);
+    int temp;
+    if(step == SQLITE_ROW){
+        temp = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    
     // Prepares Select for attributename
-    sqlite3_prepare_v2(db, "SELECT attributename FROM attribute", -1, &stmt, NULL);
+    sqlite3_prepare_v2(db, "SELECT attributename FROM attribute WHERE tableid = ?", -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, 1, temp);
     
     while ((step = sqlite3_step(stmt)) == SQLITE_ROW){
         // Convert to a string
-        string temp = string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+        string ins = string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+//        cout << ins << endl;
         // Gets each attribute name
-        _attributes.push_back(temp);
+        _attributes.push_back(ins);
     }
     
     sqlite3_finalize(stmt);
