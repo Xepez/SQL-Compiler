@@ -187,8 +187,29 @@ RelationalOp* Join::getRightRelationalOp() {
 	return right;
 }
 Join::~Join() {
-
 }
+
+void Join::NLJ() {
+    // Nested-Loop Join
+    
+}
+
+void Join::HJ() {
+    // Hash Join
+    
+}
+
+void Join::SHJ() {
+    // Symmetric Hash Join
+    
+}
+
+bool Join::GetNext(Record& _record) {
+    cout << "Join GetNext" << endl;
+    
+    return true;
+}
+
 ostream& Join::print(ostream& _os) {
 	return _os << "JOIN: SCHEMA LEFT: " << schemaLeft << " SCHEMA RIGHT: " << schemaRight << " SCHEMA OUT:" << schemaOut << endl;
 }

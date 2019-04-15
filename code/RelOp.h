@@ -161,8 +161,13 @@ public:
 	CNF& getPredicate();
 	RelationalOp* getLeftRelationalOp();
 	RelationalOp* getRightRelationalOp();
+    
+    // Get Next Algorithms
+    void NLJ();
+    void HJ();
+    void SHJ();
 
-    virtual bool GetNext(Record& _record) {}
+    virtual bool GetNext(Record& _record);
 
 	virtual ostream& print(ostream& _os);
 };
