@@ -197,29 +197,40 @@ void Join::NLJ(Record& _record) {
 
 void Join::HJ(Record& _record) {
     // Hash Join
+    Record tempRec;
     
-    // TODO
-    OrderMaker omL;
-    OrderMaker omR;
-    if (predicate.GetSortOrders(omL, omR) != 0) {
-        _record.SetOrderMaker(om);
+    // Inserting (TODO:smaller?) one side of relation into memory
+    while (left->GetNext(tempRec)) {
+        hashMapJ.Insert(tempRec);
     }
-    else {
-        cout << "Error getting OrderMaker from predicate in Hash Join" << endl;
-    }
-    
-    // Probe
-    if (hashMapJ.IsThere(_record)) {
-        //Temp values to store removed data from map
-        Record removedRec;
-        int removedData;
-        // If a value is found remove from map
-        hashMapJ.Remove(_record, removedRec, removedData);
-        // And set it into a two way list
-        hashListJ.Insert(_record);
-    }
-    else {
+
+    // Go through other side after left side has been inserted
+    while (right->GetNext(tempRec)) {
+        // Temp Ordermaker values
+        OrderMaker omL;
+        OrderMaker omR;
+        // Get and Set the Ordermaker
+        if (predicate.GetSortOrders(omL, omR) != 0) {
+            tempRec.SetOrderMaker(omR);
+        }
+        else {
+            cout << "Error getting OrderMaker from predicate in Hash Join" << endl;
+        }
         
+        // Probe
+        if (hashMapJ.IsThere(tempRec)) {
+            //Temp values to store removed data from map
+            Record removedRec;
+            int removedData;
+            // If a value is found remove from map
+            hashMapJ.Remove(tempRec, removedRec, removedData);
+            // And set it into a two way list
+            hashListJ.Insert(tempRec);
+        }
+        else {
+            // When no more records match
+            
+        }
     }
 }
 
@@ -235,7 +246,7 @@ bool Join::GetNext(Record& _record) {
     // Check to see if there are any inequality conditions
     for (int x = 0; x < predicate.andList.size(); x++) {
         if (predicate.andList[x].op == '>' || predicate.andList[x].op == '<') {
-            NLJ();
+            NLJ(_record);
             ran = true;
         }
     }
@@ -244,11 +255,11 @@ bool Join::GetNext(Record& _record) {
     if (ran != true) {
         // If both children have larger records than 1000
         if () { //TODO
-            SHJ();
+            SHJ(_record);
             ran = true;
         }
         else {
-            HJ();
+            HJ(_record);
             ran = true;
         }
     }
