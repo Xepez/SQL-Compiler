@@ -3,6 +3,7 @@
 #include "RelOp.h"
 #include "Keyify.h"
 #include "EfficientMap.h"
+#include "TwoWayList.h"
 
 using namespace std;
 
@@ -189,24 +190,69 @@ RelationalOp* Join::getRightRelationalOp() {
 Join::~Join() {
 }
 
-void Join::NLJ() {
+void Join::NLJ(Record& _record) {
     // Nested-Loop Join
     
 }
 
-void Join::HJ() {
+void Join::HJ(Record& _record) {
     // Hash Join
     
+    // TODO
+    OrderMaker omL;
+    OrderMaker omR;
+    if (predicate.GetSortOrders(omL, omR) != 0) {
+        _record.SetOrderMaker(om);
+    }
+    else {
+        cout << "Error getting OrderMaker from predicate in Hash Join" << endl;
+    }
+    
+    // Probe
+    if (hashMapJ.IsThere(_record)) {
+        //Temp values to store removed data from map
+        Record removedRec;
+        int removedData;
+        // If a value is found remove from map
+        hashMapJ.Remove(_record, removedRec, removedData);
+        // And set it into a two way list
+        hashListJ.Insert(_record);
+    }
+    else {
+        
+    }
 }
 
-void Join::SHJ() {
+void Join::SHJ(Record& _record) {
     // Symmetric Hash Join
     
 }
 
 bool Join::GetNext(Record& _record) {
     cout << "Join GetNext" << endl;
+    bool ran = false;
+
+    // Check to see if there are any inequality conditions
+    for (int x = 0; x < predicate.andList.size(); x++) {
+        if (predicate.andList[x].op == '>' || predicate.andList[x].op == '<') {
+            NLJ();
+            ran = true;
+        }
+    }
     
+    // If NLJ was not run then check for the hash joins
+    if (ran != true) {
+        // If both children have larger records than 1000
+        if () { //TODO
+            SHJ();
+            ran = true;
+        }
+        else {
+            HJ();
+            ran = true;
+        }
+    }
+
     return true;
 }
 

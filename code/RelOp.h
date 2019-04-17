@@ -13,6 +13,8 @@
 #include "EfficientMap.cc"
 #include "Keyify.h"
 #include "Keyify.cc"
+#include "TwoWayList.h"
+#include "TwoWayList.cc"
 
 using namespace std;
 
@@ -148,6 +150,11 @@ private:
 	// operators generating data
 	RelationalOp* left;
 	RelationalOp* right;
+    
+    // Efficient Map for hash join
+    EfficientMap<Record, int> hashMapJ;
+    // Two Way List for hash join
+    TwoWayList<Record> hashListJ;
 
 
 public:
@@ -163,9 +170,9 @@ public:
 	RelationalOp* getRightRelationalOp();
     
     // Get Next Algorithms
-    void NLJ();
-    void HJ();
-    void SHJ();
+    void NLJ(Record& _record);
+    void HJ(Record& _record);
+    void SHJ(Record& _record);
 
     virtual bool GetNext(Record& _record);
 
