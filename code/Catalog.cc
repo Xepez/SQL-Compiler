@@ -1,4 +1,8 @@
 #include <iostream>
+#include <cstdlib>
+#include <fstream>
+#include <string>
+#include <cstring>
 
 #include "Schema.h"
 #include "Catalog.h"

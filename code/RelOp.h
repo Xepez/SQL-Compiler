@@ -15,6 +15,7 @@
 #include "Keyify.cc"
 #include "TwoWayList.h"
 #include "TwoWayList.cc"
+#include "Swapify.h"
 
 using namespace std;
 
@@ -152,10 +153,17 @@ private:
 	RelationalOp* right;
     
     // Efficient Map for hash join
-    EfficientMap<Record, int> hashMapJ;
-    // Two Way List for hash join
-    TwoWayList<Record> hashListJ;
-
+    EfficientMap<Record, SwapInt> hashMapJ;
+    // Two Way List for all joins
+    TwoWayList<Record> joinList;
+    // Determines if we have run through this join yet
+    bool ran;
+    // Determines the amount of records on each side
+    int countLeft;
+    int countRight;
+    // Ordermakers for each side
+    OrderMaker omL;
+    OrderMaker omR;
 
 public:
 	Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut,
