@@ -224,23 +224,23 @@ void Join::HJ(Record& _record) {
     }
     
 //    // Print Current Data
-//    int ccc = 0;
+//    int accc = 0;
 //    cout << "Printing" << endl;
 //    hashMapJ.MoveToStart();
 //    for (EfficientMap<Record, SwapInt> it = hashMapJ; !it.AtEnd(); it.Advance()) {
 //        //cout << "Key " << it.CurrentKey() << " Data " << it.CurrentData() << endl;
 //        it.CurrentKey().print(cout, schemaLeft);
 //        cout << endl;
-//        ccc++;
+//        accc++;
 //    }
-//    cout << "End Print / Count = " << ccc << endl;
+//    cout << "End Print / Count = " << accc << endl;
     
     // Go through other side after left side has been inserted
     while (right->GetNext(tempRec)) {
         tempRec.SetOrderMaker(&omR);
         
         // Probe
-        //while(true) {
+        while(true) {
             if (hashMapJ.IsThere(tempRec)) {
                 cout << "Found Same" << endl;
                 //tempRec.print(cout, schemaRight);
@@ -256,6 +256,17 @@ void Join::HJ(Record& _record) {
                 // Append the two records
                 newRec.AppendRecords(removedRec, tempRec, schemaLeft.GetNumAtts(), schemaRight.GetNumAtts());
                 cout << "appended" << endl;
+                
+                cout << "Old -" << endl;
+                removedRec.print(cout, schemaLeft);
+                
+                cout << "\nNew -"  << endl;
+                Record r1;
+                Record r2;
+                
+                r2.AppendRecords(newRec, r1, schemaLeft.GetNumAtts(), 0);
+                r2.print(cout, schemaLeft);
+                
                 // And set it into a two way list
                 joinList.Insert(newRec);
             }
@@ -265,25 +276,32 @@ void Join::HJ(Record& _record) {
                 joinList.AtStart();
                 for (int x = 0; x < joinList.Length(); x++) {
                     SwapInt tempSI = 0;
+                    // Current Record
                     Record r = joinList.Current();
-                    hashMapJ.Insert(r, tempSI);
+                    // Blank Record to get Left side from output record
+                    Record r1;
+                    Record r2;
+                    // Creates left record from out record
+                    r2.AppendRecords(r, r1, schemaLeft.GetNumAtts(), 0);
+                    r2.print(cout, schemaLeft);
+                    hashMapJ.Insert(r2, tempSI);
                     joinList.Advance();
                 }
-                //break;
+                break;
             }
-        //}
-        
+        }
+    
     }
-    int ccc = 0;
-    cout << "Printing" << endl;
-    //joinList.MoveToStart();
-    TwoWayList<Record> it;
-    for (it.Swap(joinList); !it.AtEnd(); it.Advance()) {
-        it.Current().print(cout, schemaLeft);
-        cout << endl;
-        ccc++;
-    }
-    cout << "End Print / Count = " << ccc << endl;
+//    int ccc = 0;
+//    cout << "Printing" << endl;
+//    //joinList.MoveToStart();
+//    TwoWayList<Record> it;
+//    for (it.Swap(joinList); !it.AtEnd(); it.Advance()) {
+//        it.Current().print(cout, schemaOut);
+//        cout << endl;
+//        ccc++;
+//    }
+//    cout << "End Print / Count = " << ccc << endl;
 }
 
 void Join::SHJ(Record& _record) {
