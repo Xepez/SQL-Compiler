@@ -553,7 +553,7 @@ int CNF::ExtractCNF (AndList& parseTree, Schema& schema, Record& literal) {
 			// add to record literal
 			attStart[numFieldsInLiteral] = recSize;
 			int cLen = sizeof(double);
-			*((double *) recPos) = atof (currCond->left->left->value);
+			*((double *) recPos) = atof (currCond->left->right->value);
 			recSize += cLen;
 			recPos += cLen;
 			numFieldsInLiteral += 1;

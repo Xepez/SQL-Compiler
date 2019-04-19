@@ -257,15 +257,15 @@ void Join::HJ(Record& _record) {
                 newRec.AppendRecords(removedRec, tempRec, schemaLeft.GetNumAtts(), schemaRight.GetNumAtts());
                 cout << "appended" << endl;
                 
-                cout << "Old -" << endl;
-                removedRec.print(cout, schemaLeft);
-                
-                cout << "\nNew -"  << endl;
-                Record r1;
-                Record r2;
-                
-                r2.AppendRecords(newRec, r1, schemaLeft.GetNumAtts(), 0);
-                r2.print(cout, schemaLeft);
+//                cout << "Old -" << endl;
+//                removedRec.print(cout, schemaLeft);
+//                
+//                cout << "\nNew -"  << endl;
+//                Record r1;
+//                Record r2;
+//                
+//                r2.AppendRecords(newRec, r1, schemaLeft.GetNumAtts(), 0);
+//                r2.print(cout, schemaLeft);
                 
                 // And set it into a two way list
                 joinList.Insert(newRec);
