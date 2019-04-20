@@ -156,8 +156,10 @@ private:
     EfficientMap<Record, SwapInt> hashMapJ;
     // Two Way List for all joins
     TwoWayList<Record> joinList;
+    // List of Records that needs to be put back
+    TwoWayList<Record> putBackList;
     // Determines if we have run through this join yet
-    bool ran;
+    bool hashAdded;
     // Determines the amount of records on each side
     int countLeft;
     int countRight;
@@ -178,9 +180,9 @@ public:
 	RelationalOp* getRightRelationalOp();
     
     // Get Next Algorithms
-    void NLJ(Record& _record);
-    void HJ(Record& _record);
-    void SHJ(Record& _record);
+    bool NLJ(Record& _record);
+    bool HJ(Record& _record);
+    bool SHJ(Record& _record);
 
     virtual bool GetNext(Record& _record);
 
