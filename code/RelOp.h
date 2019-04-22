@@ -154,12 +154,21 @@ private:
     
     // Efficient Map for hash join
     EfficientMap<Record, SwapInt> hashMapJ;
+    // Efficient Maps for Symetric Hash Join
+    EfficientMap<Record, SwapInt> hashLeft;
+    EfficientMap<Record, SwapInt> hashRight;
     // Two Way List for all joins
     TwoWayList<Record> joinList;
     // List of Records that needs to be put back
     TwoWayList<Record> putBackList;
+    // List of Records that needs to be put back for either hash map in SHJ
+    TwoWayList<Record> putBackLeft;
+    TwoWayList<Record> putBackRight;
     // Determines if we have run through this join yet
     bool hashAdded;
+    bool firstLeft;
+    // Swap between left and right maps
+    bool swap;
     // Determines the amount of records on each side
     int countLeft;
     int countRight;
