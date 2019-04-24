@@ -462,3 +462,10 @@ bool Record::LessThan (Record& _withMe) {
 	if (ret == -1) return true;
 	return false;
 }
+
+bool Record::compareOM(OrderMaker* _order) {
+    if (_order = compOrder)
+        return true;
+    else
+        return false;
+}

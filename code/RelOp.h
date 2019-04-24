@@ -169,9 +169,8 @@ private:
     bool firstLeft;
     // Swap between left and right maps
     bool swap;
-    // Determines the amount of records on each side
-    int countLeft;
-    int countRight;
+    // Determines when to switch in SHJ
+    int shjCount;
     // Ordermakers for each side
     OrderMaker omL;
     OrderMaker omR;

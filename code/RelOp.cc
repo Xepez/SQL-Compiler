@@ -171,9 +171,17 @@ Join:: Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut,
     hashAdded = false;
     swap = true;
     firstLeft = true;
+    shjCount = 0;
     
     if (predicate.GetSortOrders(omL, omR) == 0) {
         cout << "Error getting OrderMaker from predicate" << endl;
+    }
+    else {
+        cout << "\nORDERMAKERS FOR THIS JOIN" << endl;
+        cout << "LEFT OM: " << omL << endl;
+        cout << "LEFT SCHEMA\n" << schemaLeft << endl;
+        cout << "RIGHT OM: " << omR << endl;
+        cout << "RIGHT SCHEMA\n" << schemaRight << endl;
     }
 }
 Schema& Join::getLeftSchema() {
@@ -261,9 +269,14 @@ bool Join::HJ(Record& _record) {
             // Set right ordermaker
             tempRec.SetOrderMaker(&omR);
             
-//            cout << "Right Record:" << endl;
-//            tempRec.print(cout, schemaRight);
-//            cout << endl;
+//            if (tempRec.compareOM(&omL))
+//                cout << "---------------TRUE---------------" << endl;
+//            else
+//                cout << "---------------FALSE---------------" << endl;
+            
+            cout << "Right Record:" << endl;
+            tempRec.print(cout, schemaRight);
+            cout << endl;
 //            cout << "L: " << schemaLeft << endl;
 //            cout << "R: " << schemaRight << endl;
             
@@ -328,7 +341,7 @@ bool Join::SHJ(Record& _record) {
     SwapInt leftCount = 0;
     SwapInt rightCount = 0;
     
-    // IF LIST IS NOT EMPTY RETURN TUPLE
+    // If list is not empty return a saved record
     if (!joinList.AtEnd()) {
         cout << "List Not Empty" << endl;
         joinList.MoveToStart();
@@ -336,17 +349,22 @@ bool Join::SHJ(Record& _record) {
         joinList.Remove(_record);
         return true;
     }
+    // Left Side
     else if (swap) {
-        // Swap from left to right
-        swap = false;
+        // Swap from left to right after 10 intervals
+        if (shjCount == 10) {
+            swap = false;
+            shjCount = 0;
+        }
+        else {
+            shjCount++;
+        }
         
         // Make sure right hashmap is full
         cout << "Putting Back from Right List" << endl;
-        // When no more records match
         putBackRight.MoveToStart();
         SwapInt tempSI = 0;
         for (int x = 0; x < putBackRight.Length(); x++) {
-            // Current Record
             Record r = putBackRight.Current();
             hashLeft.Insert(r, tempSI);
             tempSI = tempSI + 1;
@@ -398,17 +416,22 @@ bool Join::SHJ(Record& _record) {
             return false;
         }
     }
+    // Right Side
     else {
-        // Swap from right to left
-        swap = true;
+        // Swap from right to left after 10 intervals
+        if (shjCount == 10) {
+            swap = true;
+            shjCount = 0;
+        }
+        else {
+            shjCount++;
+        }
         
         // Make sure left hashmap is full
         cout << "Putting Back from Left List" << endl;
-        // When no more records match
         putBackLeft.MoveToStart();
         SwapInt tempSI = 0;
         for (int x = 0; x < putBackLeft.Length(); x++) {
-            // Current Record
             Record r = putBackLeft.Current();
             hashLeft.Insert(r, tempSI);
             tempSI = tempSI + 1;
