@@ -8,6 +8,8 @@
 using namespace std;
 
 
+// For Peyton For Debuging in lldb - settings set target.input-path Queries_project_5/1.sql
+
 //---------------------------------------------------------------------------------------------------------------------------------------------
 ostream& operator<<(ostream& _os, RelationalOp& _op) {
 	return _op.print(_os);
@@ -230,7 +232,7 @@ bool Join::HJ(Record& _record) {
 
     // Insert left side into the hashmap
     if (!hashAdded) {
-        cout << "Adding Left Side" << endl;
+//        cout << "Adding Left Side" << endl;
         while (left->GetNext(tempRec)) {
             // Set left side ordermaker
             tempRec.SetOrderMaker(&omL);
@@ -244,7 +246,7 @@ bool Join::HJ(Record& _record) {
     
     // If list is not empty keep returning records till it is
     if (!joinList.AtEnd()) {
-        cout << "List Not Empty" << endl;
+//        cout << "List Not Empty" << endl;
         joinList.MoveToStart();
         _record = joinList.Current();
         joinList.Remove(_record);
@@ -254,7 +256,7 @@ bool Join::HJ(Record& _record) {
         // If list is empty get right record and probe
         
         // Putting used records back into hashmap
-        cout << "Putting back into hashmap from list" << endl;
+//        cout << "Putting back into hashmap from list" << endl;
         putBackList.MoveToStart();
         SwapInt tempSI = 0;
         for (int x = 0; x < putBackList.Length(); x++) {
@@ -274,16 +276,16 @@ bool Join::HJ(Record& _record) {
 //            else
 //                cout << "---------------FALSE---------------" << endl;
             
-            cout << "Right Record:" << endl;
-            tempRec.print(cout, schemaRight);
-            cout << endl;
+//            cout << "Right Record:" << endl;
+//            tempRec.print(cout, schemaRight);
+//            cout << endl;
 //            cout << "L: " << schemaLeft << endl;
 //            cout << "R: " << schemaRight << endl;
             
-            cout << "check we got a right record" << endl;
+//            cout << "check we got a right record" << endl;
             // Probe
             while (hashMapJ.IsThere(tempRec)) {
-                cout << "Found same record in hashmap" << endl;
+//                cout << "Found same record in hashmap" << endl;
                 
                 //Temp values to store removed data from map
                 Record removedRec;
@@ -296,7 +298,7 @@ bool Join::HJ(Record& _record) {
                 Record newRec;
                 // Append the two records
                 newRec.AppendRecords(removedRec, tempRec, schemaLeft.GetNumAtts(), schemaRight.GetNumAtts());
-                cout << "Append Succeeded" << endl;
+//                cout << "Append Succeeded" << endl;
                 
                 // Print Records
 //                cout << "LEFT RECORD:" << endl;
@@ -315,19 +317,19 @@ bool Join::HJ(Record& _record) {
                 joinList.Insert(newRec);
                 // Also need to save old records to be put back
                 putBackList.Insert(removedRec);
-                cout << "Inserted properly to lists" << endl;
+//                cout << "Inserted properly to lists" << endl;
             }
             
             // Return First Appended Record
-            cout << "Done in while loop" << endl;
+//            cout << "Done in while loop" << endl;
             joinList.MoveToStart();
             _record = joinList.Current();
             joinList.Remove(_record);
-            cout << "Finished and returning True w/ appeneded record" << endl;
+//            cout << "Finished and returning True w/ appeneded record" << endl;
             return true;
         }
         else {
-            cout << "Returned False" << endl;
+//            cout << "Returned False" << endl;
             return false;
         }
     }

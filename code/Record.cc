@@ -446,25 +446,46 @@ void Record :: print(ostream& _os, Schema& mySchema) {
 
 
 bool Record::operator< (Record& _withMe) {
-	int ret = compOrder->Run(*this, _withMe);
+    int ret;
+    if (!compareOM(_withMe.getOrderMaker())) {
+        OrderMaker tempOM = *_withMe.getOrderMaker();
+        ret = compOrder->Run(*this, _withMe, tempOM);
+    }
+    else {
+        ret =compOrder->Run(*this, _withMe);
+    }
 	if (ret == -1) return true;
 	return false;
 }
 
 bool Record::IsEqual (Record& _withMe) {
-	int ret = compOrder->Run(*this, _withMe);
+    int ret;
+    if (!compareOM(_withMe.getOrderMaker())) {
+        OrderMaker tempOM = *_withMe.getOrderMaker();
+        ret = compOrder->Run(*this, _withMe, tempOM);
+    }
+    else {
+        ret =compOrder->Run(*this, _withMe);
+    }
 	if (ret == 0) return true;
 	return false;
 }
 
 bool Record::LessThan (Record& _withMe) {
-	int ret = compOrder->Run(*this, _withMe);
+    int ret;
+    if (!compareOM(_withMe.getOrderMaker())) {
+        OrderMaker tempOM = *_withMe.getOrderMaker();
+        ret = compOrder->Run(*this, _withMe, tempOM);
+    }
+    else {
+        ret =compOrder->Run(*this, _withMe);
+    }
 	if (ret == -1) return true;
 	return false;
 }
 
 bool Record::compareOM(OrderMaker* _order) {
-    if (_order = compOrder)
+    if (_order == compOrder)
         return true;
     else
         return false;

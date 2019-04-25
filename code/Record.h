@@ -89,7 +89,7 @@ public:
     bool LessThan(Record& _me);
 
     void SetOrderMaker(OrderMaker* _order) {compOrder = _order;}
-    
+    OrderMaker* getOrderMaker() {return compOrder;}
     bool compareOM(OrderMaker* _order);
 };
 
