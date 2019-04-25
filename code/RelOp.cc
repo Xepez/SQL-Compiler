@@ -178,13 +178,13 @@ Join:: Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut,
     if (predicate.GetSortOrders(omL, omR) == 0) {
         cout << "Error getting OrderMaker from predicate" << endl;
     }
-    else {
-        cout << "\nORDERMAKERS FOR THIS JOIN" << endl;
-        cout << "LEFT OM: " << omL << endl;
-        cout << "LEFT SCHEMA\n" << schemaLeft << endl;
-        cout << "RIGHT OM: " << omR << endl;
-        cout << "RIGHT SCHEMA\n" << schemaRight << endl;
-    }
+//    else {
+//        cout << "\nORDERMAKERS FOR THIS JOIN" << endl;
+//        cout << "LEFT OM: " << omL << endl;
+//        cout << "LEFT SCHEMA\n" << schemaLeft << endl;
+//        cout << "RIGHT OM: " << omR << endl;
+//        cout << "RIGHT SCHEMA\n" << schemaRight << endl;
+//    }
 }
 Schema& Join::getLeftSchema() {
 	return schemaLeft;
@@ -224,7 +224,7 @@ bool Join::NLJ(Record& _record) {
 
 bool Join::HJ(Record& _record) {
     // Hash Join
-    cout << "Hash Join" << endl;
+    //cout << "Hash Join" << endl;
     
     // Temp varialbes to hold our inserted data
     Record tempRec;
@@ -257,13 +257,24 @@ bool Join::HJ(Record& _record) {
         
         // Putting used records back into hashmap
 //        cout << "Putting back into hashmap from list" << endl;
-        putBackList.MoveToStart();
+        
+        // OLD
+//        putBackList.MoveToStart();
+//        SwapInt tempSI = 0;
+//        for (int x = 0; x < putBackList.Length(); x++) {
+//            Record r = putBackList.Current();
+//            hashMapJ.Insert(r, tempSI);
+//            tempSI = tempSI + 1;
+//            putBackList.Advance();
+//        }
+        // NEW
         SwapInt tempSI = 0;
         for (int x = 0; x < putBackList.Length(); x++) {
+            putBackList.MoveToStart();
             Record r = putBackList.Current();
             hashMapJ.Insert(r, tempSI);
             tempSI = tempSI + 1;
-            putBackList.Advance();
+            putBackList.Remove(r);
         }
         
         // Get right record and probe left side
@@ -482,7 +493,7 @@ bool Join::SHJ(Record& _record) {
 }
 
 bool Join::GetNext(Record& _record) {
-    cout << "Join GetNext" << endl;
+    //cout << "Join GetNext" << endl;
 
     return HJ(_record);
 //        // Check to see if there are any inequality conditions
@@ -742,12 +753,12 @@ WriteOut::~WriteOut() {
 }
 
 bool WriteOut::GetNext(Record& _record) {
-    cout << "Write Out GetNext" << endl;
+    //cout << "Write Out GetNext" << endl;
     if (producer->GetNext(_record)) {
-        cout << "Back to Write Out" << endl;
+        //cout << "Back to Write Out" << endl;
         _record.print(cout, schema);
         cout << endl;
-        cout << "Success at Write Out" << endl;
+        //cout << "Success at Write Out" << endl;
         return true;
     }
     else{

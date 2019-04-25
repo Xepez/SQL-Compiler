@@ -1,4 +1,4 @@
-SELECT r_name 
+SELECT n_name 
 FROM nation, region
-WHERE r_regionkey = n_regionkey AND n_nationkey = 24
+WHERE r_regionkey = n_regionkey
 
