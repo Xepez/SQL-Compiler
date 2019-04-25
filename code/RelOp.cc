@@ -173,6 +173,8 @@ Join:: Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut,
     hashAdded = false;
     swap = true;
     firstLeft = true;
+    leftEmpty = false;
+    rightEmpty = false;
     shjCount = 0;
     
     if (predicate.GetSortOrders(omL, omR) == 0) {
@@ -207,8 +209,9 @@ RelationalOp* Join::getRightRelationalOp() {
 Join::~Join() {
 }
 
+// Nested-Loop Join
 bool Join::NLJ(Record& _record) {
-    // Nested-Loop Join
+    cout << "NestLoop Join" << endl;
     
     // Build Phase -------------------------------------------------------
     Record tempRec;
@@ -222,9 +225,9 @@ bool Join::NLJ(Record& _record) {
     
 }
 
+// Hash Join
 bool Join::HJ(Record& _record) {
-    // Hash Join
-    //cout << "Hash Join" << endl;
+    cout << "Hash Join" << endl;
     
     // Temp varialbes to hold our inserted data
     Record tempRec;
@@ -232,7 +235,7 @@ bool Join::HJ(Record& _record) {
 
     // Insert left side into the hashmap
     if (!hashAdded) {
-//        cout << "Adding Left Side" << endl;
+        cout << "Adding Left Side" << endl;
         while (left->GetNext(tempRec)) {
             // Set left side ordermaker
             tempRec.SetOrderMaker(&omL);
@@ -246,28 +249,16 @@ bool Join::HJ(Record& _record) {
     
     // If list is not empty keep returning records till it is
     if (!joinList.AtEnd()) {
-//        cout << "List Not Empty" << endl;
+        cout << "List Not Empty" << endl;
         joinList.MoveToStart();
         _record = joinList.Current();
         joinList.Remove(_record);
         return true;
     }
+    // If list is empty get right record and probe
     else {
-        // If list is empty get right record and probe
-        
         // Putting used records back into hashmap
-//        cout << "Putting back into hashmap from list" << endl;
-        
-        // OLD
-//        putBackList.MoveToStart();
-//        SwapInt tempSI = 0;
-//        for (int x = 0; x < putBackList.Length(); x++) {
-//            Record r = putBackList.Current();
-//            hashMapJ.Insert(r, tempSI);
-//            tempSI = tempSI + 1;
-//            putBackList.Advance();
-//        }
-        // NEW
+        cout << "Putting back into hashmap from list " << putBackList.Length() << endl;
         SwapInt tempSI = 0;
         for (int x = 0; x < putBackList.Length(); x++) {
             putBackList.MoveToStart();
@@ -282,21 +273,9 @@ bool Join::HJ(Record& _record) {
             // Set right ordermaker
             tempRec.SetOrderMaker(&omR);
             
-//            if (tempRec.compareOM(&omL))
-//                cout << "---------------TRUE---------------" << endl;
-//            else
-//                cout << "---------------FALSE---------------" << endl;
-            
-//            cout << "Right Record:" << endl;
-//            tempRec.print(cout, schemaRight);
-//            cout << endl;
-//            cout << "L: " << schemaLeft << endl;
-//            cout << "R: " << schemaRight << endl;
-            
-//            cout << "check we got a right record" << endl;
             // Probe
             while (hashMapJ.IsThere(tempRec)) {
-//                cout << "Found same record in hashmap" << endl;
+                cout << "Found same record in hashmap" << endl;
                 
                 //Temp values to store removed data from map
                 Record removedRec;
@@ -309,7 +288,7 @@ bool Join::HJ(Record& _record) {
                 Record newRec;
                 // Append the two records
                 newRec.AppendRecords(removedRec, tempRec, schemaLeft.GetNumAtts(), schemaRight.GetNumAtts());
-//                cout << "Append Succeeded" << endl;
+                //cout << "Append Succeeded" << endl;
                 
                 // Print Records
 //                cout << "LEFT RECORD:" << endl;
@@ -328,26 +307,24 @@ bool Join::HJ(Record& _record) {
                 joinList.Insert(newRec);
                 // Also need to save old records to be put back
                 putBackList.Insert(removedRec);
-//                cout << "Inserted properly to lists" << endl;
             }
             
             // Return First Appended Record
-//            cout << "Done in while loop" << endl;
             joinList.MoveToStart();
             _record = joinList.Current();
             joinList.Remove(_record);
-//            cout << "Finished and returning True w/ appeneded record" << endl;
+            cout << "Finished and returning True w/ appeneded record" << endl;
             return true;
         }
         else {
-//            cout << "Returned False" << endl;
+            cout << "Returning False No More Found" << endl;
             return false;
         }
     }
 }
 
+// Symmetric Hash Join
 bool Join::SHJ(Record& _record) {
-    // Symmetric Hash Join
     cout << "Symmetric Hash Join" << endl;
     
     Record tempRec;
@@ -362,6 +339,10 @@ bool Join::SHJ(Record& _record) {
         joinList.Remove(_record);
         return true;
     }
+    // If both the left and right side are empty
+    else if (leftEmpty && rightEmpty) {
+        return false;
+    }
     // Left Side
     else if (swap) {
         // Swap from left to right after 10 intervals
@@ -375,16 +356,16 @@ bool Join::SHJ(Record& _record) {
         
         // Make sure right hashmap is full
         cout << "Putting Back from Right List" << endl;
-        putBackRight.MoveToStart();
         SwapInt tempSI = 0;
         for (int x = 0; x < putBackRight.Length(); x++) {
+            putBackRight.MoveToStart();
             Record r = putBackRight.Current();
             hashLeft.Insert(r, tempSI);
             tempSI = tempSI + 1;
-            putBackRight.Advance();
+            putBackRight.Remove(r);
         }
         
-        if (left->GetNext(tempRec)) {
+        if (left->GetNext(tempRec) && !leftEmpty) {
             // Build
             cout << "Build Left" << endl;
             tempRec.SetOrderMaker(&omL);
@@ -426,7 +407,7 @@ bool Join::SHJ(Record& _record) {
             return true;
         }
         else {
-            return false;
+            leftEmpty = true;
         }
     }
     // Right Side
@@ -442,16 +423,16 @@ bool Join::SHJ(Record& _record) {
         
         // Make sure left hashmap is full
         cout << "Putting Back from Left List" << endl;
-        putBackLeft.MoveToStart();
         SwapInt tempSI = 0;
         for (int x = 0; x < putBackLeft.Length(); x++) {
+            putBackLeft.MoveToStart();
             Record r = putBackLeft.Current();
             hashLeft.Insert(r, tempSI);
             tempSI = tempSI + 1;
-            putBackLeft.Advance();
+            putBackLeft.Remove(r);
         }
         
-        if (right->GetNext(tempRec)) {
+        if (right->GetNext(tempRec) && !rightEmpty) {
             // Build
             cout << "Build Right" << endl;
             tempRec.SetOrderMaker(&omR);
@@ -487,7 +468,7 @@ bool Join::SHJ(Record& _record) {
             return true;
         }
         else {
-            return false;
+            rightEmpty = true;;
         }
     }
 }

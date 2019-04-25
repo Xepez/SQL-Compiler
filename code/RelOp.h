@@ -164,11 +164,15 @@ private:
     // List of Records that needs to be put back for either hash map in SHJ
     TwoWayList<Record> putBackLeft;
     TwoWayList<Record> putBackRight;
+    // So many Booleans lol
     // Determines if we have run through this join yet
     bool hashAdded;
     bool firstLeft;
     // Swap between left and right maps
     bool swap;
+    // Identifies if the left and right sides are empty in SHJ
+    bool leftEmpty;
+    bool rightEmpty;
     // Determines when to switch in SHJ
     int shjCount;
     // Ordermakers for each side
