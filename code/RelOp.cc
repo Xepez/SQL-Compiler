@@ -211,18 +211,35 @@ Join::~Join() {
 
 // Nested-Loop Join
 bool Join::NLJ(Record& _record) {
-    cout << "NestLoop Join" << endl;
+    //cout << "Nest-Loop Join" << endl;
     
     // Build Phase -------------------------------------------------------
     Record tempRec;
     
     // Inserting (TODO:smaller?) one side of relation into memory
-    while (left->GetNext(tempRec)) {
-        joinList.Insert(tempRec);
+    if (firstLeft) {
+        while (left->GetNext(tempRec)) {
+            joinList.Insert(tempRec);
+        }
+        firstLeft = false;
     }
     
     // Probe Phase -------------------------------------------------------
-    
+    Record currRec;
+    if (right->GetNext(tempRec)) {
+        joinList.MoveToStart();
+        while (!joinList.AtEnd()) {
+            currRec = joinList.Current();
+            if (predicate.Run(currRec, tempRec)) {
+                _record.AppendRecords(currRec, tempRec, schemaLeft.GetNumAtts(), schemaRight.GetNumAtts());
+                //_record.print(cout, schemaOut);
+                //cout << endl;
+                return true;
+            }
+            joinList.Advance();
+        }
+    }
+    return false;
 }
 
 // Hash Join
@@ -292,17 +309,17 @@ bool Join::HJ(Record& _record) {
                 //cout << "Append Succeeded" << endl;
                 
                 // Print Records
-//                cout << "\nLEFT RECORD:" << endl;
-//                removedRec.print(cout, schemaLeft);
-//                cout << "\n" << endl;
-//
-//                cout << "RIGHT RECORD:" << endl;
-//                tempRec.print(cout, schemaRight);
-//                cout << "\n" << endl;
-//
-//                cout << "OUR NEW RECORD:" << endl;
-//                newRec.print(cout, schemaOut);
-//                cout << "\n" << endl;
+                cout << "\nLEFT RECORD:" << endl;
+                removedRec.print(cout, schemaLeft);
+                cout << "\n" << endl;
+
+                cout << "RIGHT RECORD:" << endl;
+                tempRec.print(cout, schemaRight);
+                cout << "\n" << endl;
+
+                cout << "OUR NEW RECORD:" << endl;
+                newRec.print(cout, schemaOut);
+                cout << "\n" << endl;
                 
                 // And appended record to our list of matched records
                 joinList.Insert(newRec);
@@ -520,7 +537,7 @@ bool Join::SHJ(Record& _record) {
 bool Join::GetNext(Record& _record) {
     //cout << "Join GetNext" << endl;
 
-    return HJ(_record);
+    return NLJ(_record);
 //        // Check to see if there are any inequality conditions
 //        for (int x = 0; x < predicate.numAnds; x++) {
 //            if (predicate.andList[x].op == '>' || predicate.andList[x].op == '<')
