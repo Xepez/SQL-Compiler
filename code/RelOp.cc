@@ -226,7 +226,7 @@ bool Join::NLJ(Record& _record) {
     
     // Probe Phase -------------------------------------------------------
     Record currRec;
-    if (right->GetNext(tempRec)) {
+    while (right->GetNext(tempRec)) {
         joinList.MoveToStart();
         while (!joinList.AtEnd()) {
             currRec = joinList.Current();
@@ -537,7 +537,7 @@ bool Join::SHJ(Record& _record) {
 bool Join::GetNext(Record& _record) {
     //cout << "Join GetNext" << endl;
 
-    return NLJ(_record);
+    return HJ(_record);
 //        // Check to see if there are any inequality conditions
 //        for (int x = 0; x < predicate.numAnds; x++) {
 //            if (predicate.andList[x].op == '>' || predicate.andList[x].op == '<')
