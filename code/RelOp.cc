@@ -180,6 +180,8 @@ Join:: Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut,
     if (predicate.GetSortOrders(omL, omR) == 0) {
         cout << "Error getting OrderMaker from predicate" << endl;
     }
+    omL.side = 0;
+    omR.side = 1;
 //    else {
 //        cout << "\nORDERMAKERS FOR THIS JOIN" << endl;
 //        cout << "LEFT OM: " << omL << endl;
@@ -309,9 +311,13 @@ bool Join::HJ(Record& _record) {
                 
                 hashMapJ.Remove(tempRec, removedRec, removedData);
                 
-                // cout << "REMOVED MATCHING RECORD: ";
-                // removedRec.print(cout, schemaLeft);
-                // cout << endl;
+                cout << "RECORD WE GOT: ";
+                tempRec.print(cout, schemaRight);
+                cout << endl;
+                
+                cout << "REMOVED MATCHING RECORD: ";
+                removedRec.print(cout, schemaLeft);
+                cout << endl;
                 
                 Record newRec;
                 
@@ -686,7 +692,7 @@ bool Join::SHJ(Record& _record) {
 bool Join::GetNext(Record& _record) {
     //cout << "Join GetNext" << endl;
 
-    return SHJ(_record);
+    return HJ(_record);
 //        // Check to see if there are any inequality conditions
 //        for (int x = 0; x < predicate.numAnds; x++) {
 //            if (predicate.andList[x].op == '>' || predicate.andList[x].op == '<')

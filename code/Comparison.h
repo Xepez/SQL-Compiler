@@ -67,6 +67,9 @@ public:
 	int whichAtts[MAX_ANDS];
 	Type whichTypes[MAX_ANDS];
 
+    // Determines sides for Join Functions
+    // 0 = left // 1 = right
+    int side;
 	
 	OrderMaker();
 	//copy constructor
