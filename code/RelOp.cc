@@ -163,7 +163,7 @@ ostream& Project::print(ostream& _os) {
 
 //-------------------------------------------------------JOIN --------------------------------------------------------------------------------------
 Join:: Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut,
-	CNF& _predicate, RelationalOp* _left, RelationalOp* _right) {
+	CNF& _predicate, RelationalOp* _left, RelationalOp* _right, int lCnt, int rCnt) {
 	schemaLeft = _schemaLeft;
 	schemaRight = _schemaRight;
 	schemaOut = _schemaOut;
@@ -175,6 +175,8 @@ Join:: Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut,
     firstLeft = true;
     leftEmpty = false;
     rightEmpty = false;
+    leftCount = lCnt;
+    rightCount = rCnt;
     shjCount = 0;
     
     if (predicate.GetSortOrders(omL, omR) == 0) {
@@ -311,13 +313,13 @@ bool Join::HJ(Record& _record) {
                 
                 hashMapJ.Remove(tempRec, removedRec, removedData);
                 
-                cout << "RECORD WE GOT: ";
-                tempRec.print(cout, schemaRight);
-                cout << endl;
+                //cout << "RECORD WE GOT: ";
+                //tempRec.print(cout, schemaRight);
+                //cout << endl;
                 
-                cout << "REMOVED MATCHING RECORD: ";
-                removedRec.print(cout, schemaLeft);
-                cout << endl;
+                //cout << "REMOVED MATCHING RECORD: ";
+                //removedRec.print(cout, schemaLeft);
+                //cout << endl;
                 
                 Record newRec;
                 
@@ -507,16 +509,12 @@ bool Join::SHJ(Record& _record) {
             shjCount++;
         }
         shjCount = 1;
-        if (leftEmpty) {
-            swap = true;
-        }
-        else {
-            swap = false;
-        }
+//        swap = true;
         
         if (right->GetNext(tempRec) && !rightEmpty) {
             tempRec.SetOrderMaker(&omR);
             
+            Record newRec;
             // Probe Left Side
             while (hashLeft.IsThere(tempRec)) {
                 //cout << "Found Same in Left Hashmap" << endl;
@@ -527,7 +525,7 @@ bool Join::SHJ(Record& _record) {
                 // If a value is found remove from map
                 hashLeft.Remove(tempRec, removedRec, removedData);
                 
-                Record newRec;
+                
                 // Append the two records
                 newRec.AppendRecords(removedRec, tempRec, schemaLeft.GetNumAtts(), schemaRight.GetNumAtts());
                 //cout << "Appended" << endl;
@@ -543,6 +541,7 @@ bool Join::SHJ(Record& _record) {
         }
         else {
             rightEmpty = true;
+            swap = false;
         }
         //cout << "Done now Return First Record" << endl;
         if (joinList.AtEnd())
@@ -557,7 +556,10 @@ bool Join::SHJ(Record& _record) {
     else if (swap) {
         // Swap from left to right after 10 intervals
         if (shjCount == 10) {
-            swap = false;
+            if (rightEmpty)
+                swap = true;
+            else
+                swap = false;
             shjCount = 0;
         }
         else {
@@ -624,7 +626,10 @@ bool Join::SHJ(Record& _record) {
     else {
         // Swap from right to left after 10 intervals
         if (shjCount == 10) {
-            swap = true;
+            if (leftEmpty)
+                swap = false;
+            else
+                swap = true;
             shjCount = 0;
         }
         else {
@@ -692,18 +697,23 @@ bool Join::SHJ(Record& _record) {
 bool Join::GetNext(Record& _record) {
     //cout << "Join GetNext" << endl;
 
-    return HJ(_record);
-//        // Check to see if there are any inequality conditions
-//        for (int x = 0; x < predicate.numAnds; x++) {
-//            if (predicate.andList[x].op == '>' || predicate.andList[x].op == '<')
-//                return NLJ(_record);
-//        }
-//
-//        // If both children have larger records than 1000
-//        if (countLeft >= 1000 && countRight >= 1000)
-//            return SHJ(_record);
-//        else
-//            return HJ(_record);
+    // Test each function individually
+    //return SHJ(_record);
+    
+    // Check to see if there are any inequality conditions
+    for (int x = 0; x < predicate.numAnds; x++) {
+        if (predicate.andList[x].op == '>' || predicate.andList[x].op == '<')
+            return NLJ(_record);
+    }
+
+//    cout << "\nLeft: " << leftCount << endl;
+//    cout << "Right: " << rightCount << endl;
+    
+    // If both children have larger records than 1000
+    if (leftCount >= 1000 && rightCount >= 1000)
+        return SHJ(_record);
+    else
+        return HJ(_record);
 }
 
 ostream& Join::print(ostream& _os) {

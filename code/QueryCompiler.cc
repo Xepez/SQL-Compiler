@@ -96,8 +96,10 @@ RelationalOp* postOrderTraversal(OptimizationTree*root, vector<Scan*>allTableSca
 		outSchema.Append(rightSchema);
 
 		tableCNF.ExtractCNF(*_predicate, leftSchema, rightSchema);
+        int lTupleCount = root->leftChild->noTuples;
+        int rTupleCount = root->rightChild->noTuples;
 
-		Join *joinedStuff = new Join(leftSchema, rightSchema, outSchema, tableCNF, leftChild, rightChild);
+		Join *joinedStuff = new Join(leftSchema, rightSchema, outSchema, tableCNF, leftChild, rightChild, lTupleCount, rTupleCount);
 	
 		return joinedStuff;
 

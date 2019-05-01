@@ -175,13 +175,15 @@ private:
     bool rightEmpty;
     // Determines when to switch in SHJ
     int shjCount;
+    int leftCount;
+    int rightCount;
     // Ordermakers for each side
     OrderMaker omL;
     OrderMaker omR;
 
 public:
 	Join(Schema& _schemaLeft, Schema& _schemaRight, Schema& _schemaOut,
-		CNF& _predicate, RelationalOp* _left, RelationalOp* _right);
+		CNF& _predicate, RelationalOp* _left, RelationalOp* _right, int lCnt, int rCnt);
 	virtual ~Join();
 
 	Schema& getLeftSchema();

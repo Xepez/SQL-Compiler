@@ -444,7 +444,6 @@ void Record :: print(ostream& _os, Schema& mySchema) {
 	_os << '}';
 }
 
-
 bool Record::operator< (Record& _withMe) {
     int ret;
     if (!compareOM(_withMe.getOrderMaker())) {
@@ -495,11 +494,11 @@ bool Record::compareOM(OrderMaker* _order) {
 bool Record::operator< (Record& _withMe) {
     int ret;
     if (!compareOM(_withMe.getOrderMaker())) {
-        if (compOrder->side == 0) {
+        if (compOrder->side == 1) {
             OrderMaker tempOM = *_withMe.getOrderMaker();
             ret = compOrder->Run(*this, _withMe, tempOM);
         }
-        else if (compOrder->side == 1) {
+        else if (compOrder->side == 0) {
             OrderMaker tempCompOrder = *this->getOrderMaker();
             ret = _withMe.getOrderMaker()->Run(_withMe, *this, tempCompOrder);
         }
@@ -514,11 +513,11 @@ bool Record::operator< (Record& _withMe) {
 bool Record::IsEqual (Record& _withMe) {
     int ret;
     if (!compareOM(_withMe.getOrderMaker())) {
-        if (compOrder->side == 0) {
+        if (compOrder->side == 1) {
             OrderMaker tempOM = *_withMe.getOrderMaker();
             ret = compOrder->Run(*this, _withMe, tempOM);
         }
-        else if (compOrder->side == 1) {
+        else if (compOrder->side == 0) {
             OrderMaker tempCompOrder = *this->getOrderMaker();
             ret = _withMe.getOrderMaker()->Run(_withMe, *this, tempCompOrder);
         }
@@ -533,11 +532,11 @@ bool Record::IsEqual (Record& _withMe) {
 bool Record::LessThan (Record& _withMe) {
     int ret;
     if (!compareOM(_withMe.getOrderMaker())) {
-        if (compOrder->side == 0) {
+        if (compOrder->side == 1) {
             OrderMaker tempOM = *_withMe.getOrderMaker();
             ret = compOrder->Run(*this, _withMe, tempOM);
         }
-        else if (compOrder->side == 1) {
+        else if (compOrder->side == 0) {
             OrderMaker tempCompOrder = *this->getOrderMaker();
             ret = _withMe.getOrderMaker()->Run(_withMe, *this, tempCompOrder);
         }
