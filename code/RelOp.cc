@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <stdio.h>
 #include "RelOp.h"
 #include "Keyify.h"
 #include "EfficientMap.h"
@@ -215,7 +216,7 @@ Join::~Join() {
 
 // Nested-Loop Join
 bool Join::NLJ(Record& _record) {
-    //cout << "Nest-Loop Join" << endl;
+//    cout << "Nest-Loop Join" << endl;
     
     // Build Phase -------------------------------------------------------
     Record tempRec;
@@ -248,7 +249,7 @@ bool Join::NLJ(Record& _record) {
 
 // Hash Join
 bool Join::HJ(Record& _record) {
-    //cout << "Hash Join" << endl;
+//    cout << "Hash Join" << endl;
     
     // Hash Join
     Record tempRec;
@@ -472,7 +473,7 @@ bool Join::HJ(Record& _record) {
 
 // Symmetric Hash Join
 bool Join::SHJ(Record& _record) {
-    // cout << "Symmetric Hash Join" << endl;
+//     cout << "Symmetric Hash Join" << endl;
     
     Record tempRec;
     SwapInt leftCount = 0;
@@ -623,6 +624,8 @@ bool Join::SHJ(Record& _record) {
         }
         else {
             leftEmpty = true;
+            swap = false;
+            shjCount = 0;
         }
     }
     // Right Side
@@ -668,6 +671,8 @@ bool Join::SHJ(Record& _record) {
                 Record newRec;
                 // Append the two records
                 newRec.AppendRecords(removedRec, tempRec, schemaLeft.GetNumAtts(), schemaRight.GetNumAtts());
+//                newRec.AppendRecords(tempRec, removedRec, schemaRight.GetNumAtts(), schemaLeft.GetNumAtts());
+
                 //cout << "Appended" << endl;
 
                 // And set it into a two way list
@@ -692,6 +697,8 @@ bool Join::SHJ(Record& _record) {
         }
         else {
             rightEmpty = true;
+            swap = true;
+            shjCount = 0;
         }
     }
 }
@@ -700,7 +707,7 @@ bool Join::GetNext(Record& _record) {
     //cout << "Join GetNext" << endl;
 
     // Test each function individually
-    //return SHJ(_record);
+//    return HJ(_record);
     
     // Check to see if there are any inequality conditions
     for (int x = 0; x < predicate.numAnds; x++) {
@@ -710,7 +717,7 @@ bool Join::GetNext(Record& _record) {
 
 //    cout << "\nLeft: " << leftCount << endl;
 //    cout << "Right: " << rightCount << endl;
-    
+
     // If both children have larger records than 1000
     if (leftCount >= 1000 && rightCount >= 1000)
         return SHJ(_record);
@@ -999,6 +1006,7 @@ void QueryExecutionTree::ExecuteQuery() {
     Record rec;
     while(root->GetNext(rec)){ count++; }
     cout << count << endl;
+    cerr << "Count: " << count << endl;
 }
 
 ostream& operator<<(ostream& _os, QueryExecutionTree& _op) {
