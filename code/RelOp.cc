@@ -473,24 +473,24 @@ bool Join::HJ(Record& _record) {
 
 // Symmetric Hash Join
 bool Join::SHJ(Record& _record) {
-    cout << "Symmetric Hash Join" << endl;
+    //cout << "Symmetric Hash Join" << endl;
     
     if (!joinList.AtEnd()) {
-        cout << "Returning from Join List" << endl;
+        //cout << "Returning from Join List" << endl;
         joinList.MoveToStart();
         _record = joinList.Current();
         joinList.Remove(_record);
         return true;
     }
     if (leftEmpty && rightEmpty) {
-        cout << "Both Empty Done Now -----------------------" << endl;
+        //cout << "Both Empty Done Now -----------------------" << endl;
         return false;
     }
     
     Record r;
     SwapInt temp = 0;
     for (int i = 0; i < putBackRight.Length(); i++) {
-        cout << "Putting back from Right List" << endl;
+        //cout << "Putting back from Right List" << endl;
         putBackRight.MoveToStart();
         r = putBackRight.Current();
         hashRight.Insert(r, temp);
@@ -498,7 +498,7 @@ bool Join::SHJ(Record& _record) {
         temp = temp + 1;
     }
     for (int j = 0; j < putBackLeft.Length(); j++) {
-        cout << "Putting back from Left List" << endl;
+        //cout << "Putting back from Left List" << endl;
         putBackLeft.MoveToStart();
         r = putBackLeft.Current();
         hashLeft.Insert(r, temp);
@@ -507,7 +507,7 @@ bool Join::SHJ(Record& _record) {
     }
 
     if (firstLeft) {
-        cout << "First Time" << endl;
+        //cout << "First Time" << endl;
         firstLeft = false;
         
         Record tempRec;
@@ -516,12 +516,12 @@ bool Join::SHJ(Record& _record) {
         while (shjCount < 10) {
             if (left->GetNext(tempRec)) {
                 tempRec.SetOrderMaker(&omL);
-                cout << "First - Inserting Left " << tempData << endl;
+                //cout << "First - Inserting Left " << tempData << endl;
                 hashLeft.Insert(tempRec, tempData);
                 tempData = tempData + 1;
             }
             else {
-                cout << "First - Left Empty" << endl;
+                //cout << "First - Left Empty" << endl;
                 leftEmpty = true;
             }
             shjCount++;
@@ -531,14 +531,14 @@ bool Join::SHJ(Record& _record) {
         swap = false;
         
         if (right->GetNext(tempRec)) {
-            cout << "First - Got a Right Record" << endl;
+            //cout << "First - Got a Right Record" << endl;
             Record newRec;
             Record removeRec;
             SwapInt removeData = 0;
             tempRec.SetOrderMaker(&omR);
             
             while (hashLeft.IsThere(tempRec)) {
-                cout << "First - Found Right Rec in Left Hash" << endl;
+                //cout << "First - Found Right Rec in Left Hash" << endl;
                 hashLeft.Remove(tempRec, removeRec, removeData);
                 newRec.AppendRecords(removeRec, tempRec, schemaLeft.GetNumAtts(), schemaRight.GetNumAtts());
                 
@@ -548,7 +548,7 @@ bool Join::SHJ(Record& _record) {
             hashRight.Insert(tempRec, removeData);
         }
         else {
-            cout << "First - Right Empty" << endl;
+            //cout << "First - Right Empty" << endl;
             rightEmpty = true;
         }
     }
@@ -557,21 +557,21 @@ bool Join::SHJ(Record& _record) {
             shjCount++;
         }
         else {
-            cout << "Swapping to Left" << endl;
+            //cout << "Swapping to Left" << endl;
             swap = !swap;
             shjCount = 0;
         }
         
         Record tempRec;
         if (right->GetNext(tempRec) && !rightEmpty) {
-            cout << "Got a Right Record" << endl;
+            //cout << "Got a Right Record" << endl;
             Record newRec;
             Record removeRec;
             SwapInt removeData = 0;
             tempRec.SetOrderMaker(&omR);
             
             while (hashLeft.IsThere(tempRec)) {
-                cout << "Found Right Rec in Left Hash" << endl;
+                //cout << "Found Right Rec in Left Hash" << endl;
                 hashLeft.Remove(tempRec, removeRec, removeData);
                 newRec.AppendRecords(removeRec, tempRec, schemaLeft.GetNumAtts(), schemaRight.GetNumAtts());
                 
@@ -589,21 +589,21 @@ bool Join::SHJ(Record& _record) {
             shjCount++;
         }
         else {
-            cout << "Swapping to Right" << endl;
+            //cout << "Swapping to Right" << endl;
             swap = !swap;
             shjCount = 0;
         }
         
         Record tempRec;
         if (left->GetNext(tempRec) && !leftEmpty) {
-            cout << "Got a Left Record" << endl;
+            //cout << "Got a Left Record" << endl;
             Record newRec;
             Record removeRec;
             SwapInt removeData = 0;
             tempRec.SetOrderMaker(&omL);
             
             while (hashRight.IsThere(tempRec)) {
-                cout << "Found Left Rec in Right Hash" << endl;
+                //cout << "Found Left Rec in Right Hash" << endl;
                 hashRight.Remove(tempRec, removeRec, removeData);
                 newRec.AppendRecords(tempRec, removeRec, schemaLeft.GetNumAtts(), schemaRight.GetNumAtts());
                 
@@ -619,11 +619,11 @@ bool Join::SHJ(Record& _record) {
     
     joinList.MoveToStart();
     if (joinList.AtEnd()) {
-        cout << "No Record Found : Running SHJ Again" << endl;
+        //cout << "No Record Found : Running SHJ Again" << endl;
         return SHJ(_record);
     }
     else {
-        cout << "Got a Record and returning true" << endl;
+        //cout << "Got a Record and returning true" << endl;
         _record = joinList.Current();
         joinList.Remove(_record);
         return true;
