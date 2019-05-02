@@ -1,5 +1,4 @@
 SELECT SUM(c_acctbal), c_name 
-FROM customer, orders 
-WHERE c_custkey = o_custkey
+FROM orders, customer
+WHERE o_custkey = c_custkey
 GROUP BY c_name
-

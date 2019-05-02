@@ -526,6 +526,7 @@ bool Join::SHJ(Record& _record) {
             }
             shjCount++;
         }
+        
         // Reset Values
         shjCount = 0;
         swap = false;
@@ -862,7 +863,7 @@ bool Join::GetNext(Record& _record) {
     //cout << "Join GetNext" << endl;
 
     // Test each function individually
-//    return HJ(_record);
+//    return NLJ(_record);
     
     // Check to see if there are any inequality conditions
     for (int x = 0; x < predicate.numAnds; x++) {
@@ -974,7 +975,6 @@ bool Sum::GetNext(Record& _record) {
         // Make sure we dont run again
         hasComp = true;
         return true;
-		
     }
     
     // We have already ran through sum before
@@ -1019,8 +1019,8 @@ bool GroupBy::GetNext(Record& _record) {
 
 		//Creating dummy record variables
 		Record rec;
-//        Record temp;
-
+        double runningSum = 0;
+        
 		//For all getnexts
 		while(producer->GetNext(rec)){
             //cout << "CHECK" << endl;
@@ -1028,70 +1028,59 @@ bool GroupBy::GetNext(Record& _record) {
             //Apply and set as runningSum
             int intResult = 0;
             double doubleResult = 0.0;
-			int applied = compute.Apply(rec, intResult, doubleResult);
-			double runningSum = intResult + doubleResult;
+			Type applied = compute.Apply(rec, intResult, doubleResult);
             
-//             Create new temp Record
-//            temp = rec;
-//            temp.SetOrderMaker(&groupingAtts);
-            rec.SetOrderMaker(&groupingAtts);
-			KeyDouble kd = KeyDouble(runningSum);
-//            cout << kd << endl;
+            // Gets return type and adds to the running sum depending on that type
+            if (applied == Float) {
+                runningSum += doubleResult;
+                //cout << "Double: " << runDoubSum << endl;
+            }
+            if (applied == Integer) {
+                runningSum += (double)intResult;
+                //cout << "Int: " << runIntSum << endl;
+            }
 
-			//Check if this record exists
-//            if(hashtable.IsThere(temp)){ //KeyDouble it
-//                hashtable.Find(temp) = KeyDouble(hashtable.Find(temp) + runningSum);
-//                cout << hashtable.Find(temp) << endl;
-//            }
-//            else //Insert it into table
-//                hashtable.Insert(temp, kd);
-            if(hashtable.IsThere(rec)){ //KeyDouble it
-                hashtable.Find(rec) = KeyDouble(hashtable.Find(rec) + runningSum);
+            // Key Double it
+			SwapDouble sd = runningSum;
+            rec.SetOrderMaker(&groupingAtts);
+            if(hashtable.IsThere(rec)){
+                //KeyDouble it
+                hashtable.Find(rec) = hashtable.Find(rec) + sd;
                 //cout << hashtable.Find(rec) << endl;
             }
             else //Insert it into table
-                hashtable.Insert(rec, kd);
+                hashtable.Insert(rec, sd);
 		}
 
-		//No longer beginning of table
-		atBeginning = false;
 		//Reset the hashtable
 		hashtable.MoveToStart();
-        //cout << "done" << endl;
+        //No longer beginning of table
+        atBeginning = false;
 	}
 
 	if(hashtable.AtEnd()) //counldnt get any more
 		return false;
-	
-	double tempdouble = hashtable.CurrentData();
-    //cout << "Temp Dbl: " << tempdouble << endl;
-	
+
 	char* recContent = new char[(2*sizeof(int))+sizeof(double)];
 	((int *) recContent)[0] = 2*sizeof(int)+sizeof(double);
 	//cout << "A: " << ((int *) recContent)[0] << endl;
 	((int *) recContent)[1] = 2*sizeof(int);
 	//cout << "B: " << ((int *) recContent)[1] << endl;
-	((double *) (recContent+2*sizeof(int)))[0] = tempdouble;
-
-	Record r;
-	r.Consume(recContent);
+	((double *) (recContent+2*sizeof(int)))[0] = hashtable.CurrentData();
     
     hashtable.CurrentKey().Project(groupingAtts.whichAtts, groupingAtts.numAtts, schemaIn.GetNumAtts());
-//    for (int xxx = 0; xxx < (sizeof(groupingAtts.whichAtts)/sizeof(groupingAtts.whichAtts[0])); xxx++) {
-//        cout << xxx << ": Checking " << groupingAtts.whichAtts[xxx] << " " << groupingAtts.numAtts << " " << schemaIn.GetNumAtts() << endl;
-//    }
-    
 	char* bits = hashtable.CurrentKey().GetBits();
 	int size = hashtable.CurrentKey().GetSize();
-    //cout << "Bits " << ((double *) (bits+2*sizeof(int)))[0] << "\tSize " << size << endl;
-	Record r2;
+
+    
+    Record r1;
+    r1.Consume(recContent);
+    Record r2;
 	r2.CopyBits(bits, size);
     
-	_record.AppendRecords(r, r2, 1, groupingAtts.numAtts);
-    //_record.AppendRecords(r, r2, 1, schemaOut.GetNumAtts() - 1);
+	_record.AppendRecords(r1, r2, 1, groupingAtts.numAtts);
 	hashtable.Advance();
 	return true;
-
 }
 
 Schema& GroupBy::getSchemaIn() {
@@ -1160,7 +1149,7 @@ void QueryExecutionTree::ExecuteQuery() {
     cout << "Executing Query" << endl;
     Record rec;
     while(root->GetNext(rec)){ count++; }
-    cout << count << endl;
+//    cout << count << endl;
     cerr << "Count: " << count << endl;
 }
 

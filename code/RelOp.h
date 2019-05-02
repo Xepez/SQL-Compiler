@@ -271,7 +271,7 @@ private:
 	// operator generating data
 	RelationalOp* producer;
 
-	EfficientMap<Record, KeyDouble> hashtable;
+	EfficientMap<Record, SwapDouble> hashtable;
 
 	bool atBeginning;
 
