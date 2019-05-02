@@ -1019,7 +1019,7 @@ bool GroupBy::GetNext(Record& _record) {
 
 		//Creating dummy record variables
 		Record rec;
-        double runningSum = 0;
+        SwapDouble runningSum = 0;
         
 		//For all getnexts
 		while(producer->GetNext(rec)){
@@ -1032,24 +1032,21 @@ bool GroupBy::GetNext(Record& _record) {
             
             // Gets return type and adds to the running sum depending on that type
             if (applied == Float) {
-                runningSum += doubleResult;
+                runningSum = doubleResult;
                 //cout << "Double: " << runDoubSum << endl;
             }
             if (applied == Integer) {
-                runningSum += (double)intResult;
+                runningSum = (double)intResult;
                 //cout << "Int: " << runIntSum << endl;
             }
 
-            // Key Double it
-			SwapDouble sd = runningSum;
             rec.SetOrderMaker(&groupingAtts);
             if(hashtable.IsThere(rec)){
-                //KeyDouble it
-                hashtable.Find(rec) = hashtable.Find(rec) + sd;
+                hashtable.Find(rec) = hashtable.Find(rec) + runningSum;
                 //cout << hashtable.Find(rec) << endl;
             }
             else //Insert it into table
-                hashtable.Insert(rec, sd);
+                hashtable.Insert(rec, runningSum);
 		}
 
 		//Reset the hashtable
