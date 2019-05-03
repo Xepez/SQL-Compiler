@@ -473,7 +473,7 @@ bool Join::HJ(Record& _record) {
 
 // Symmetric Hash Join
 bool Join::SHJ(Record& _record) {
-    //cout << "Symmetric Hash Join" << endl;
+//    cout << "Symmetric Hash Join" << endl;
     
     if (!joinList.AtEnd()) {
         //cout << "Returning from Join List" << endl;
@@ -1069,7 +1069,6 @@ bool GroupBy::GetNext(Record& _record) {
 	char* bits = hashtable.CurrentKey().GetBits();
 	int size = hashtable.CurrentKey().GetSize();
 
-    
     Record r1;
     r1.Consume(recContent);
     Record r2;
