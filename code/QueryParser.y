@@ -38,6 +38,10 @@
 %token <actualChars> YY_INTEGER
 %token <actualChars> YY_STRING
 %token SELECT
+%token CREATE
+%token INDEX
+%token TABLE
+%token ON
 %token GROUP 
 %token DISTINCT
 %token BY
@@ -79,6 +83,12 @@ SQL: SELECT SelectAtts FROM Tables WHERE AndList
 	tables = $4;
 	predicate = $6;	
 	groupingAtts = $9;
+}
+
+// NEW
+| CREATE INDEX YY_NAME TABLE Tables ON SelectAtts
+{
+    tables = $5;
 };
 
 

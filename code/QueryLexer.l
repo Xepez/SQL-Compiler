@@ -37,6 +37,14 @@ void yyerror(char* s);
 
 "SELECT"		return(SELECT);
 
+"CREATE"        return(CREATE);
+
+"INDEX"         return(INDEX);
+
+"TABLE"         return(TABLE);
+
+"ON"            return(ON);
+
 "FROM"			return(FROM);
 
 "WHERE"			return(WHERE);
