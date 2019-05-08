@@ -19,6 +19,7 @@ extern struct AndList* predicate; // the predicate in WHERE
 extern struct NameList* groupingAtts; // grouping attributes
 extern struct NameList* attsToSelect; // the attributes in SELECT
 extern int distinctAtts; // 1 if there is a DISTINCT in a non-aggregate query
+extern int sqlType;    // 0 - Select, 1 - Create Index, 2 - Load Data, 3 - Create Table
 
 extern "C" int yyparse();
 extern "C" int yylex_destroy();
@@ -415,14 +416,26 @@ int main () {
 //            cout << "Query is INVALID" << endl;
 //            return 1;
 //        }
-        QueryExecutionTree queryTree;
-        compiler.Compile(tables, attsToSelect, finalFunction, predicate,
-            groupingAtts, distinctAtts, queryTree);
+        if (sqlType == 0) {     // SELECT
+            cout << "SELECT" << endl;
+            QueryExecutionTree queryTree;
+            compiler.Compile(tables, attsToSelect, finalFunction, predicate,
+                groupingAtts, distinctAtts, queryTree);
 
-        
-        cout << queryTree << endl;
-        
-        queryTree.ExecuteQuery();
+            
+            cout << queryTree << endl;
+            
+            queryTree.ExecuteQuery();
+        }
+        else if (sqlType == 1) {    // CREATE INDEX
+            cout << "CREATE INDEX" << endl;
+        }
+        else if (sqlType == 2) {    // LOAD DATA
+            cout << "LOAD DATA" << endl;
+        }
+        else if (sqlType == 3) {    // CREATE TABLE
+            cout << "CREATE TABLE" << endl;
+        }
     }
     else { // Load the Data
         cout << "---------------------------------------------------" << endl;

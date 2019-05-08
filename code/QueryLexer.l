@@ -39,6 +39,10 @@ void yyerror(char* s);
 
 "CREATE"        return(CREATE);
 
+"LOAD"          return(LOAD);
+
+"DATA"          return(DATA);
+
 "INDEX"         return(INDEX);
 
 "TABLE"         return(TABLE);

@@ -15,7 +15,8 @@
 	struct AndList* predicate; // the predicate in WHERE
 	struct NameList* groupingAtts; // grouping attributes
 	struct NameList* attsToSelect; // the attributes in SELECT
-	int distinctAtts; // 1 if there is a DISTINCT in a non-aggregate query 
+	int distinctAtts; // 1 if there is a DISTINCT in a non-aggregate query
+    int sqlType;    // 0 - Select, 1 - Create Index, 2 - Load Data, 3 - Create Table
 %}
 
 
@@ -41,6 +42,8 @@
 %token CREATE
 %token INDEX
 %token TABLE
+%token LOAD
+%token DATA
 %token ON
 %token GROUP 
 %token DISTINCT
@@ -76,6 +79,7 @@ SQL: SELECT SelectAtts FROM Tables WHERE AndList
 	tables = $4;
 	predicate = $6;	
 	groupingAtts = NULL;
+    sqlType = 0;
 }
 
 | SELECT SelectAtts FROM Tables WHERE AndList GROUP BY Atts
@@ -83,14 +87,28 @@ SQL: SELECT SelectAtts FROM Tables WHERE AndList
 	tables = $4;
 	predicate = $6;	
 	groupingAtts = $9;
+    sqlType = 0;
 }
 
 // NEW
 | CREATE INDEX YY_NAME TABLE Tables ON SelectAtts
 {
     tables = $5;
-};
+    sqlType = 1;
+}
 
+| LOAD DATA Tables FROM YY_NAME
+{
+    tables = $3;
+    sqlType = 2;
+}
+
+| CREATE TABLE Tables ( SelectAtts Literal )
+{
+    tables = $3;
+    sqlType = 3;
+};
+// End NEW
 
 SelectAtts: Function ',' Atts 
 {
