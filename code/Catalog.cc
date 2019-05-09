@@ -1,505 +1,411 @@
 #include <iostream>
-#include <cstdlib>
-#include <fstream>
+#include <vector>
 #include <string>
-#include <cstring>
+#include <sstream>
+#include <map>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sqlite3.h>
 
 #include "Schema.h"
 #include "Catalog.h"
 
 using namespace std;
 
-Catalog::Catalog(string& _fileName) {
-    
-    int rc = sqlite3_open(_fileName.c_str(), &db);
-    
-    if(rc){
-        cout << "Cannot open database" << endl;
-    }
-    else{
-        cout << "Connection successful" << endl;
-    }
+sqlite3 *db;
+vector<string> sql;
+string currentTable;
+string currentPath;
+int currentNoTuples;
+
+struct table{
+	string name;
+	unsigned int numOfTuples;
+	string pathToData;
+	vector<string> attribute;
+	vector<string> type;
+	vector<unsigned int> noDistinct;
+};
+
+vector<table> catalog;
+
+int callback(void *data, int argc, char **argv, char **azColName){ //Default callback function from sqlite3
+
+   fprintf(stderr, "%s: ", (const char*)data);
+   
+   for(int i = 0; i<argc; i++){
+      printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+   }
+   
+   printf("\n");
+   return 0;
 }
 
-Catalog::~Catalog() {
-    
-    sqlite3_close(db);
-    
-    cout << "Database Closed" << endl;
-    
+int listAtts(void *data, int argc, char **argv, char **azColName){
+	//cout << "\nAttribute: " << endl;
+	vector<table>::iterator it;
+
+	for(it = catalog.begin(); it != catalog.end(); it++){
+		if(it->name == currentTable)
+			break;
+	}
+
+		//printf("%s = %s\n", azColName[0], argv[0] ? argv[1] : "NULL");
+		string currentAtt = ("%s", argv[0]); //Save attribute as string
+
+		for(vector<string>::iterator its = it->attribute.begin(); its != it->attribute.end(); its++){
+			if(*its == currentAtt) //if attribute exists, quit
+				return 0;
+		}
+
+		it->attribute.push_back(currentAtt);
+		//printf("%s = %s\n", azColName[2], argv[2] ? argv[2] : "NULL");
+		string currentType = ("%s", argv[1]); //Save type as string
+		it->type.push_back(currentType); //Push type
+		
+		it->noDistinct.push_back(atoi(argv[2])); //Initializing distinct column
+
+	return 0;
 }
 
-bool Catalog::Save() {
-    
-    //save();
-    // Will always be success since we are doing SQL statements
-    return true;
-    
+int listTables(void *data, int argc, char **argv, char **azColName){
+
+	char* error;
+	bool found = false;
+
+		// printf("FOUND TABLE: %s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+		string tableName = ("%s", argv[0]);
+		currentTable = tableName;
+
+		currentNoTuples = atoi(argv[2]);
+
+		for(vector<table>::iterator it = catalog.begin(); it != catalog.end(); it++){ //check if it already exists, if it does don't re-add it.
+			if(it->name == tableName)
+				found = true;
+		}
+
+		if(!found){ //If it doesn't exist, add it to the catalog
+			table temp;
+			temp.name = currentTable;
+			temp.pathToData = currentTable + ".dat";
+			temp.numOfTuples = currentNoTuples;
+			catalog.push_back(temp);
+		}
+		else{
+			//MAKE IT EXIST
+		}
+
+		string pragmaStatement = "SELECT attribute, type, noDistinct FROM tableAtts WHERE tableName = '" + tableName + "';";
+		int exit = sqlite3_exec(db, pragmaStatement.c_str(), listAtts, (void*)data, &error);
+		cout << "\n";
+
+	return 0;
 }
 
-bool Catalog::GetNoTuples(string& _table, unsigned int& _noTuples) {
-    
-    sqlite3_stmt *stmt;
-    
-    // Prepares Select for tablename and numTuples
-    int rc = sqlite3_prepare_v2(db, "SELECT numTuples FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
-    
-    if (rc == SQLITE_OK) {
-        // Binds the table we are looking for
-        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
-    } else {
-        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
-    }
-    
-    int step = sqlite3_step(stmt);
-    
-    if(step == SQLITE_ROW){
-        _noTuples = sqlite3_column_int(stmt, 0);
-        sqlite3_finalize(stmt);
-        return true;
-    } else {
-        sqlite3_finalize(stmt);
-        return false;
-    }
+Catalog::Catalog(string &_fileName)
+{
+	int exit = sqlite3_open(_fileName.c_str(), &db); //Start connection
+
+	if (exit != SQLITE_OK) { //Print if successfull or failure
+        std::cerr << "Error Connection" << std::endl; 
+    } 
+    else
+        std::cout << "Connected Succesfully" << std::endl; 
+
+	///////////////////////////////////////////////////////////////////////////////////
+
+	// string tableStatement = "select name From sqlite_master where type = 'table';"; //SQL for all table names
+	string tableStatement = "select tableName, path, noTuples from tables;"; //Get table names from table
+
+	char* error;	//Error pointer
+	const char* data; //Data pointer
+	currentPath = _fileName; //Set the name of this database as path
+
+	table temp; //Make sure catalog isn't empty
+	temp.name = "--CURRENT CATALOG CONTENTS--";
+	catalog.push_back(temp);
+
+	exit = sqlite3_exec(db, tableStatement.c_str(), listTables, (void*)data, &error); //Get all table names
+
 }
 
-void Catalog::SetNoTuples(string& _table, unsigned int& _noTuples) {
-    
-    sqlite3_stmt *stmt;
-    
-    // Prepares Insert for numTuples in table
-    sqlite3_prepare_v2(db, "UPDATE table_info SET numTuples = ? WHERE tablename = ?", -1, &stmt, NULL);
-    // Binds the value and table we are looking for
-    sqlite3_bind_int(stmt, 1, _noTuples);
-    sqlite3_bind_text(stmt, 2, _table.c_str(), -1, NULL);
-    
-    int rc = sqlite3_step(stmt);
-    
-    if (rc != SQLITE_DONE) {
-        cout << "ERROR inserting data -> " << sqlite3_errmsg(db) << endl;
-    }
-    
-    sqlite3_finalize(stmt);
+Catalog::~Catalog()
+{
+	Save();
+	sqlite3_close(db);	//Close connection
+
 }
 
-bool Catalog::GetDataFile(string& _table, string& _path) {
-    
-    sqlite3_stmt *stmt;
-    
-    // Prepares Select for tablename and numTuples
-    int rc = sqlite3_prepare_v2(db, "SELECT path FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
-    
-    if (rc == SQLITE_OK) {
-        // Binds the table we are looking for
-        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
-    } else {
-        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
-    }
-    
-    int step = sqlite3_step(stmt);
-    
-    if(step == SQLITE_ROW){
-        _path = string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
-        sqlite3_finalize(stmt);
-        return true;
-    } else {
-        sqlite3_finalize(stmt);
-        return false;
-    }
+bool Catalog::Save()
+{
+	int exit;
+	char* error;
+	const char* data;
+
+	for (int i = 0; i < sql.size(); i++) {
+
+		exit = sqlite3_exec(db, sql[i].c_str(), callback, (void*)data, &error);
+
+		/*if (exit != SQLITE_OK) { 
+        	std::cerr << "SQL Runtime Error" << std::endl; 
+    	} 
+    	else{
+        	std::cout << "Executed function successfully" << std::endl;
+		}*/
+	}
+
+	string tableStatement = "select tableName, path, noTuples from tables;"; //Refresh catalog
+	exit = sqlite3_exec(db, tableStatement.c_str(), listTables, (void*)data, &error); //Refresh catalog
+
+	sql.clear();
+	
 }
 
-void Catalog::SetDataFile(string& _table, string& _path) {
-    
-    sqlite3_stmt *stmt;
-    
-    // Prepares Insert for numTuples in table
-    sqlite3_prepare_v2(db, "UPDATE table_info SET path = ? WHERE tablename = ?", -1, &stmt, NULL);
-    // Binds the value and table we are looking for
-    sqlite3_bind_text(stmt, 1, _path.c_str(), -1, NULL);
-    sqlite3_bind_text(stmt, 2, _table.c_str(), -1, NULL);
-    
-    int rc = sqlite3_step(stmt);
-    
-    if (rc != SQLITE_DONE) {
-        cout << "ERROR inserting data -> " << sqlite3_errmsg(db) << endl;
-    }
-    
-    sqlite3_finalize(stmt);
+bool Catalog::GetNoTuples(string &_table, unsigned int &_noTuples)
+{
+
+	//GET NUMBER OF TUPLES
+	vector<table>::iterator it;
+	for(it = catalog.begin(); it != catalog.end(); it++){
+		if(it->name == _table){
+			_noTuples = it->numOfTuples;
+			return true;
+		}
+	}
+
+	return false;
+	
 }
 
-bool Catalog::GetNoDistinct(string& _table, string& _attribute, unsigned int& _noDistinct) {
-    
-    sqlite3_stmt *stmt;
-    
-    // Prepares Select for numDistinct
-    int rc = sqlite3_prepare_v2(db, "SELECT numDistinct FROM table_info, attribute WHERE tablename = ? AND attribute.tableid = table_info.tableid AND attributename = ?", -1, &stmt, NULL);
-    
-    if (rc == SQLITE_OK) {
-        // Binds the table we are looking for
-        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
-        sqlite3_bind_text(stmt, 2, _attribute.c_str(), -1, NULL);
-    } else {
-        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
-    }
-    
-    int step = sqlite3_step(stmt);
-    
-    if(step == SQLITE_ROW){
-        _noDistinct = sqlite3_column_int(stmt, 0);
-        sqlite3_finalize(stmt);
-        return true;
-    } else {
-        sqlite3_finalize(stmt);
-        return false;
-    }
-}
-void Catalog::SetNoDistinct(string& _table, string& _attribute, unsigned int& _noDistinct) {
-    
-    sqlite3_stmt *stmt;
-    
-    // Prepares Insert for numDistinct in table
-    sqlite3_prepare_v2(db, "UPDATE attribute SET numDistinct = ? WHERE attribute.tableid = (SELECT tableid FROM table_info WHERE tablename = ?) AND attributename = ?;", -1, &stmt, NULL);
-    // Binds the value and table we are looking for
-    sqlite3_bind_int(stmt, 1, _noDistinct);
-    sqlite3_bind_text(stmt, 2, _table.c_str(), -1, NULL);
-    sqlite3_bind_text(stmt, 3, _attribute.c_str(), -1, NULL);
-    
-    int rc = sqlite3_step(stmt);
-    
-    if (rc != SQLITE_DONE) {
-        cout << "ERROR inserting data -> " << sqlite3_errmsg(db) << endl;
-    }
-    
-    sqlite3_finalize(stmt);
+void Catalog::SetNoTuples(string &_table, unsigned int &_noTuples)
+{
+	
+	vector<table>::iterator it;
+	for(it = catalog.begin(); it != catalog.end(); it++){
+
+		if(it->name == _table){
+			it->numOfTuples = _noTuples;
+
+			string setStatement = "UPDATE tables SET noTuples = ";
+
+			string unsint; //I absolutely hate c++ unsigned int -> string conversion.
+			stringstream i;
+			i << _noTuples;
+			unsint = i.str();
+			
+			setStatement += unsint;
+			setStatement += " WHERE tableName = '";
+			setStatement += _table;
+			setStatement += "';";
+			
+			sql.push_back(setStatement);
+		}
+	}
+
+	return;
 }
 
-void Catalog::GetTables(vector<string>& _tables) {
-    
-    sqlite3_stmt *stmt;
-    int step;
-    
-    // Prepares Select for tablename
-    sqlite3_prepare_v2(db, "SELECT tablename FROM table_info", -1, &stmt, NULL);
-    
-    while ((step = sqlite3_step(stmt)) == SQLITE_ROW){
-        // Convert to a string
-        string temp = string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
-        // Gets each table name
-        _tables.push_back(temp);
-    }
-    
-    sqlite3_finalize(stmt);
+bool Catalog::GetDataFile(string &_table, string &_path)
+{
+
+	//GET FILE LOCATION
+	vector<table>::iterator it;
+	for(it = catalog.begin(); it != catalog.end(); it++){
+		if(it->name == _table){
+			_path = it->pathToData;
+			return true;
+		}
+	}
+
+	return false;
 }
 
-bool Catalog::GetAttributes(string& _table, vector<string>& _attributes) {
-    
-    sqlite3_stmt *stmt;
-    int step;
-    
-    int rc = sqlite3_prepare_v2(db, "SELECT tableid FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
-    if (rc == SQLITE_OK) {
-        // Binds the table we are looking for
-        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
-    } else {
-        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
-        return false;
-    }
-    step = sqlite3_step(stmt);
-    int temp;
-    if(step == SQLITE_ROW){
-        temp = sqlite3_column_int(stmt, 0);
-    }
-    sqlite3_finalize(stmt);
-    
-    // Prepares Select for attributename
-    sqlite3_prepare_v2(db, "SELECT attributename FROM attribute WHERE tableid = ?", -1, &stmt, NULL);
-    sqlite3_bind_int(stmt, 1, temp);
-    
-    while ((step = sqlite3_step(stmt)) == SQLITE_ROW){
-        // Convert to a string
-        string ins = string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
-//        cout << ins << endl;
-        // Gets each attribute name
-        _attributes.push_back(ins);
-    }
-    
-    sqlite3_finalize(stmt);
-    return true;
+void Catalog::SetDataFile(string &_table, string &_path)
+{
+	vector<table>::iterator it;
+	for(it = catalog.begin(); it != catalog.end(); it++){
+
+		if(it->name == _table){
+			it->pathToData = _path;
+
+			string setStatement = "UPDATE tables SET path = '" + _path + "' WHERE tableName = '" + _table + "';";
+			sql.push_back(setStatement);
+		}
+	}
+
+	return;
 }
 
-bool Catalog::GetSchema(string& _table, Schema& _schema) {
-    
-    sqlite3_stmt *stmt;
-    vector<string> attName;
-    vector<string> attType;
-    vector<unsigned int> attNoDist;
-    
-    // Prepares Select for attribute's attributes
-    int rc = sqlite3_prepare_v2(db, "SELECT attributename, attType, numDistinct FROM attribute, table_info WHERE table_info.tableid = attribute.tableid AND tablename = ?", -1, &stmt, NULL);
-    
-    if (rc == SQLITE_OK) {
-        // Binds the table we are looking for
-        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
-    } else {
-        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
-    }
-    
-    int step = sqlite3_step(stmt);
-    
-    if(step != SQLITE_ROW){
-        sqlite3_finalize(stmt);
-        return false;
-    }
-    
-    while(step == SQLITE_ROW) {
-        attName.push_back(string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0))));
-        attType.push_back(string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1))));
-        attNoDist.push_back(sqlite3_column_int(stmt, 2));
-        
-        // Take a step to the next row
-        step = sqlite3_step(stmt);
-    }
-    
-    sqlite3_finalize(stmt);
-    Schema insertSchema(attName, attType, attNoDist);
-    _schema = insertSchema;
-    return true;
+bool Catalog::GetNoDistinct(string &_table, string &_attribute,
+							unsigned int &_noDistinct)
+{
+	vector<table>::iterator it;
+	for(it = catalog.begin(); it != catalog.end(); it++){
+		if(it->name == _table){
+			int i = 0;
+			for(vector<string>::iterator its = it->attribute.begin(); its != it->attribute.end(); its++){
+				if(*its == _attribute){
+					_noDistinct = it->noDistinct.at(i);
+					return true;
+				}
+				i++;
+			}
+		}
+	}
+
+	return false;
+}
+void Catalog::SetNoDistinct(string &_table, string &_attribute,
+							unsigned int &_noDistinct)
+{
+	vector<table>::iterator it = catalog.begin(); //Beginning of catalog
+
+	for(it = catalog.begin(); it != catalog.end(); it++){ //For every table in the catalog
+		if(it->name == _table){ //If this is the one
+			int i = 0;
+			vector<string>::iterator it2;
+
+			for(it2 = it->attribute.begin(); it2 != it->attribute.end(); it2++){
+				if(*it2 == _attribute){ //is this the attribute?
+					it->noDistinct.at(i) = _noDistinct; //Set values
+
+					string setStatement = "UPDATE tableAtts SET noDistinct = ";
+
+					string unsint; //I absolutely hate c++ unsigned int -> string conversion.
+					stringstream i;
+					i << _noDistinct;
+					unsint = i.str();
+					
+					setStatement += unsint + " WHERE tableName = '" + _table + "' AND attribute = '" + _attribute + "';";
+					
+					sql.push_back(setStatement);
+
+					break;
+				}
+				i++;		
+			}
+			break;
+		}
+	}
+	
+	return;
+
 }
 
-bool Catalog::CreateTable(string& _table, vector<string>& _attributes, vector<string>& _attributeTypes) {
+void Catalog::GetTables(vector<string> &_tables)
+{
 
-    sqlite3_stmt *stmt;
-    int step2, att_id = 0, table_id = 0;
-    string att = "None";
-    string attT = "None";
-    int step, rc;
-
-    rc = sqlite3_prepare_v2(db, "SELECT tableid FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
-    if (rc == SQLITE_OK) {
-        // Binds the table we are looking for
-        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
-    } else {
-        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
-        return false;
-    }
-    
-    step = sqlite3_step(stmt);
-    if (step == SQLITE_ROW) {
-        return false;
-    }
-    
-    // Get Max Table ID
-    sqlite3_prepare_v2(db, "SELECT MAX(tableid) FROM table_info", -1, &stmt, NULL);
-    step = sqlite3_step(stmt);
-    if(step == SQLITE_ROW){
-        table_id = sqlite3_column_int(stmt, 0) + 1;
-        sqlite3_finalize(stmt);
-    }
-
-    // Get Max Attribute ID
-    sqlite3_prepare_v2(db, "SELECT MAX(attributeid) FROM attribute", -1, &stmt, NULL);
-    step = sqlite3_step(stmt);
-    if(step == SQLITE_ROW){
-        att_id = sqlite3_column_int(stmt, 0) + 1;
-        sqlite3_finalize(stmt);
-    }
-
-    sqlite3_prepare_v2(db, "INSERT INTO table_info(tableid,tablename) VALUES(?,?)", -1, &stmt, NULL);
-
-    // Table_info binds
-    sqlite3_bind_int(stmt, 1, table_id);
-    sqlite3_bind_text(stmt, 2, _table.c_str(), -1, NULL);
-    step = sqlite3_step(stmt);
-    if (step != SQLITE_DONE) {
-        sqlite3_finalize(stmt);
-        cout << "Error1: " << sqlite3_errmsg(db) << endl;
-        return false;
-    }
-    sqlite3_finalize(stmt);
-
-    // Attribute binds
-    vector<string>::iterator itType = _attributeTypes.begin();
-    for (vector<string>::iterator it = _attributes.begin(); it != _attributes.end(); it++) {
-        att = *it;
-        attT = *itType;
-        
-        sqlite3_prepare_v2(db, "INSERT INTO attribute(attributeid, attributename, tableid, attType) VALUES(?, ?, ?, ?)", -1, &stmt, NULL);
-
-        sqlite3_bind_int(stmt, 1, att_id);
-        sqlite3_bind_text(stmt, 2, att.c_str(), -1, NULL);
-        sqlite3_bind_int(stmt, 3, table_id);
-        sqlite3_bind_text(stmt, 4, attT.c_str(), -1, NULL);
-
-        step2 = sqlite3_step(stmt);
-        if (step2 != SQLITE_DONE) {
-            sqlite3_finalize(stmt);
-            cout << "Error2: " << sqlite3_errmsg(db) << endl;
-            return false;
-        }
-
-        att_id++;
-        itType++;
-    }
-
-    //bind values for attribute aswell
-    //push_back _attribute/_attributeTypes vector to add each
-
-    sqlite3_finalize(stmt);
-    printf("Table successfully added");
-    cout << endl;
-    return true;
+	
 }
 
-bool Catalog::DropTable(string& _table) {
-    
-    sqlite3_stmt *stmt;
-    //sqlite3_stmt *stmt2;
-    int table_id ;
-    //int rc2;
-    
-    int rc = sqlite3_prepare_v2(db, "SELECT tableid FROM table_info WHERE tablename = ?", -1, &stmt, NULL);
-    
-    if (rc == SQLITE_OK) {
-        // Binds the table we are looking for
-        sqlite3_bind_text(stmt, 1, _table.c_str(), -1, NULL);
-    } else {
-        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
-        return false;
-    }
-    
-    int step = sqlite3_step(stmt);
-    
-    if(step == SQLITE_ROW){
-        table_id = sqlite3_column_int(stmt, 0);
-        sqlite3_finalize(stmt);
-    }
-    else {
-        return false;
-    }
-    
-    sqlite3_finalize(stmt);
-    
-    rc = sqlite3_prepare_v2(db, "DELETE FROM table_info WHERE tableid = ?", -1, &stmt, NULL);
-    
-    if (rc == SQLITE_OK) {
-        sqlite3_bind_int(stmt, 1, table_id);
-    } else {
-        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
-        return false;
-    }
+bool Catalog::GetAttributes(string &_table, vector<string> &_attributes)
+{
 
-    step = sqlite3_step(stmt);
-    
-    if (step != SQLITE_DONE){
-        cout << "Error1: " << sqlite3_errmsg(db) << endl;
-    }
-    
-//    if(rc){
-//
-//        printf("Error1 dropping table: ");
-//        cout << sqlite3_errmsg(db) << endl;
-//        sqlite3_finalize(stmt);
-//        //sqlite3_finalize(stmt2);
-//        return false;
-//
-//    }
-    
-    rc = sqlite3_prepare_v2(db, "DELETE FROM attribute WHERE tableid = ?", -1, &stmt, NULL);
-    
-    if (rc == SQLITE_OK) {
-        sqlite3_bind_int(stmt, 1, table_id);
-    } else {
-        cout << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
-        return false;
-    }
-    
-    step = sqlite3_step(stmt);
-    
-    if (step != SQLITE_DONE){
-        cout << "Error2: " << sqlite3_errmsg(db) << endl;
-    }
-//    if(rc){
-//
-//        printf("Error2 dropping table: ");
-//        cout << sqlite3_errmsg(db) << endl;
-//        sqlite3_finalize(stmt);
-//        //sqlite3_finalize(stmt2);
-//        return false;
-//
-//    }
-//    else{
-    
-    sqlite3_finalize(stmt);
-    //sqlite3_finalize(stmt2);
-    printf("Table dropped");
-    cout << endl;
-    return true;
-    
+	//Get name, type, and num of Distincts
+	for(vector<table>::iterator it = catalog.begin(); it != catalog.end(); it++){
+		if(it->name == _table){
+			int size = it->attribute.size();
+			for(int i = 0; i < size; i++){
+				cout << it->attribute.at(i) << " - ";
+				cout << it->type.at(i) << " -> ";
+				cout << "No. Distincts: " << it->noDistinct.at(i) << endl;
+			}
+		}
+	}
+
+	return true;
 }
 
-ostream& operator<<(ostream& _os, Catalog& _c) {
-    
-    sqlite3_stmt *stmt;
-    sqlite3_stmt *stmt2;
-    int rc;
-    int step2;
-    
-    // Prepares Select for all of catalog
-    sqlite3_prepare_v2(_c.db, "SELECT tablename, numTuples, path, tableid FROM table_info ORDER BY tablename ASC", -1, &stmt, NULL);
-    // Runs Query
-    int step = sqlite3_step(stmt);
-    
-    // Prints out Info
-    while(step == SQLITE_ROW){
-        cout << sqlite3_column_text(stmt, 0) << "\t";
-        if (sqlite3_column_int(stmt, 1) == NULL)
-            cout << "NULL" << "\t";
-        else
-            cout << sqlite3_column_int(stmt, 1) << "\t";
-        
-        if (sqlite3_column_text(stmt, 2) == NULL)
-            cout << "NULL" << endl;
-        else
-            cout << sqlite3_column_text(stmt, 2) << endl;
-        
-        
-        rc = sqlite3_prepare_v2(_c.db, "SELECT attributename, attType, numDistinct FROM attribute WHERE tableid = ? ORDER BY attributename ASC", -1, &stmt2, NULL);
-        
-        if (rc == SQLITE_OK) {
-            // Binds the table we are looking for
-            sqlite3_bind_int(stmt2, 1, sqlite3_column_int(stmt, 3));
-        } else {
-            cout << "Failed to execute statement: " << sqlite3_errmsg(_c.db) << endl;
-        }
-        
-        step2 = sqlite3_step(stmt2);
-        
-        while(step2 == SQLITE_ROW) {
-            cout << "\t" << sqlite3_column_text(stmt2, 0) << "\t";
-            if (sqlite3_column_text(stmt2, 1) == NULL)
-                cout << "NULL" << "\t";
-            else
-                cout << sqlite3_column_text(stmt2, 1) << "\t";
-            
-            if (sqlite3_column_int(stmt2, 2) == NULL)
-                cout << "NULL" << endl;
-            else
-                cout << sqlite3_column_int(stmt2, 2) << endl;
-            
-            // Take a step to the next row
-            step2 = sqlite3_step(stmt2);
-        }
-        
-        // Take a step to the next row
-        step = sqlite3_step(stmt);
-        sqlite3_finalize(stmt2);
-        cout << endl;
-    }
-    
-    //table_1 \tab noTuples \tab pathToFile
-    //* \tab attribute_1 \tab type \tab noDistinct
-    //* \tab attribute_2 \tab type \tab noDistinct
-    
-    sqlite3_finalize(stmt);
-    return _os;
+bool Catalog::GetSchema(string &_table, Schema &_schema)
+{
+
+	//Get Attributes for schema
+
+	return true;
+}
+
+bool Catalog::CreateTable(string &_table, vector<string> &_attributes,
+						  vector<string> &_attributeTypes)
+{
+	//CREATE TABLE HERE
+
+	if((_attributes.size() == 0)||(_attributeTypes.size() == 0))
+		return false;
+
+	for(vector<table>::iterator it = catalog.begin(); it != catalog.end(); it++){
+		if(it->name == _table)
+			return false;
+	}
+
+
+	table temp;
+	temp.name = _table;
+
+	vector<string>::iterator iterType = _attributeTypes.begin();
+	vector<string>::iterator iterAtt = _attributes.begin();
+
+	string createTable = "INSERT INTO  tables VALUES('" + _table + "', '" + currentPath + "/" + _table + "', 0);"; //Begin Create Table SQL Cmd
+	sql.push_back(createTable); //Push to queue
+
+	while(iterAtt != _attributes.end()){
+
+		string tableAtts = "INSERT INTO  tableAtts VALUES('" + _table + "', '" + *iterAtt + "', '" + *iterType + "', 0);"; //Insert all atts into tableAtts
+		temp.attribute.push_back(*iterAtt);
+		temp.type.push_back(*iterType);
+		temp.noDistinct.push_back(0);
+
+		iterAtt++; //Increment pointers
+		iterType++;
+		sql.push_back(tableAtts); //Push to queue
+	}
+
+	catalog.push_back(temp);
+
+	Save();
+
+	return true;
+}
+
+bool Catalog::DropTable(string &_table)
+{
+
+	//DROP TABLE HERE
+	
+	for(vector<table>::iterator it = catalog.begin(); it != catalog.end(); it++){
+		if(it->name == _table){
+			catalog.erase(it);
+			string dropTable = "DELETE FROM tables WHERE tableName = '" + _table + "';";
+			sql.push_back(dropTable);
+			dropTable = "DELETE FROM tableAtts WHERE tableName = '" + _table + "';";
+			sql.push_back(dropTable);
+			return true;
+		}
+	}
+
+	//Save();
+
+	return false;
+}
+
+ostream &operator<<(ostream &_os, Catalog &_c)
+{
+
+	for(vector<table>::iterator it = catalog.begin(); it != catalog.end(); it++){
+
+		// if(it->name == "--CURRENT CATALOG CONTENTS--")
+			// cout << it->name << endl;
+		// else
+			cout << it->name << " -> No. Tuples: " << it->numOfTuples << " | FOUND AT PATH: " << it->pathToData << endl;
+
+		int size = it->attribute.size();
+		
+		for(int i = 0; i < size; i++){
+			cout << "Attribute: " << it->attribute.at(i);
+			cout  << " Type: " << it->type.at(i) << " -> ";
+			cout << "No. Distincts: " << it->noDistinct.at(i) << endl;
+		}
+
+		cout << "----------------------------" << endl;
+	}
+	return _os;
 }
