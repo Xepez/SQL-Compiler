@@ -434,25 +434,15 @@ int main () {
         }
         else if (sqlType == 1) {    // CREATE INDEX
             cout << "CREATE INDEX" << endl;
+            compliler.CreateIndex(IndexName, TableName, AttName);
         }
         else if (sqlType == 2) {    // LOAD DATA
             cout << "LOAD DATA" << endl;
+            compiler.LoadData(TableName, FileName);
         }
         else if (sqlType == 3) {    // CREATE TABLE
             cout << "CREATE TABLE" << endl;
-            
-            string newTblName = TableName;
-            vector<string> attributes;
-            vector<string> attributeTypes;
-            
-            AttsLiteral* TempTBL = createTable;
-            while (TempTBL != NULL) {
-                attributes.push_back(TempTBL->name);
-                attributes.push_back(TempTBL->type);
-                TempTBL = TempTBL->next;
-            }
-            
-            catalog.CreateTable(newTblName, attributes, attributeTypes);
+            compiler.CreateTable(TableName, createTable);
         }
     }
     else { // Load the Data
