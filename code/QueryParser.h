@@ -47,14 +47,16 @@
      CREATE = 263,
      INDEX = 264,
      TABLE = 265,
-     ON = 266,
-     GROUP = 267,
-     DISTINCT = 268,
-     BY = 269,
-     FROM = 270,
-     WHERE = 271,
-     SUM = 272,
-     AND = 273
+     LOAD = 266,
+     DATA = 267,
+     ON = 268,
+     GROUP = 269,
+     DISTINCT = 270,
+     BY = 271,
+     FROM = 272,
+     WHERE = 273,
+     SUM = 274,
+     AND = 275
    };
 #endif
 /* Tokens.  */
@@ -66,21 +68,23 @@
 #define CREATE 263
 #define INDEX 264
 #define TABLE 265
-#define ON 266
-#define GROUP 267
-#define DISTINCT 268
-#define BY 269
-#define FROM 270
-#define WHERE 271
-#define SUM 272
-#define AND 273
+#define LOAD 266
+#define DATA 267
+#define ON 268
+#define GROUP 269
+#define DISTINCT 270
+#define BY 271
+#define FROM 272
+#define WHERE 273
+#define SUM 274
+#define AND 275
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 23 "QueryParser.y"
+#line 26 "QueryParser.y"
 {
  	struct FuncOperand* myOperand;
 	struct FuncOperator* myOperator; 
@@ -91,9 +95,10 @@ typedef union YYSTYPE
 	struct NameList* myNames;
 	char* actualChars;
 	char whichOne;
+    struct AttsLiteral* createTable;
 }
 /* Line 1529 of yacc.c.  */
-#line 97 "QueryParser.h"
+#line 102 "QueryParser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

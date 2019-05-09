@@ -20,6 +20,11 @@ extern struct NameList* groupingAtts; // grouping attributes
 extern struct NameList* attsToSelect; // the attributes in SELECT
 extern int distinctAtts; // 1 if there is a DISTINCT in a non-aggregate query
 extern int sqlType;    // 0 - Select, 1 - Create Index, 2 - Load Data, 3 - Create Table
+extern char* TableName;    // For Load, Create Index, and Create Table
+extern char* FileName;     // For Load
+extern char* IndexName;    // For Create Index
+extern char* AttName;      // For Create Index
+extern struct AttsLiteral* createTable;    // For Create Table
 
 extern "C" int yyparse();
 extern "C" int yylex_destroy();
@@ -435,6 +440,19 @@ int main () {
         }
         else if (sqlType == 3) {    // CREATE TABLE
             cout << "CREATE TABLE" << endl;
+            
+            string newTblName = TableName;
+            vector<string> attributes;
+            vector<string> attributeTypes;
+            
+            AttsLiteral* TempTBL = createTable;
+            while (TempTBL != NULL) {
+                attributes.push_back(TempTBL->name);
+                attributes.push_back(TempTBL->type);
+                TempTBL = TempTBL->next;
+            }
+            
+            catalog.CreateTable(newTblName, attributes, attributeTypes);
         }
     }
     else { // Load the Data

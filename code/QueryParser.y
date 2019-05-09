@@ -17,6 +17,11 @@
 	struct NameList* attsToSelect; // the attributes in SELECT
 	int distinctAtts; // 1 if there is a DISTINCT in a non-aggregate query
     int sqlType;    // 0 - Select, 1 - Create Index, 2 - Load Data, 3 - Create Table
+    char* TableName;    // For Load, Create Index, and Create Table
+    char* FileName;     // For Load
+    char* IndexName;    // For Create Index
+    char* AttName;      // For Create Index
+    struct AttsLiteral* createTable;    // For Create Table
 %}
 
 
@@ -31,6 +36,7 @@
 	struct NameList* myNames;
 	char* actualChars;
 	char whichOne;
+    struct AttsLiteral* createTable;
 }
 
 
@@ -62,6 +68,7 @@
 %type <myTables> Tables
 %type <myBoolOperand> Literal
 %type <myNames> Atts
+%type <createTable> AttsLit
 
 %start SQL
 
@@ -91,24 +98,42 @@ SQL: SELECT SelectAtts FROM Tables WHERE AndList
 }
 
 // NEW
-| CREATE INDEX YY_NAME TABLE Tables ON SelectAtts
+| CREATE INDEX YY_NAME TABLE YY_NAME ON YY_NAME
 {
-    tables = $5;
+    IndexName = $3;
+    TableName = $5;
+    AttName = $7;
     sqlType = 1;
 }
 
-| LOAD DATA Tables FROM YY_NAME
+| LOAD DATA YY_NAME FROM YY_NAME
 {
-    tables = $3;
+    TableName = $3;
+    FileName = $5;
     sqlType = 2;
 }
 
-| CREATE TABLE Tables ( SelectAtts Literal )
+| CREATE TABLE YY_NAME '(' AttsLit ')'
 {
-    tables = $3;
+    TableName = $3;
     sqlType = 3;
 };
-// End NEW
+
+AttsLit: AttsLit ',' YY_NAME YY_NAME
+{
+    $$ = (struct AttsLiteral*) malloc(sizeof (struct AttsLiteral));
+    $$->name = $3;
+    $$->type = $4;
+    $$->next = $1;
+}
+
+| YY_NAME YY_NAME
+{
+    $$ = (struct AttsLiteral*) malloc(sizeof (struct AttsLiteral));
+    $$->name = $1;
+    $$->type = $2;
+    $$->next = NULL;
+};
 
 SelectAtts: Function ',' Atts 
 {

@@ -66,4 +66,13 @@ struct AndList {
 	struct AndList* rightAnd;
 };
 
+struct AttsLiteral {
+    // Attribute Name
+    char* name;
+    // Attruibute Type
+    char* type;
+    // Next Att
+    struct AttsLiteral* next;
+};
+
 #endif

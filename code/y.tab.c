@@ -168,7 +168,7 @@ typedef union YYSTYPE
     struct AttsLiteral* createTable;
 }
 /* Line 193 of yacc.c.  */
-#line 172 "QueryParser.c"
+#line 172 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -181,7 +181,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 185 "QueryParser.c"
+#line 185 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -1475,20 +1475,20 @@ yyreduce:
   case 7:
 #line 118 "QueryParser.y"
     {
-    (yyval.createTable) = (struct AttsLiteral*) malloc(sizeof (struct AttsLiteral));
-    (yyval.createTable)->name = (yyvsp[(3) - (4)].actualChars);
-    (yyval.createTable)->type = (yyvsp[(4) - (4)].actualChars);
-    (yyval.createTable)->next = (yyvsp[(1) - (4)].createTable);
+    (yyval.myAttsLit) = (struct AttsLiteral*) malloc(sizeof (struct AttsLiteral));
+    (yyval.myAttsLit)->name = (yyvsp[(3) - (4)].actualChars);
+    (yyval.myAttsLit)->type = (yyvsp[(4) - (4)].actualChars);
+    (yyval.myAttsLit)->next = (yyvsp[(1) - (4)].myAttsLit);
 }
     break;
 
   case 8:
 #line 126 "QueryParser.y"
     {
-    (yyval.createTable) = (struct AttsLiteral*) malloc(sizeof (struct AttsLiteral));
-    (yyval.createTable)->name = (yyvsp[(1) - (2)].actualChars);
-    (yyval.createTable)->type = (yyvsp[(2) - (2)].actualChars);
-    (yyval.createTable)->next = NULL;
+    (yyval.myAttsLit) = (struct AttsLiteral*) malloc(sizeof (struct AttsLiteral));
+    (yyval.myAttsLit)->name = (yyvsp[(1) - (2)].actualChars);
+    (yyval.myAttsLit)->type = (yyvsp[(2) - (2)].actualChars);
+    (yyval.myAttsLit)->next = NULL;
 }
     break;
 
@@ -1784,7 +1784,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1788 "QueryParser.c"
+#line 1788 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

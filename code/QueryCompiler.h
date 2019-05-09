@@ -32,6 +32,10 @@ public:
 		FuncOperator* _finalFunction, AndList* _predicate,
 		NameList* _groupingAtts, int& _distinctAtts,
 		QueryExecutionTree& _queryTree);
+    
+    void CreateTable(char* tblName, AttsLiteral* createTable);
+    void LoadData(char* tblName, char* fileName);
+    void CreateIndex(char* indexName, char* tblName, char* attName);
 };
 
 #endif // _QUERY_COMPILER_H
