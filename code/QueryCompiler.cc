@@ -639,6 +639,7 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 }
 
 void QueryCompiler::CreateTable(char* tblName, AttsLiteral* createTable) {
+    string tName = tblName;
     vector<string> attributes;
     vector<string> attributeTypes;
     
@@ -649,11 +650,7 @@ void QueryCompiler::CreateTable(char* tblName, AttsLiteral* createTable) {
         TempTBL = TempTBL->next;
     }
     
-    catalog.CreateTable(tblName, attributes, attributeTypes);
-}
-
-void QueryCompiler::LoadData(char* tblName, char* fileName) {
-    
+    catalog->CreateTable(tName, attributes, attributeTypes);
 }
 
 void QueryCompiler::CreateIndex(char* indexName, char* tblName, char* attName) {

@@ -434,11 +434,14 @@ int main () {
         }
         else if (sqlType == 1) {    // CREATE INDEX
             cout << "CREATE INDEX" << endl;
-            compliler.CreateIndex(IndexName, TableName, AttName);
+            compiler.CreateIndex(IndexName, TableName, AttName);
         }
         else if (sqlType == 2) {    // LOAD DATA
             cout << "LOAD DATA" << endl;
-            compiler.LoadData(TableName, FileName);
+            string tableName = TableName;
+            string tempH = "heap/" + tableName + ".heap";
+            char* heapLoc = &tempH[0u];
+            loadTables(catalog, TableName, heapLoc, FileName);
         }
         else if (sqlType == 3) {    // CREATE TABLE
             cout << "CREATE TABLE" << endl;

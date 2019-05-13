@@ -34,7 +34,6 @@ public:
 		QueryExecutionTree& _queryTree);
     
     void CreateTable(char* tblName, AttsLiteral* createTable);
-    void LoadData(char* tblName, char* fileName);
     void CreateIndex(char* indexName, char* tblName, char* attName);
 };
 
