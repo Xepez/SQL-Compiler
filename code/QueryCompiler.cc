@@ -639,21 +639,36 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
 }
 
 void QueryCompiler::CreateTable(char* tblName, AttsLiteral* createTable) {
-    vector<string> attributes;
+    string tableName = tblName;
+	vector<string> attributes;
     vector<string> attributeTypes;
     
     AttsLiteral* TempTBL = createTable;
     while (TempTBL != NULL) {
-        attributes.push_back(TempTBL->name);
-        attributes.push_back(TempTBL->type);
+		string strName = TempTBL->name;
+        attributes.push_back(strName);
+		string strType = TempTBL->type;
+        attributeTypes.push_back(strType);
+		// cout << strName << endl;
         TempTBL = TempTBL->next;
     }
     
-    catalog.CreateTable(tblName, attributes, attributeTypes);
+    catalog->CreateTable(tableName, attributes, attributeTypes);
 }
 
 void QueryCompiler::LoadData(char* tblName, char* fileName) {
-    
+    string tableName = tblName;
+    Schema s;
+    catalog->GetSchema(tableName, s);
+    DBFile dbF = DBFile();
+    // Open the Heap File
+//    dbF.Open('heap/' + tblName + '.heap');
+    char* loc = "tempNat.heap";
+    dbF.Open(loc);
+    // Load the Data
+    dbF.Load(s, fileName);
+    // Close the Heap File
+    dbF.Close();
 }
 
 void QueryCompiler::CreateIndex(char* indexName, char* tblName, char* attName) {
