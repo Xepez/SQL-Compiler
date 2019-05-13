@@ -106,7 +106,7 @@ SQL: SELECT SelectAtts FROM Tables WHERE AndList
     sqlType = 1;
 }
 
-| LOAD DATA YY_NAME FROM YY_STRING
+| LOAD DATA YY_NAME FROM YY_NAME
 {
     TableName = $3;
     FileName = $5;

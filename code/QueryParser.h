@@ -84,7 +84,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 26 "QueryParser.y"
+#line 29 "QueryParser.y"
 {
  	struct FuncOperand* myOperand;
 	struct FuncOperator* myOperator; 

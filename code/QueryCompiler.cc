@@ -637,24 +637,19 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
     
 	// free the memory occupied by the parse tree since it is not necessary anymore
 }
-<<<<<<< HEAD
 
 void QueryCompiler::CreateTable(char* tblName, AttsLiteral* createTable) {
-    string tableName = tblName;
-	vector<string> attributes;
+    vector<string> attributes;
     vector<string> attributeTypes;
     
     AttsLiteral* TempTBL = createTable;
     while (TempTBL != NULL) {
-		string strName = TempTBL->name;
-        attributes.push_back(strName);
-		string strType = TempTBL->type;
-        attributeTypes.push_back(strType);
-		// cout << strName << endl;
+        attributes.push_back(TempTBL->name);
+        attributes.push_back(TempTBL->type);
         TempTBL = TempTBL->next;
     }
     
-    catalog->CreateTable(tableName, attributes, attributeTypes);
+    catalog.CreateTable(tblName, attributes, attributeTypes);
 }
 
 void QueryCompiler::LoadData(char* tblName, char* fileName) {
@@ -664,5 +659,3 @@ void QueryCompiler::LoadData(char* tblName, char* fileName) {
 void QueryCompiler::CreateIndex(char* indexName, char* tblName, char* attName) {
     
 }
-=======
->>>>>>> parent of e852d6c... added QC stuff
