@@ -637,6 +637,7 @@ void QueryCompiler::Compile(TableList* _tables, NameList* _attsToSelect,
     
 	// free the memory occupied by the parse tree since it is not necessary anymore
 }
+<<<<<<< HEAD
 
 void QueryCompiler::CreateTable(char* tblName, AttsLiteral* createTable) {
     string tableName = tblName;
@@ -663,3 +664,5 @@ void QueryCompiler::LoadData(char* tblName, char* fileName) {
 void QueryCompiler::CreateIndex(char* indexName, char* tblName, char* attName) {
     
 }
+=======
+>>>>>>> parent of e852d6c... added QC stuff

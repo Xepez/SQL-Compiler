@@ -434,15 +434,29 @@ int main () {
         }
         else if (sqlType == 1) {    // CREATE INDEX
             cout << "CREATE INDEX" << endl;
+<<<<<<< HEAD
             compiler.CreateIndex(IndexName, TableName, AttName);
+=======
+>>>>>>> parent of e852d6c... added QC stuff
         }
         else if (sqlType == 2) {    // LOAD DATA
             cout << "LOAD DATA" << endl;
-            compiler.LoadData(TableName, FileName);
         }
         else if (sqlType == 3) {    // CREATE TABLE
             cout << "CREATE TABLE" << endl;
-            compiler.CreateTable(TableName, createTable);
+            
+            string newTblName = TableName;
+            vector<string> attributes;
+            vector<string> attributeTypes;
+            
+            AttsLiteral* TempTBL = createTable;
+            while (TempTBL != NULL) {
+                attributes.push_back(TempTBL->name);
+                attributes.push_back(TempTBL->type);
+                TempTBL = TempTBL->next;
+            }
+            
+            catalog.CreateTable(newTblName, attributes, attributeTypes);
         }
     }
     else { // Load the Data
