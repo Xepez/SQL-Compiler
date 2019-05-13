@@ -657,18 +657,7 @@ void QueryCompiler::CreateTable(char* tblName, AttsLiteral* createTable) {
 }
 
 void QueryCompiler::LoadData(char* tblName, char* fileName) {
-    string tableName = tblName;
-    Schema s;
-    catalog->GetSchema(tableName, s);
-    DBFile dbF = DBFile();
-    // Open the Heap File
-//    dbF.Open('heap/' + tblName + '.heap');
-    char* loc = "tempNat.heap";
-    dbF.Open(loc);
-    // Load the Data
-    dbF.Load(s, fileName);
-    // Close the Heap File
-    dbF.Close();
+    
 }
 
 void QueryCompiler::CreateIndex(char* indexName, char* tblName, char* attName) {

@@ -434,11 +434,10 @@ int main () {
         }
         else if (sqlType == 1) {    // CREATE INDEX
             cout << "CREATE INDEX" << endl;
-            compliler.CreateIndex(IndexName, TableName, AttName);
+            compiler.CreateIndex(IndexName, TableName, AttName);
         }
         else if (sqlType == 2) {    // LOAD DATA
             cout << "LOAD DATA" << endl;
-	    loadTables(catalog, "nation", "tempNat.heap", "tables/nation.tbl");
             compiler.LoadData(TableName, FileName);
         }
         else if (sqlType == 3) {    // CREATE TABLE
