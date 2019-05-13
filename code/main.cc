@@ -438,6 +438,7 @@ int main () {
         }
         else if (sqlType == 2) {    // LOAD DATA
             cout << "LOAD DATA" << endl;
+	    loadTables(catalog, "nation", "tempNat.heap", "tables/nation.tbl");
             compiler.LoadData(TableName, FileName);
         }
         else if (sqlType == 3) {    // CREATE TABLE
