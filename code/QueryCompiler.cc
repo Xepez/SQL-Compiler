@@ -645,8 +645,10 @@ void QueryCompiler::CreateTable(char* tblName, AttsLiteral* createTable) {
     
     AttsLiteral* TempTBL = createTable;
     while (TempTBL != NULL) {
-        attributes.push_back(TempTBL->name);
-        attributes.push_back(TempTBL->type);
+        string n = TempTBL->name;
+        string t = TempTBL->type;
+        attributes.push_back(n);
+        attributeTypes.push_back(t);
         TempTBL = TempTBL->next;
     }
     
